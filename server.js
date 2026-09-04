@@ -1,8 +1,25 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
-
 const app = express();
+
+const FRONTEND_ORIGIN =
+  process.env.FRONTEND_ORIGIN ||
+  'https://tracelabcompiler.netlify.app';
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', FRONTEND_ORIGIN);
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
 const PORT = process.env.PORT || 10000;
 const ONECOMPILER_URL = process.env.ONECOMPILER_URL || 'https://api.onecompiler.org/v1/run';
 const ONECOMPILER_API_KEY = process.env.ONECOMPILER_API_KEY || '';
