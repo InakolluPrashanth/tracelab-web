@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: tracelab-free
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: ONECOMPILER_API_KEY
+        sync: false
