@@ -1,3257 +1,3631 @@
-<!DOCTYPE html>
-
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-
-<meta
-name="viewport"
-content="width=device-width, initial-scale=1.0"
-
->
-
-<meta
-name="description"
-content="TraceLab - Interactive code execution and visualization playground"
-
->
-
-  <title>TraceLab — Code Playground</title>
-
-  <style>
-    :root {
-      --bg: #07111f;
-      --panel: #0d1b2d;
-      --panel-2: #10243a;
-      --border: #20364f;
-      --text: #edf5ff;
-      --muted: #91a5bb;
-      --accent: #60a5fa;
-      --accent-2: #38bdf8;
-      --success: #4ade80;
-      --danger: #fb7185;
-      --radius: 14px;
-      --shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-
-      background:
-        radial-gradient(
-          circle at top right,
-          rgba(56, 189, 248, 0.08),
-          transparent 32%
-        ),
-        radial-gradient(
-          circle at top left,
-          rgba(96, 165, 250, 0.07),
-          transparent 30%
-        ),
-        var(--bg);
-
-      color: var(--text);
-
-      font-family:
-        Inter,
-        ui-sans-serif,
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-    }
-
-    button,
-    select,
-    textarea {
-      font: inherit;
-    }
-
-    button,
-    select {
-      cursor: pointer;
-    }
-
-    .app {
-      width: min(1500px, 96%);
-      margin: 0 auto;
-      padding: 22px 0 40px;
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 20px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 13px;
-    }
-
-    .logo {
-      width: 44px;
-      height: 44px;
-
-      border-radius: 12px;
-
-      display: grid;
-      place-items: center;
-
-      background: linear-gradient(
-        135deg,
-        #2563eb,
-        #06b6d4
-      );
-
-      font-weight: 900;
-      font-size: 20px;
-
-      box-shadow:
-        0 8px 25px rgba(37, 99, 235, 0.25);
-    }
-
-    .brand h1 {
-      margin: 0;
-      font-size: 22px;
-      letter-spacing: -0.5px;
-    }
-
-    .brand p {
-      margin: 2px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .status-dot {
-      width: 9px;
-      height: 9px;
-
-      border-radius: 50%;
-
-      background: var(--success);
-
-      box-shadow:
-        0 0 12px rgba(74, 222, 128, 0.65);
-    }
-
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-
-      padding: 12px;
-      margin-bottom: 16px;
-
-      border: 1px solid var(--border);
-
-      background: rgba(13, 27, 45, 0.88);
-
-      border-radius: var(--radius);
-
-      box-shadow: var(--shadow);
-    }
-
-    select,
-    button {
-      border: 1px solid var(--border);
-
-      border-radius: 9px;
-
-      background: #10243a;
-
-      color: var(--text);
-
-      padding: 9px 13px;
-
-      transition:
-        transform 0.15s ease,
-        border-color 0.15s ease,
-        background 0.15s ease;
-    }
-
-    button:hover,
-    select:hover {
-      border-color: #3c6085;
-      background: #14304c;
-    }
-
-    button:active {
-      transform: translateY(1px);
-    }
-
-    .run-btn {
-      border: none;
-
-      background:
-        linear-gradient(
-          135deg,
-          #2563eb,
-          #0891b2
-        );
-
-      font-weight: 750;
-    }
-
-    .run-btn:hover {
-      background:
-        linear-gradient(
-          135deg,
-          #1d4ed8,
-          #0e7490
-        );
-    }
-
-    .workspace {
-      display: grid;
-
-      grid-template-columns:
-        minmax(0, 1.1fr)
-        minmax(360px, 0.9fr);
-
-      gap: 16px;
-    }
-
-    .panel {
-      min-width: 0;
-
-      border: 1px solid var(--border);
-
-      background:
-        rgba(13, 27, 45, 0.9);
-
-      border-radius: var(--radius);
-
-      box-shadow: var(--shadow);
-
-      overflow: hidden;
-    }
-
-    .panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      gap: 10px;
-
-      padding: 12px 14px;
-
-      border-bottom:
-        1px solid var(--border);
-
-      background:
-        rgba(16, 36, 58, 0.72);
-    }
-
-    .panel-title {
-      font-weight: 750;
-      font-size: 14px;
-    }
-
-    .panel-subtitle {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    #code {
-      display: block;
-
-      width: 100%;
-
-      min-height: 530px;
-
-      resize: vertical;
-
-      border: 0;
-      outline: 0;
-
-      padding: 18px;
-
-      background: #06101d;
-
-      color: #dbeafe;
-
-      font-family:
-        "Cascadia Code",
-        "SFMono-Regular",
-        Consolas,
-        "Liberation Mono",
-        monospace;
-
-      font-size: 14px;
-
-      line-height: 1.65;
-
-      tab-size: 2;
-    }
-
-    #stdin {
-      width: 100%;
-
-      min-height: 100px;
-
-      resize: vertical;
-
-      padding: 13px;
-
-      border: 0;
-      outline: 0;
-
-      background: #071421;
-
-      color: var(--text);
-
-      font-family:
-        "Cascadia Code",
-        "SFMono-Regular",
-        Consolas,
-        monospace;
-    }
-
-    .right {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .flow-panel {
-      padding-bottom: 14px;
-    }
-
-    .flow {
-      position: relative;
-
-      padding: 18px 18px 4px;
-    }
-
-    .flow-line {
-      position: absolute;
-
-      left: 31px;
-
-      top: 30px;
-      bottom: 30px;
-
-      width: 2px;
-
-      background: #20364f;
-    }
-
-    .flow-step {
-      position: relative;
-
-      display: flex;
-
-      align-items: flex-start;
-
-      gap: 13px;
-
-      min-height: 62px;
-    }
-
-    .flow-node {
-      position: relative;
-
-      z-index: 1;
-
-      flex: 0 0 28px;
-
-      width: 28px;
-      height: 28px;
-
-      border-radius: 50%;
-
-      display: grid;
-      place-items: center;
-
-      border: 2px solid #31506f;
-
-      background: #0a1828;
-
-      color: var(--muted);
-
-      font-size: 11px;
-
-      font-weight: 800;
-
-      transition:
-        background 0.2s ease,
-        border-color 0.2s ease,
-        color 0.2s ease,
-        box-shadow 0.2s ease;
-    }
-
-    .flow-content {
-      flex: 1;
-      padding-top: 3px;
-    }
-
-    .flow-label {
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .flow-description {
-      margin-top: 3px;
-
-      color: var(--muted);
-
-      font-size: 12px;
-
-      line-height: 1.45;
-    }
-
-    .flow-step.active .flow-node {
-      background: var(--accent);
-
-      border-color: var(--accent);
-
-      color: #06101d;
-
-      box-shadow:
-        0 0 20px rgba(96, 165, 250, 0.4);
-    }
-
-    .flow-step.active .flow-label {
-      color: #bfdbfe;
-    }
-
-    .flow-step.done .flow-node {
-      background: #123b2a;
-
-      border-color: var(--success);
-
-      color: var(--success);
-    }
-
-    .flow-step.done .flow-label {
-      color: #bbf7d0;
-    }
-
-    .flow-controls {
-      display: flex;
-      gap: 8px;
-
-      padding: 0 18px;
-    }
-
-    #play.playing {
-      border-color: var(--accent);
-      color: #bfdbfe;
-    }
-
-    .output-panel {
-      min-height: 245px;
-    }
-
-    #output {
-      margin: 0;
-
-      min-height: 185px;
-
-      max-height: 320px;
-
-      overflow: auto;
-
-      padding: 15px;
-
-      background: #050d17;
-
-      color: #dbeafe;
-
-      white-space: pre-wrap;
-
-      word-break: break-word;
-
-      font-family:
-        "Cascadia Code",
-        "SFMono-Regular",
-        Consolas,
-        monospace;
-
-      font-size: 13px;
-
-      line-height: 1.55;
-    }
-
-    .output-success {
-      color: #bbf7d0;
-    }
-
-    .output-error {
-      color: #fecdd3;
-    }
-
-    .preview-frame {
-      width: 100%;
-      height: 280px;
-
-      border: 0;
-
-      display: block;
-
-      background: white;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .meta-row {
-      display: flex;
-
-      align-items: center;
-
-      justify-content: space-between;
-
-      padding: 8px 14px;
-
-      color: var(--muted);
-
-      font-size: 11px;
-
-      border-top:
-        1px solid var(--border);
-    }
-
-    .loading {
-      opacity: 0.7;
-      pointer-events: none;
-    }
-
-    .error-box {
-      margin: 12px 14px 0;
-
-      padding: 10px 12px;
-
-      border:
-        1px solid
-        rgba(251, 113, 133, 0.35);
-
-      border-radius: 9px;
-
-      background:
-        rgba(127, 29, 29, 0.18);
-
-      color: #fecdd3;
-
-      font-size: 12px;
-
-      line-height: 1.5;
-    }
-
-    @media (max-width: 980px) {
-      .workspace {
-        grid-template-columns: 1fr;
-      }
-
-      #code {
-        min-height: 400px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .app {
-        width: 94%;
-      }
-
-      header {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .toolbar {
-        align-items: stretch;
-      }
-
-      .toolbar select,
-      .toolbar button {
-        width: 100%;
-      }
-    }
-  </style>
-
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="TraceLab is an interactive code playground with real execution and language-aware step-by-step visualization.">
+<meta name="theme-color" content="#5277f5">
+
+<title>TraceLab | Learn code by watching it run</title>
+
+<style>
+:root{
+  --ink:#18223b;
+  --muted:#6e7890;
+  --line:#e6eaf1;
+  --blue:#5277f5;
+  --mint:#35cba4;
+  --bg:#f8f9fc;
+  --pale:#eff2ff;
+}
+
+*{box-sizing:border-box}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+button,select,textarea{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+.top{
+  height:72px;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 clamp(18px,6vw,88px);
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+
+.brand{
+  font-size:20px;
+  font-weight:800;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.mark{
+  width:32px;
+  height:32px;
+  border-radius:10px;
+  background:var(--blue);
+  color:#fff;
+  font:700 13px monospace;
+  display:grid;
+  place-items:center;
+}
+
+.nav{
+  display:flex;
+  gap:24px;
+  font-size:12px;
+  font-weight:700;
+  color:#737d90;
+}
+
+.nav a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.nav a:hover{
+  color:var(--ink);
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.cta{
+  background:var(--ink);
+  color:#fff;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+  padding:10px 16px;
+  border-radius:8px;
+}
+
+.menu-btn{
+  display:none;
+  background:transparent;
+  font-size:20px;
+  color:var(--ink);
+}
+
+main{
+  max-width:1440px;
+  margin:auto;
+  padding:38px clamp(18px,6vw,88px) 60px;
+}
+
+.hero{
+  padding-top:6px;
+}
+
+.eyebrow{
+  color:#657ed8;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  font-weight:800;
+  font-size:10px;
+}
+
+h1{
+  font-size:clamp(28px,3vw,40px);
+  letter-spacing:-2px;
+  margin:7px 0 8px;
+}
+
+h1 span{
+  color:var(--blue);
+}
+
+.sub{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.workspace{
+  margin-top:29px;
+  display:grid;
+  grid-template-columns:minmax(330px,.94fr) minmax(430px,1.35fr);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 18px 50px #1a29420d;
+}
+
+.editor{
+  min-height:610px;
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+}
+
+.bar{
+  min-height:58px;
+  padding:8px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  gap:10px;
+}
+
+.bar-actions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+
+.file{
+  font:12px monospace;
+  color:#4d5870;
+  white-space:nowrap;
+}
+
+.file i{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  background:#f3c158;
+  border-radius:3px;
+  margin-right:8px;
+}
+
+.lang,
+.speed{
+  appearance:none;
+  border:1px solid var(--line);
+  background:var(--bg);
+  color:var(--ink);
+  border-radius:8px;
+  padding:7px 10px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.lang{
+  min-width:136px;
+}
+
+.detect,
+.server-test{
+  border:1px solid #dce3ff;
+  background:#f6f7ff;
+  color:#526de5;
+  border-radius:7px;
+  padding:7px 9px;
+  font-size:10px;
+  font-weight:800;
+}
+
+.codearea{
+  position:relative;
+  flex:1;
+  background:#fcfcfe;
+  min-height:330px;
+}
+
+.nums{
+  position:absolute;
+  left:0;
+  top:16px;
+  width:40px;
+  text-align:right;
+  color:#adb5c6;
+  font:12px/27px monospace;
+  user-select:none;
+}
+
+.codearea textarea{
+  width:100%;
+  height:100%;
+  min-height:330px;
+  padding:16px 18px 16px 58px;
+  border:0;
+  outline:0;
+  resize:none;
+  background:transparent;
+  color:#2b3852;
+  font:13px/27px monospace;
+}
+
+.runbar{
+  padding:13px 16px;
+  display:flex;
+  gap:9px;
+  border-top:1px solid var(--line);
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.run{
+  background:var(--blue);
+  color:#fff;
+  padding:10px 16px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.run:disabled,
+.server-test:disabled{
+  opacity:.6;
+  cursor:progress;
+}
+
+.reset,
+.circle{
+  background:#f1f3f8;
+  color:#536079;
+  font-weight:800;
+  border-radius:8px;
+}
+
+.reset{
+  padding:10px 13px;
+  font-size:12px;
+}
+
+.saved{
+  margin-left:auto;
+  font-size:11px;
+  color:#9aa3b3;
+  max-width:260px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.server-pill{
+  font:700 10px monospace;
+  white-space:nowrap;
+}
+
+.server-pill.online{
+  color:#15956f;
+}
+
+.server-pill.warning{
+  color:#b07a12;
+}
+
+.server-pill.offline{
+  color:#e35b5b;
+}
+
+.console{
+  min-height:128px;
+  padding:14px 18px;
+  background:#fbfcff;
+  border-top:1px solid var(--line);
+}
+
+.chead{
+  display:flex;
+  justify-content:space-between;
+  color:#929baa;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-size:10px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.ok{
+  color:#28a87f;
+}
+
+.console pre{
+  margin:0;
+  color:#5b6881;
+  font:12px/21px monospace;
+  white-space:pre-wrap;
+}
+
+.preview{
+  display:none;
+  padding:14px 18px;
+  border-top:1px solid var(--line);
+  background:#fbfcff;
+}
+
+.preview iframe{
+  width:100%;
+  height:240px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
+}
+
+#openBrowser{
+  color:#28a87f;
+  border-color:#bfe9d9;
+  background:#f2fbf8;
+}
+
+.visual{
+  min-width:0;
+}
+
+.title{
+  font-size:13px;
+  font-weight:800;
+}
+
+.badge{
+  padding:5px 9px;
+  border-radius:6px;
+  background:var(--pale);
+  color:#5570e9;
+  font-size:10px;
+  font-weight:800;
+}
+
+.stage{
+  height:317px;
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--line);
+  background-image:radial-gradient(#d8deea 1px,transparent 1px);
+  background-size:19px 19px;
+}
+
+.line{
+  position:absolute;
+  left:9%;
+  right:9%;
+  top:156px;
+  height:2px;
+  background:#cdd6eb;
+}
+
+.pulse{
+  position:absolute;
+  left:11%;
+  top:151px;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:var(--blue);
+  box-shadow:0 0 0 7px #5277f523;
+  z-index:2;
+  transition:left .35s ease;
+}
+
+.node{
+  position:absolute;
+  top:125px;
+  transform:translateX(-50%);
+  z-index:1;
+  width:64px;
+  height:64px;
+  border:2px solid #dce1ec;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:#fff;
+  transition:.25s;
+}
+
+.node small{
+  position:absolute;
+  top:74px;
+  white-space:nowrap;
+  color:#6e7890;
+  font-size:10px;
+  font-weight:800;
+}
+
+.node span{
+  font-size:20px;
+}
+
+.node.active{
+  border-color:var(--blue);
+  background:#edf1ff;
+  transform:translateX(-50%) translateY(-8px) scale(1.08);
+  box-shadow:0 10px 25px #5277f538;
+}
+
+.node.done{
+  background:#edfff9;
+  border-color:#8adeca;
+}
+
+.node.done:after{
+  content:"✓";
+  position:absolute;
+  right:-7px;
+  bottom:-7px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--mint);
+  color:#fff;
+  font-size:11px;
+}
+
+.n1{left:11%}
+.n2{left:30%}
+.n3{left:50%}
+.n4{left:70%}
+.n5{left:89%}
+
+.note{
+  position:absolute;
+  bottom:17px;
+  left:25px;
+  right:25px;
+  text-align:center;
+  color:#68738a;
+  font-size:12px;
+}
+
+.note b{
+  color:var(--ink);
+}
+
+.timeline{
+  padding:20px 25px;
+}
+
+.toptime{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.toptime strong{
+  font-size:13px;
+}
+
+.toptime span{
+  color:#8792a8;
+  font:11px monospace;
+}
+
+.tracks{
+  display:flex;
+  gap:9px;
+}
+
+.track{
+  height:6px;
+  flex:1;
+  border-radius:8px;
+  background:#edf0f5;
+}
+
+.track.done{
+  background:#78dfc5;
+}
+
+.track.now{
+  background:var(--blue);
+  box-shadow:0 0 0 4px #5277f51c;
+}
+
+.labels{
+  display:flex;
+  justify-content:space-between;
+  margin-top:7px;
+  color:#9ba4b4;
+  font-size:9px;
+  font-weight:700;
+}
+
+.controls{
+  margin-top:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.circle{
+  width:34px;
+  height:34px;
+  margin-right:6px;
+  font-size:14px;
+}
+
+.play{
+  padding:9px 13px;
+  border-radius:8px;
+  background:var(--blue);
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+}
+
+.playing{
+  background:var(--blue)!important;
+  color:#fff!important;
+}
+
+.lower{
+  display:grid;
+  grid-template-columns:1fr 1fr 1.25fr;
+  gap:18px;
+  margin-top:18px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px 22px;
+}
+
+.tiny{
+  font-size:10px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:#9099aa;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.card p{
+  color:#68738a;
+  font-size:13px;
+  line-height:1.65;
+  margin:0;
+}
+
+.variables{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.var,
+.chip{
+  padding:8px 11px;
+  border-radius:7px;
+  background:#f4f6fb;
+  color:#53617b;
+  font:12px monospace;
+}
+
+.var b{
+  color:#293650;
+}
+
+.logic-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+
+.focus{
+  background:var(--pale);
+  color:#4e69de;
+  padding:8px 10px;
+  border-radius:7px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.logic-code{
+  margin:10px 0 0;
+  background:#fbfcff;
+  border-left:3px solid var(--blue);
+  padding:8px 10px;
+  color:#48556d;
+  font:11px/1.55 monospace;
+  white-space:pre-wrap;
+  max-height:100px;
+  overflow:auto;
+}
+
+.languages{
+  margin-top:16px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.chip{
+  font-size:10px;
+  padding:5px 8px;
+}
+
+.hint{
+  text-align:center;
+  color:#929bac;
+  font-size:12px;
+  margin-top:20px;
+}
+
+.hint b{
+  color:#5570e9;
+}
+
+.steps,
+.capabilities,
+.faq{
+  max-width:1440px;
+  margin:auto;
+  padding:64px clamp(18px,6vw,88px);
+}
+
+.section-head{
+  max-width:560px;
+  margin:0 auto 30px;
+  text-align:center;
+}
+
+.section-head h2{
+  font-size:28px;
+  letter-spacing:-1px;
+  margin:0 0 8px;
+}
+
+.section-head p{
+  color:var(--muted);
+  font-size:14px;
+  margin:0;
+}
+
+.step-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.step,
+.cap-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:24px;
+}
+
+.step .num{
+  display:inline-grid;
+  place-items:center;
+  width:28px;
+  height:28px;
+  border-radius:9px;
+  background:var(--pale);
+  color:#4e69de;
+  font:700 13px monospace;
+  margin-bottom:14px;
+}
+
+.step h3,
+.cap-card h3{
+  margin:0 0 8px;
+  font-size:15px;
+}
+
+.step p,
+.cap-card p,
+.faq-item p{
+  margin:0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
+}
+
+.cap-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+}
+
+.cap-card .badge{
+  display:inline-block;
+}
+
+.faq-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px 40px;
+}
+
+.faq-item h3{
+  margin:0 0 6px;
+  font-size:14px;
+}
+
+.site-footer{
+  border-top:1px solid var(--line);
+  padding:32px clamp(18px,6vw,88px) 40px;
+  max-width:1440px;
+  margin:auto;
+}
+
+.foot-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+}
+
+.foot-links{
+  display:flex;
+  gap:22px;
+  font-size:12px;
+  font-weight:700;
+  color:#737d90;
+}
+
+.foot-links a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.foot-note{
+  margin:18px 0 0;
+  color:#9099aa;
+  font-size:12px;
+}
+
+@media(max-width:1050px){
+  .lower{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .logic{
+    grid-column:span 2;
+  }
+
+  .cap-grid{
+    grid-template-columns:1fr 1fr;
+  }
+}
+
+@media(max-width:860px){
+  .nav{
+    position:absolute;
+    top:72px;
+    left:0;
+    right:0;
+    background:#fff;
+    flex-direction:column;
+    gap:0;
+    border-bottom:1px solid var(--line);
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .25s;
+  }
+
+  .nav.open{
+    max-height:260px;
+  }
+
+  .nav a{
+    padding:14px 22px;
+    width:100%;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+
+  .cta{
+    display:none;
+  }
+
+  .workspace{
+    grid-template-columns:1fr;
+  }
+
+  .editor{
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+
+  .lower{
+    grid-template-columns:1fr;
+  }
+
+  .logic{
+    grid-column:auto;
+  }
+
+  .step-grid,
+  .cap-grid,
+  .faq-grid{
+    grid-template-columns:1fr;
+  }
+}
+
+@media(max-width:560px){
+  .bar{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .bar-actions{
+    width:100%;
+    justify-content:flex-start;
+  }
+
+  .lang{
+    min-width:115px;
+  }
+
+  .saved{
+    display:none;
+  }
+
+  .server-pill{
+    display:none;
+  }
+
+  .stage{
+    height:285px;
+  }
+
+  .node{
+    width:50px;
+    height:50px;
+    top:118px;
+  }
+
+  .node small{
+    top:58px;
+    font-size:9px;
+    white-space:normal;
+    width:60px;
+    text-align:center;
+  }
+
+  .node span{
+    font-size:16px;
+  }
+
+  .line{
+    top:143px;
+  }
+
+  .pulse{
+    top:138px;
+  }
+
+  .tracks{
+    gap:5px;
+  }
+}
+
+@media(prefers-color-scheme:dark){
+  :root{
+    --ink:#edf2ff;
+    --muted:#aeb8cc;
+    --line:#2a3550;
+    --blue:#86a0ff;
+    --mint:#56dbb8;
+    --bg:#0e1423;
+    --pale:#202b4d;
+  }
+
+  body{
+    background:var(--bg);
+    color:var(--ink);
+  }
+
+  .top,
+  .workspace,
+  .card,
+  .node,
+  .step,
+  .cap-card{
+    background:#141c30;
+    border-color:var(--line);
+  }
+
+  .nav{
+    background:#141c30;
+    color:#a9b4ca;
+  }
+
+  .nav a:hover{
+    color:#fff;
+  }
+
+  .editor{
+    border-color:var(--line);
+  }
+
+  .bar,
+  .console,
+  .preview{
+    background:#141c30;
+    border-color:var(--line);
+  }
+
+  .codearea,
+  .console{
+    background:#11182a;
+  }
+
+  .nums{
+    color:#66728c;
+  }
+
+  .codearea textarea{
+    color:#d9e2f6;
+  }
+
+  .reset,
+  .circle{
+    background:#28334c;
+    color:#c7d1e6;
+  }
+
+  .console pre{
+    color:#bdc9df;
+  }
+
+  .stage{
+    background-color:#10182a;
+    background-image:radial-gradient(#34415a 1px,transparent 1px);
+  }
+
+  .line{
+    background:#3a4764;
+  }
+
+  .node{
+    border-color:#40506f;
+  }
+
+  .node.active{
+    background:#26345e;
+    border-color:var(--blue);
+  }
+
+  .node.done{
+    background:#173b37;
+    border-color:#4d9f91;
+  }
+
+  .note{
+    color:#b3bed3;
+  }
+
+  .toptime span,
+  .labels{
+    color:#96a3bd;
+  }
+
+  .track{
+    background:#29344b;
+  }
+
+  .card p,
+  .step p,
+  .cap-card p,
+  .faq-item p{
+    color:#bac5d9;
+  }
+
+  .var,
+  .chip{
+    background:#222d45;
+    color:#c1cbe1;
+  }
+
+  .logic-code{
+    background:#101827;
+    color:#cbd5e8;
+  }
+
+  .focus,
+  .detect,
+  .server-test{
+    background:#222e53;
+    border-color:#40558f;
+    color:#aebdff;
+  }
+
+  .lang,
+  .speed{
+    background:#141c30;
+    color:#edf2ff;
+    border-color:#40506f;
+  }
+
+  .lang option,
+  .speed option{
+    background:#141c30;
+    color:#edf2ff;
+  }
+
+  .badge,
+  .step .num{
+    background:#202b4d;
+    color:#aebdff;
+  }
+
+  .cta{
+    background:#eef2ff;
+    color:#18223b;
+  }
+
+  .foot-links{
+    color:#a9b4ca;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <div class="app">
-
-```
-<header>
-
+<header class="top">
   <div class="brand">
+    <div class="mark">&gt;_</div>
+    TraceLab
+  </div>
 
-    <div class="logo">
-      &gt;_
+  <nav class="nav" id="siteNav">
+    <a href="#playground">Playground</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#capabilities">What runs live</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <div class="top-actions">
+    <a class="cta" href="#playground">Start coding</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="eyebrow">Interactive code playground</div>
+
+  <h1>
+    Don’t just run code.
+    <span>Watch it think.</span>
+  </h1>
+
+  <p class="sub">
+    Write, run, and understand code in 16 supported languages —
+    with real output and a language-aware execution flow.
+  </p>
+</section>
+
+<section class="workspace" id="playground">
+
+<div class="editor">
+
+  <div class="bar">
+    <div class="file">
+      <i></i>
+      <span id="file">main.py</span>
     </div>
 
-    <div>
-      <h1>TraceLab</h1>
+    <div class="bar-actions">
+      <button class="detect" id="detect">✦ Auto-detect</button>
 
+      <button
+        class="detect"
+        id="openBrowser"
+        style="display:none"
+      >
+        ↗ Open in browser
+      </button>
+
+      <select class="lang" id="language" aria-label="Select programming language">
+        <optgroup label="Web">
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+        </optgroup>
+
+        <optgroup label="Popular">
+          <option value="python" selected>Python 3</option>
+          <option value="javascript">JavaScript</option>
+          <option value="typescript">TypeScript</option>
+          <option value="c">C</option>
+          <option value="cpp">C++</option>
+          <option value="java">Java</option>
+          <option value="go">Go</option>
+        </optgroup>
+
+        <optgroup label="Modern & mobile">
+          <option value="kotlin">Kotlin</option>
+          <option value="swift">Swift</option>
+        </optgroup>
+
+        <optgroup label="Scripting & data">
+          <option value="ruby">Ruby</option>
+          <option value="php">PHP</option>
+          <option value="perl">Perl</option>
+          <option value="bash">Bash</option>
+          <option value="sql">SQL</option>
+        </optgroup>
+      </select>
+    </div>
+  </div>
+
+  <div class="codearea">
+    <div class="nums" id="nums"></div>
+    <textarea
+      id="code"
+      spellcheck="false"
+      aria-label="Code editor"
+    ></textarea>
+  </div>
+
+  <div class="runbar">
+    <button class="run" id="run">▶ Analyze & run</button>
+
+    <button class="reset" id="reset">↻ Reset</button>
+
+    <span class="saved" id="modeStatus">
+      Python runs locally in your browser
+    </span>
+
+    <button class="server-test" id="serverTest" type="button">
+      Test backend
+    </button>
+
+    <span class="server-pill" id="serverStatus">
+      ● Checking backend…
+    </span>
+  </div>
+
+  <div class="console">
+    <div class="chead">
+      <span>Output</span>
+      <span class="ok" id="status">● Ready</span>
+    </div>
+
+    <pre id="output">
+Choose a language and run the example.
+    </pre>
+  </div>
+
+  <div class="preview" id="previewWrap">
+    <div class="chead">
+      <span>Live preview</span>
+      <span>Sandboxed browser preview</span>
+    </div>
+
+    <iframe
+      id="previewFrame"
+      title="Live preview"
+      sandbox="allow-scripts"
+    ></iframe>
+  </div>
+
+</div>
+
+<div class="visual">
+
+  <div class="bar">
+    <span class="title">Program flow</span>
+    <span class="badge" id="badge">Step 1 of 5</span>
+  </div>
+
+  <div class="stage">
+
+    <div class="line"></div>
+
+    <div class="pulse" id="pulse"></div>
+
+    <div class="node n1 active">
+      <small>Start</small>
+      <span>⚡</span>
+    </div>
+
+    <div class="node n2">
+      <small>Setup</small>
+      <span>📦</span>
+    </div>
+
+    <div class="node n3">
+      <small>Logic</small>
+      <span>↻</span>
+    </div>
+
+    <div class="node n4">
+      <small>Update</small>
+      <span>＋</span>
+    </div>
+
+    <div class="node n5">
+      <small>Output</small>
+      <span>⌁</span>
+    </div>
+
+    <p class="note" id="note">
+      <b>Start</b> — execution enters the program.
+    </p>
+  </div>
+
+  <div class="timeline">
+
+    <div class="toptime">
+      <strong id="stepname">Start program</strong>
+      <span id="lineref">line 1</span>
+    </div>
+
+    <div class="tracks" id="tracks">
+      <i class="track now"></i>
+      <i class="track"></i>
+      <i class="track"></i>
+      <i class="track"></i>
+      <i class="track"></i>
+    </div>
+
+    <div class="labels" id="labels">
+      <span>Start</span>
+      <span>Setup</span>
+      <span>Logic</span>
+      <span>Update</span>
+      <span>Output</span>
+    </div>
+
+    <div class="controls">
+
+      <div>
+        <button class="circle" id="prev" aria-label="Previous step">←</button>
+
+        <button class="circle" id="next" aria-label="Next step">→</button>
+
+        <button class="play" id="play">
+          ▶ Play flow
+        </button>
+      </div>
+
+      <select class="speed" id="speed">
+        <option value="1400">1× speed</option>
+        <option value="800">1.5× speed</option>
+        <option value="500">2× speed</option>
+      </select>
+
+    </div>
+
+  </div>
+
+</div>
+
+</section>
+
+<section class="lower">
+
+  <div class="card">
+    <div class="tiny">What’s happening now</div>
+    <p id="insight">
+      <strong>Execution begins.</strong>
+      Select a language, then run the code.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="tiny">Live variables</div>
+    <div class="variables" id="vars"></div>
+  </div>
+
+  <div class="card logic">
+
+    <div class="logic-top">
+      <div class="tiny" style="margin:0">
+        Main logic finder
+      </div>
+
+      <button class="focus" id="focus">
+        ⌘ Explain main logic
+      </button>
+    </div>
+
+    <p id="logicSummary">
+      TraceLab finds loops, decisions, functions, and entry points in your code.
+    </p>
+
+    <pre class="logic-code" id="logicCode">
+Run this view on any pasted code.
+    </pre>
+
+  </div>
+
+</section>
+
+<div class="languages">
+  <span class="tiny" style="margin:0 4px 0 0">16 supported</span>
+  <span class="chip">HTML / CSS</span>
+  <span class="chip">Python</span>
+  <span class="chip">JavaScript</span>
+  <span class="chip">TypeScript</span>
+  <span class="chip">C / C++</span>
+  <span class="chip">Java / Go</span>
+  <span class="chip">Kotlin / Swift</span>
+  <span class="chip">Ruby / PHP</span>
+  <span class="chip">Perl / Bash</span>
+  <span class="chip">SQL</span>
+</div>
+
+<p class="hint">
+  Use ← → to inspect the flow, or Play flow to animate it.
+</p>
+
+</main>
+
+<section class="steps" id="how-it-works">
+
+  <div class="section-head">
+    <h2>How it works</h2>
+    <p>
+      Write code, select a language, execute it for real,
+      then inspect the language-specific flow.
+    </p>
+  </div>
+
+  <div class="step-grid">
+
+    <div class="step">
+      <span class="num">1</span>
+      <h3>Write or paste code</h3>
+      <p>Use the built-in example or replace it with your own code.</p>
+    </div>
+
+    <div class="step">
+      <span class="num">2</span>
+      <h3>Choose a language</h3>
       <p>
-        Execute real code. Understand the execution flow.
+        TraceLab supports 16 languages with browser or hosted
+        execution depending on the language.
+      </p>
+    </div>
+
+    <div class="step">
+      <span class="num">3</span>
+      <h3>Run it</h3>
+      <p>
+        Execution uses real runtimes. The visualization is educational
+        and never replaces actual compiler output.
       </p>
     </div>
 
   </div>
 
-  <div class="status">
+</section>
 
-    <span class="status-dot"></span>
+<section class="capabilities" id="capabilities">
 
-    <span id="backendStatus">
-      Checking backend...
-    </span>
+  <div class="section-head">
+    <h2>What actually runs</h2>
+    <p>TraceLab keeps the execution path explicit.</p>
+  </div>
+
+  <div class="cap-grid">
+
+    <div class="cap-card">
+      <span class="badge">Browser</span>
+      <h3>Python</h3>
+      <p>Runs locally with Pyodide.</p>
+    </div>
+
+    <div class="cap-card">
+      <span class="badge">Browser</span>
+      <h3>JavaScript</h3>
+      <p>Runs in a sandboxed iframe.</p>
+    </div>
+
+    <div class="cap-card">
+      <span class="badge">Browser</span>
+      <h3>HTML &amp; CSS</h3>
+      <p>Rendered in a sandboxed preview.</p>
+    </div>
+
+    <div class="cap-card">
+      <span class="badge">Hosted</span>
+      <h3>12 more runtimes</h3>
+      <p>
+        TypeScript, C, C++, Java, Go, Kotlin, Swift,
+        Ruby, PHP, Perl, Bash, and SQL.
+      </p>
+    </div>
 
   </div>
 
-</header>
+</section>
 
+<section class="faq" id="faq">
 
-<!-- TOOLBAR -->
+  <div class="section-head">
+    <h2>FAQ</h2>
+  </div>
 
-<div class="toolbar">
+  <div class="faq-grid">
 
-  <select
-    id="language"
-    aria-label="Programming language"
-  >
-
-    <option value="html">
-      HTML
-    </option>
-
-    <option value="css">
-      CSS
-    </option>
-
-    <option value="python" selected>
-      Python 3
-    </option>
-
-    <option value="javascript">
-      JavaScript
-    </option>
-
-    <option value="typescript">
-      TypeScript
-    </option>
-
-    <option value="c">
-      C
-    </option>
-
-    <option value="cpp">
-      C++
-    </option>
-
-    <option value="java">
-      Java
-    </option>
-
-    <option value="go">
-      Go
-    </option>
-
-    <option value="kotlin">
-      Kotlin
-    </option>
-
-    <option value="swift">
-      Swift
-    </option>
-
-    <option value="ruby">
-      Ruby
-    </option>
-
-    <option value="php">
-      PHP
-    </option>
-
-    <option value="perl">
-      Perl
-    </option>
-
-    <option value="bash">
-      Bash
-    </option>
-
-    <option value="sql">
-      SQL / SQLite
-    </option>
-
-  </select>
-
-
-  <button
-    id="run"
-    class="run-btn"
-  >
-    ▶ Run
-  </button>
-
-
-  <button id="reset">
-    ↻ Reset flow
-  </button>
-
-
-  <button
-    id="clearOutput"
-    class="danger-btn"
-  >
-    Clear output
-  </button>
-
-</div>
-
-
-<!-- MAIN WORKSPACE -->
-
-<div class="workspace">
-
-
-  <!-- CODE EDITOR -->
-
-  <section class="panel">
-
-    <div class="panel-header">
-
-      <div>
-
-        <div class="panel-title">
-          Code
-        </div>
-
-        <div
-          class="panel-subtitle"
-          id="editorLanguage"
-        >
-          Python 3
-        </div>
-
-      </div>
-
+    <div class="faq-item">
+      <h3>Is the output real?</h3>
+      <p>
+        Yes. Python and JavaScript execute in the browser;
+        the other executable languages are sent to the TraceLab
+        backend and then to the configured execution provider.
+      </p>
     </div>
 
-
-    <textarea
-      id="code"
-      spellcheck="false"
-      autocomplete="off"
-      autocorrect="off"
-      autocapitalize="off"
-    ></textarea>
-
-
-    <!-- STDIN -->
-
-    <div id="stdinPanel">
-
-      <div class="panel-header">
-
-        <div>
-
-          <div class="panel-title">
-            Standard Input
-          </div>
-
-          <div class="panel-subtitle">
-            Used by languages that read from stdin
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <textarea
-        id="stdin"
-        spellcheck="false"
-        placeholder="Optional input..."
-      ></textarea>
-
+    <div class="faq-item">
+      <h3>Is the API key public?</h3>
+      <p>
+        No. The OneCompiler key belongs only in the Render environment,
+        never in this HTML file.
+      </p>
     </div>
 
-
-    <div class="meta-row">
-
-      <span id="charCount">
-        0 characters
-      </span>
-
-      <span>
-        TraceLab
-      </span>
-
+    <div class="faq-item">
+      <h3>Can I publish the site?</h3>
+      <p>
+        Yes. Netlify can host the frontend publicly while
+        Render hosts the Node backend.
+      </p>
     </div>
 
-  </section>
-
-
-  <!-- RIGHT SIDE -->
-
-  <section class="right">
-
-
-    <!-- EXECUTION FLOW -->
-
-    <section class="panel flow-panel">
-
-      <div class="panel-header">
-
-        <div>
-
-          <div class="panel-title">
-            Execution Flow
-          </div>
-
-          <div
-            class="panel-subtitle"
-            id="flowLanguage"
-          >
-            Python
-          </div>
-
-        </div>
-
-
-        <div
-          class="panel-subtitle"
-          id="flowCounter"
-        >
-          Step 1 / 5
-        </div>
-
-      </div>
-
-
-      <div
-        id="flow"
-        class="flow"
-      ></div>
-
-
-      <div class="flow-controls">
-
-        <button id="play">
-          ▶ Play flow
-        </button>
-
-        <button id="prev">
-          ← Previous
-        </button>
-
-        <button id="next">
-          Next →
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- OUTPUT -->
-
-    <section
-      class="panel output-panel"
-    >
-
-      <div class="panel-header">
-
-        <div>
-
-          <div class="panel-title">
-            Output
-          </div>
-
-          <div
-            class="panel-subtitle"
-            id="outputStatus"
-          >
-            Ready
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="errorBox"
-        class="error-box hidden"
-      ></div>
-
-
-      <pre id="output">Run your code to see the real output.</pre>
-
-    </section>
-
-
-    <!-- BROWSER PREVIEW -->
-
-    <section
-      id="previewPanel"
-      class="panel hidden"
-    >
-
-      <div class="panel-header">
-
-        <div>
-
-          <div class="panel-title">
-            Browser Preview
-          </div>
-
-          <div class="panel-subtitle">
-            Sandboxed browser execution
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <iframe
-        id="preview"
-        class="preview-frame"
-        sandbox="allow-scripts"
-        title="TraceLab browser preview"
-      ></iframe>
-
-    </section>
-
-  </section>
-
-</div>
-```
+    <div class="faq-item">
+      <h3>Is the flow a debugger?</h3>
+      <p>
+        No. It is a language-aware educational visualization.
+        Compiler/interpreter output remains the source of truth.
+      </p>
+    </div>
 
   </div>
 
-  <!-- PYODIDE -->
+</section>
 
-  <script
-    src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"
-  ></script>
+<footer class="site-footer">
 
-  <script>
-    "use strict";
+  <div class="foot-top">
 
+    <div class="brand">
+      <div class="mark">&gt;_</div>
+      TraceLab
+    </div>
 
-    /*
-    ============================================================
-    BACKEND CONFIGURATION
-    ============================================================
-    */
+    <nav class="foot-links">
+      <a href="#playground">Playground</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#faq">FAQ</a>
+    </nav>
 
-    const BACKEND_URL =
-      "https://tracelab-free.onrender.com";
+  </div>
 
-    const EXECUTE_URL =
-      BACKEND_URL + "/api/execute";
+  <p class="foot-note">
+    TraceLab · real execution + educational flow visualization ·
+    © <span id="year"></span>
+  </p>
 
-    const HEALTH_URL =
-      BACKEND_URL + "/api/health";
+</footer>
 
-    const DIAGNOSTICS_URL =
-      BACKEND_URL + "/api/diagnostics";
+<script>
+"use strict";
 
+/* =========================================================
+   BACKEND CONFIG
+   ========================================================= */
 
-    /*
-    ============================================================
-    DOM ELEMENTS
-    ============================================================
-    */
+const BACKEND_URL = "https://tracelab-free.onrender.com";
 
-    const languageSelect =
-      document.querySelector("#language");
+const EXECUTE_URL =
+  BACKEND_URL + "/api/execute";
 
-    const codeEditor =
-      document.querySelector("#code");
+const HEALTH_URL =
+  BACKEND_URL + "/api/health";
 
-    const stdinEditor =
-      document.querySelector("#stdin");
+const DIAGNOSTICS_URL =
+  BACKEND_URL + "/api/diagnostics";
 
-    const runButton =
-      document.querySelector("#run");
 
-    const resetButton =
-      document.querySelector("#reset");
+/* =========================================================
+   DOM HELPERS
+   ========================================================= */
 
-    const clearOutputButton =
-      document.querySelector("#clearOutput");
+const $ = (selector) =>
+  document.querySelector(selector);
 
-    const playButton =
-      document.querySelector("#play");
+const nodes =
+  [...document.querySelectorAll(".node")];
 
-    const prevButton =
-      document.querySelector("#prev");
 
-    const nextButton =
-      document.querySelector("#next");
+/* =========================================================
+   DEFAULT EXAMPLES
+   ========================================================= */
 
-    const flowElement =
-      document.querySelector("#flow");
+const codes = {
 
-    const flowCounter =
-      document.querySelector("#flowCounter");
-
-    const flowLanguage =
-      document.querySelector("#flowLanguage");
-
-    const outputElement =
-      document.querySelector("#output");
-
-    const outputStatus =
-      document.querySelector("#outputStatus");
-
-    const errorBox =
-      document.querySelector("#errorBox");
-
-    const previewPanel =
-      document.querySelector("#previewPanel");
-
-    const previewFrame =
-      document.querySelector("#preview");
-
-    const backendStatus =
-      document.querySelector("#backendStatus");
-
-    const editorLanguage =
-      document.querySelector("#editorLanguage");
-
-    const charCount =
-      document.querySelector("#charCount");
-
-
-    /*
-    ============================================================
-    LANGUAGE-AWARE EXECUTION FLOWS
-    ============================================================
-    */
-
-    const flowDefinitions = {
-
-      html: [
-
-        {
-          label: "Parse HTML",
-
-          description:
-            "The browser reads the HTML source and identifies its elements."
-        },
-
-        {
-          label: "Build DOM",
-
-          description:
-            "HTML elements are converted into the document object model."
-        },
-
-        {
-          label: "Resolve content",
-
-          description:
-            "Text, attributes, resources, and document content are resolved."
-        },
-
-        {
-          label: "Layout page",
-
-          description:
-            "The browser calculates where elements should appear."
-        },
-
-        {
-          label: "Render",
-
-          description:
-            "The final page is rendered inside the sandboxed preview."
-        }
-
-      ],
-
-
-      css: [
-
-        {
-          label: "Parse CSS",
-
-          description:
-            "The browser reads the stylesheet and builds CSS rules."
-        },
-
-        {
-          label: "Match selectors",
-
-          description:
-            "Selectors are matched against elements in the document."
-        },
-
-        {
-          label: "Cascade",
-
-          description:
-            "Specificity, inheritance, and source order determine styles."
-        },
-
-        {
-          label: "Layout",
-
-          description:
-            "The browser calculates the geometry of styled elements."
-        },
-
-        {
-          label: "Paint",
-
-          description:
-            "The styled page is painted into the browser preview."
-        }
-
-      ],
-
-
-      python: [
-
-        {
-          label: "Start program",
-
-          description:
-            "Python begins executing the submitted program."
-        },
-
-        {
-          label: "Create variables",
-
-          description:
-            "Variables and their initial values are created."
-        },
-
-        {
-          label: "Enter loop",
-
-          description:
-            "Control flow enters the loop or repeated execution section."
-        },
-
-        {
-          label: "Update total",
-
-          description:
-            "The program updates its running value."
-        },
-
-        {
-          label: "Show result",
-
-          description:
-            "The final result is written to standard output."
-        }
-
-      ],
-
-
-      javascript: [
-
-        {
-          label: "Parse script",
-
-          description:
-            "JavaScript source is parsed before execution."
-        },
-
-        {
-          label: "Create bindings",
-
-          description:
-            "Variables, functions, and other bindings become available."
-        },
-
-        {
-          label: "Run loop",
-
-          description:
-            "The JavaScript execution flow processes the program."
-        },
-
-        {
-          label: "Update total",
-
-          description:
-            "The program modifies its running value."
-        },
-
-        {
-          label: "Console output",
-
-          description:
-            "Console messages are captured and displayed."
-        }
-
-      ],
-
-
-      typescript: [
-
-        {
-          label: "Parse TypeScript",
-
-          description:
-            "The TypeScript source is parsed."
-        },
-
-        {
-          label: "Create typed values",
-
-          description:
-            "Typed variables and functions are prepared by the compiler."
-        },
-
-        {
-          label: "Reduce values",
-
-          description:
-            "The program processes its values."
-        },
-
-        {
-          label: "Compute total",
-
-          description:
-            "The program calculates its final value."
-        },
-
-        {
-          label: "Console output",
-
-          description:
-            "The resulting output is displayed."
-        }
-
-      ]
-
-    };
-
-
-    /*
-    ============================================================
-    HOSTED LANGUAGE FLOW
-    ============================================================
-    */
-
-    const hostedFlow = [
-
-      {
-        label: "Start program",
-
-        description:
-          "TraceLab prepares the submitted source for execution."
-      },
-
-      {
-        label: "Prepare source",
-
-        description:
-          "The source file and standard input are sent to the execution service."
-      },
-
-      {
-        label: "Compile / interpret",
-
-        description:
-          "The selected compiler or interpreter processes the source."
-      },
-
-      {
-        label: "Execute",
-
-        description:
-          "The resulting program executes in the remote runtime."
-      },
-
-      {
-        label: "Show result",
-
-        description:
-          "Standard output and execution errors are returned to TraceLab."
-      }
-
-    ];
-
-
-    function getFlow(language) {
-
-      return (
-        flowDefinitions[language] ||
-        hostedFlow
-      );
-
-    }
-
-
-    /*
-    ============================================================
-    FLOW STATE
-    ============================================================
-    */
-
-    let activeFlow =
-      flowDefinitions.python;
-
-    let step = 0;
-
-    let timer = null;
-
-    /*
-      Changes whenever the active flow changes.
-
-      Old timers keep their old generation number and
-      therefore cannot continue after a language change.
-    */
-    let flowGeneration = 0;
-
-
-    /*
-      Changes whenever a new execution begins or language changes.
-
-      This prevents old execution responses from modifying
-      the UI after the user has switched language/run again.
-    */
-    let executionGeneration = 0;
-
-
-    /*
-    ============================================================
-    STOP FLOW
-    ============================================================
-    */
-
-    function stopFlow() {
-
-      if (timer !== null) {
-
-        clearInterval(timer);
-
-        timer = null;
-
-      }
-
-      playButton.textContent =
-        "▶ Play flow";
-
-      playButton.classList.remove(
-        "playing"
-      );
-
-    }
-
-
-    /*
-    ============================================================
-    RESET FLOW
-    ============================================================
-    */
-
-    function resetFlow() {
-
-      flowGeneration++;
-
-      stopFlow();
-
-      activeFlow =
-        getFlow(languageSelect.value);
-
-      step = 0;
-
-      renderFlow();
-
-    }
-
-
-    /*
-    ============================================================
-    RENDER FLOW
-    ============================================================
-    */
-
-    function renderFlow() {
-
-      flowElement.innerHTML = "";
-
-
-      const line =
-        document.createElement("div");
-
-      line.className = "flow-line";
-
-      flowElement.appendChild(line);
-
-
-      activeFlow.forEach(
-        (item, index) => {
-
-          const row =
-            document.createElement("div");
-
-          row.className =
-            "flow-step";
-
-
-          if (index < step) {
-
-            row.classList.add("done");
-
-          }
-
-
-          if (index === step) {
-
-            row.classList.add("active");
-
-          }
-
-
-          const node =
-            document.createElement("div");
-
-          node.className =
-            "flow-node";
-
-
-          node.textContent =
-            index < step
-              ? "✓"
-              : index + 1;
-
-
-          const content =
-            document.createElement("div");
-
-          content.className =
-            "flow-content";
-
-
-          const label =
-            document.createElement("div");
-
-          label.className =
-            "flow-label";
-
-          label.textContent =
-            item.label;
-
-
-          const description =
-            document.createElement("div");
-
-          description.className =
-            "flow-description";
-
-          description.textContent =
-            item.description;
-
-
-          content.appendChild(label);
-
-          content.appendChild(
-            description
-          );
-
-
-          row.appendChild(node);
-
-          row.appendChild(content);
-
-
-          flowElement.appendChild(row);
-
-        }
-      );
-
-
-      flowCounter.textContent =
-        "Step " +
-        (step + 1) +
-        " / " +
-        activeFlow.length;
-
-
-      flowLanguage.textContent =
-        languageSelect.options[
-          languageSelect.selectedIndex
-        ].text;
-
-    }
-
-
-    /*
-    ============================================================
-    NEXT STEP
-    ============================================================
-    */
-
-    function nextFlowStep() {
-
-      if (
-        step >=
-        activeFlow.length - 1
-      ) {
-
-        stopFlow();
-
-        return;
-
-      }
-
-
-      step++;
-
-      renderFlow();
-
-    }
-
-
-    /*
-    ============================================================
-    PREVIOUS STEP
-    ============================================================
-    */
-
-    function previousFlowStep() {
-
-      if (step <= 0) {
-
-        return;
-
-      }
-
-
-      step--;
-
-      renderFlow();
-
-    }
-
-
-    /*
-    ============================================================
-    PLAY FLOW
-    ============================================================
-    */
-
-    function playFlow() {
-
-      /*
-        If currently playing, pause it.
-      */
-      if (timer !== null) {
-
-        stopFlow();
-
-        return;
-
-      }
-
-
-      /*
-        If already at the final step,
-        start from the beginning.
-      */
-      if (
-        step >=
-        activeFlow.length - 1
-      ) {
-
-        step = 0;
-
-        renderFlow();
-
-      }
-
-
-      /*
-        Capture the current generation.
-
-        If the language changes later,
-        this timer becomes stale.
-      */
-      const generation =
-        flowGeneration;
-
-
-      playButton.textContent =
-        "⏸ Pause flow";
-
-      playButton.classList.add(
-        "playing"
-      );
-
-
-      timer = setInterval(
-        () => {
-
-          /*
-            CRITICAL PROTECTION:
-
-            If the language changed,
-            immediately stop this timer.
-          */
-          if (
-            generation !==
-            flowGeneration
-          ) {
-
-            stopFlow();
-
-            return;
-
-          }
-
-
-          if (
-            step >=
-            activeFlow.length - 1
-          ) {
-
-            stopFlow();
-
-            return;
-
-          }
-
-
-          step++;
-
-          renderFlow();
-
-        },
-
-        900
-      );
-
-    }
-
-
-    /*
-    ============================================================
-    EXAMPLE CODE
-    ============================================================
-    */
-
-    const examples = {
-
-
-      html:
-`<!DOCTYPE html>
+  html: [
+    "index.html",
+`<!doctype html>
 <html>
 <head>
   <title>TraceLab</title>
 </head>
-
 <body>
-  <h1>Hello TraceLab!</h1>
-
-  <p>
-    This page is rendered in a sandbox.
-  </p>
+  <h1>Hello, world!</h1>
+  <p>Edit this HTML and run it.</p>
 </body>
-</html>`,
+</html>`
+  ],
 
-
-      css:
+  css: [
+    "style.css",
 `body {
-  font-family: Arial, sans-serif;
-  padding: 30px;
-  background: #eef6ff;
+  font-family: sans-serif;
+  background: #f4f6fb;
 }
 
 h1 {
-  color: #2563eb;
-}`,
+  color: #5277f5;
+}
 
+button {
+  background: #5277f5;
+  color: white;
+  border: 0;
+  padding: 8px 14px;
+}`
+  ],
 
-      python:
-`numbers = [1, 2, 3, 4, 5]
-
+  python: [
+    "main.py",
+`numbers = [3, 7, 2, 9]
 total = 0
 
 for number in numbers:
     total += number
 
-print("Total:", total)`,
+print(total)`
+  ],
 
-
-      javascript:
-`const numbers = [1, 2, 3, 4, 5];
-
+  javascript: [
+    "main.js",
+`const numbers = [3, 7, 2, 9];
 let total = 0;
 
 for (const number of numbers) {
   total += number;
 }
 
-console.log("Total:", total);`,
+console.log(total);`
+  ],
 
+  typescript: [
+    "main.ts",
+`const numbers: number[] = [3, 7, 2, 9];
+const total = numbers.reduce(
+  (sum, n) => sum + n,
+  0
+);
+console.log(total);`
+  ],
 
-      typescript:
-`const numbers: number[] = [1, 2, 3, 4, 5];
-
-let total: number = 0;
-
-for (const number of numbers) {
-  total += number;
-}
-
-console.log("Total:", total);`,
-
-
-      c:
+  c: [
+    "main.c",
 `#include <stdio.h>
 
-int main() {
-
+int main(void) {
+    int numbers[] = {3, 7, 2, 9};
     int total = 0;
 
-    for (int i = 1; i <= 5; i++) {
-        total += i;
+    for (int i = 0; i < 4; i++) {
+        total += numbers[i];
     }
 
-    printf("Total: %d\\n", total);
-
+    printf("%d\\n", total);
     return 0;
-}`,
+}`
+  ],
 
-
-      cpp:
+  cpp: [
+    "main.cpp",
 `#include <iostream>
 
-using namespace std;
-
 int main() {
-
+    int numbers[] = {3, 7, 2, 9};
     int total = 0;
 
-    for (int i = 1; i <= 5; i++) {
-        total += i;
+    for (int number : numbers) {
+        total += number;
     }
 
-    cout << "Total: "
-         << total
-         << endl;
-
+    std::cout << total << "\\n";
     return 0;
-}`,
+}`
+  ],
 
+  java: [
+    "Main.java",
+`class Main {
+  public static void main(String[] args) {
+    int[] numbers = {3, 7, 2, 9};
+    int total = 0;
 
-      java:
-`public class Main {
-
-    public static void main(
-        String[] args
-    ) {
-
-        int total = 0;
-
-        for (
-            int i = 1;
-            i <= 5;
-            i++
-        ) {
-
-            total += i;
-
-        }
-
-        System.out.println(
-            "Total: " + total
-        );
+    for (int number : numbers) {
+      total += number;
     }
-}`,
 
+    System.out.println(total);
+  }
+}`
+  ],
 
-      go:
+  go: [
+    "main.go",
 `package main
 
 import "fmt"
 
 func main() {
+  numbers := []int{3, 7, 2, 9}
+  total := 0
 
-    total := 0
-
-    for i := 1; i <= 5; i++ {
-
-        total += i
-
-    }
-
-    fmt.Println(
-        "Total:",
-        total
-    )
-}`,
-
-
-      kotlin:
-`fun main() {
-
-    var total = 0
-
-    for (i in 1..5) {
-
-        total += i
-
-    }
-
-    println("Total: $total")
-}`,
-
-
-      swift:
-`var total = 0
-
-for number in 1...5 {
-
+  for _, number := range numbers {
     total += number
+  }
 
+  fmt.Println(total)
+}`
+  ],
+
+  kotlin: [
+    "Main.kt",
+`fun main() {
+  val numbers = intArrayOf(3, 7, 2, 9)
+  var total = 0
+
+  for (number in numbers) {
+    total += number
+  }
+
+  println(total)
+}`
+  ],
+
+  swift: [
+    "main.swift",
+`let numbers = [3, 7, 2, 9]
+var total = 0
+
+for number in numbers {
+    total += number
 }
 
-print("Total:", total)`,
+print(total)`
+  ],
 
+  ruby: [
+    "main.rb",
+`numbers = [3, 7, 2, 9]
+total = 0
 
-      ruby:
-`total = 0
-
-(1..5).each do |number|
-
+numbers.each do |number|
   total += number
-
 end
 
-puts "Total: #{total}"`,
+puts total`
+  ],
 
-
-      php:
+  php: [
+    "main.php",
 `<?php
-
+$numbers = [3, 7, 2, 9];
 $total = 0;
 
-for (
-    $i = 1;
-    $i <= 5;
-    $i++
-) {
-
-    $total += $i;
-
-}
-
-echo "Total: " . $total;
-
-?>`,
-
-
-      perl:
-`my $total = 0;
-
-for my $number (1..5) {
-
+foreach ($numbers as $number) {
     $total += $number;
-
 }
 
-print "Total: $total\\n";`,
+echo $total, PHP_EOL;`
+  ],
 
+  perl: [
+    "main.pl",
+`my @numbers = (3, 7, 2, 9);
+my $total = 0;
 
-      bash:
+for my $number (@numbers) {
+    $total += $number;
+}
+
+print "$total\\n";`
+  ],
+
+  bash: [
+    "main.sh",
 `total=0
 
-for number in 1 2 3 4 5
-do
-
+for number in 3 7 2 9; do
   total=$((total + number))
-
 done
 
-echo "Total: $total"`,
+echo "$total"`
+  ],
+
+  sql: [
+    "main.sql",
+`SELECT 3 + 7 + 2 + 9 AS total;`
+  ]
+};
 
 
-      sql:
-`CREATE TABLE numbers (
-  value INTEGER
-);
+/* =========================================================
+   LANGUAGE-SPECIFIC FLOW DEFINITIONS
+   ========================================================= */
 
-INSERT INTO numbers VALUES
-  (1),
-  (2),
-  (3),
-  (4),
-  (5);
+const flowDefinitions = {
 
-SELECT SUM(value) AS total
-FROM numbers;`
+  html: [
+    [
+      "Parse HTML",
+      "HTML",
+      "The browser parses the document structure.",
+      "The HTML parser turns tags into a document tree.",
+      '<span class="var"><b>DOM</b> = document tree</span>'
+    ],
+    [
+      "Build DOM",
+      "elements",
+      "Elements become nodes in the DOM.",
+      "The browser creates parent and child relationships.",
+      '<span class="var"><b>nodes</b> = HTML elements</span>'
+    ],
+    [
+      "Resolve content",
+      "body",
+      "Text and attributes are attached to elements.",
+      "The browser prepares the page content for rendering.",
+      '<span class="var"><b>content</b> = page elements</span>'
+    ],
+    [
+      "Layout page",
+      "render tree",
+      "The browser calculates where elements belong.",
+      "Layout determines positions and dimensions.",
+      '<span class="var"><b>layout</b> = calculated</span>'
+    ],
+    [
+      "Render",
+      "browser",
+      "The page becomes visible.",
+      "The browser paints the final result.",
+      '<span class="var"><b>status</b> = rendered</span>'
+    ]
+  ],
 
-    };
+  css: [
+    [
+      "Parse CSS",
+      "stylesheet",
+      "The browser parses CSS rules.",
+      "Selectors and declarations are read.",
+      '<span class="var"><b>rules</b> = parsed</span>'
+    ],
+    [
+      "Match selectors",
+      "selectors",
+      "Rules are matched against elements.",
+      "The browser determines which elements each selector targets.",
+      '<span class="var"><b>matches</b> = elements</span>'
+    ],
+    [
+      "Cascade",
+      "cascade",
+      "Conflicting declarations are resolved.",
+      "Specificity, inheritance, and source order determine final values.",
+      '<span class="var"><b>styles</b> = resolved</span>'
+    ],
+    [
+      "Layout",
+      "layout",
+      "Styled elements receive positions and sizes.",
+      "The browser calculates the visual geometry.",
+      '<span class="var"><b>layout</b> = calculated</span>'
+    ],
+    [
+      "Paint",
+      "pixels",
+      "The styled page is painted.",
+      "The browser draws the final appearance.",
+      '<span class="var"><b>status</b> = painted</span>'
+    ]
+  ],
+
+  python: [
+    [
+      "Start program",
+      "line 1",
+      "Python begins at the first executable statement.",
+      "The interpreter creates the initial program state.",
+      '<span class="var"><b>numbers</b> = [3, 7, 2, 9]</span><span class="var"><b>total</b> = 0</span>'
+    ],
+    [
+      "Create variables",
+      "lines 1–2",
+      "The list and total are stored.",
+      "The accumulator starts at zero.",
+      '<span class="var"><b>total</b> = 0</span>'
+    ],
+    [
+      "Enter loop",
+      "line 4",
+      "The loop selects the next number.",
+      "Python iterates through the list one item at a time.",
+      '<span class="var"><b>number</b> = 3</span><span class="var"><b>total</b> = 0</span>'
+    ],
+    [
+      "Update total",
+      "line 5",
+      "The current number is added to total.",
+      "The expression is evaluated and assigned back to total.",
+      '<span class="var"><b>number</b> = 3</span><span class="var"><b>total</b> = 3</span>'
+    ],
+    [
+      "Show result",
+      "line 7",
+      "print() sends the final value to stdout.",
+      "The real Python output is shown in the console.",
+      '<span class="var"><b>status</b> = complete</span>'
+    ]
+  ],
+
+  javascript: [
+    [
+      "Parse script",
+      "source",
+      "JavaScript parses the script.",
+      "The engine prepares the program for execution.",
+      '<span class="var"><b>engine</b> = ready</span>'
+    ],
+    [
+      "Create bindings",
+      "lines 1–2",
+      "numbers and total are initialized.",
+      "The array and accumulator enter the current scope.",
+      '<span class="var"><b>total</b> = 0</span>'
+    ],
+    [
+      "Run loop",
+      "line 4",
+      "The loop visits each array value.",
+      "The current number becomes available inside the loop.",
+      '<span class="var"><b>number</b> = 3</span>'
+    ],
+    [
+      "Update total",
+      "line 5",
+      "total is increased.",
+      "The assignment stores the new value.",
+      '<span class="var"><b>total</b> = 3</span>'
+    ],
+    [
+      "Console output",
+      "line 8",
+      "console.log() emits the result.",
+      "The sandbox captures the real console output.",
+      '<span class="var"><b>status</b> = complete</span>'
+    ]
+  ],
+
+  typescript: [
+    [
+      "Parse TypeScript",
+      "source",
+      "The TypeScript source is parsed.",
+      "The hosted TypeScript runtime prepares the program.",
+      '<span class="var"><b>runtime</b> = ready</span>'
+    ],
+    [
+      "Create typed values",
+      "line 1",
+      "numbers is created with a numeric type.",
+      "The array contains four numbers.",
+      '<span class="var"><b>numbers</b> = [3,7,2,9]</span>'
+    ],
+    [
+      "Reduce values",
+      "line 2",
+      "The reduce callback visits each value.",
+      "Each number is accumulated into the sum.",
+      '<span class="var"><b>sum</b> = accumulated</span>'
+    ],
+    [
+      "Compute total",
+      "line 2",
+      "The final accumulator becomes total.",
+      "The expression returns the completed sum.",
+      '<span class="var"><b>total</b> = 21</span>'
+    ],
+    [
+      "Console output",
+      "line 3",
+      "console.log() prints total.",
+      "The hosted runtime returns the real result.",
+      '<span class="var"><b>status</b> = complete</span>'
+    ]
+  ]
+};
 
 
-    /*
-    ============================================================
-    OUTPUT HELPERS
-    ============================================================
-    */
+/* =========================================================
+   HOSTED LANGUAGE FLOW
+   ========================================================= */
 
-    function clearError() {
+const hostedFlow = [
 
-      errorBox.textContent = "";
+  [
+    "Start program",
+    "entry point",
+    "Execution enters the selected runtime.",
+    "The backend sends your source to the configured compiler/interpreter.",
+    '<span class="var"><b>runtime</b> = selected</span>'
+  ],
 
-      errorBox.classList.add(
-        "hidden"
-      );
+  [
+    "Prepare source",
+    "source file",
+    "Your code is placed into the correct source file.",
+    "The backend maps the language to its provider runtime.",
+    '<span class="var"><b>source</b> = submitted</span>'
+  ],
 
-    }
+  [
+    "Compile / interpret",
+    "runtime",
+    "The provider processes the program.",
+    "Compilation or interpretation happens in the execution service.",
+    '<span class="var"><b>status</b> = running</span>'
+  ],
 
+  [
+    "Execute",
+    "program",
+    "The compiled/interpreted program runs.",
+    "stdout, stderr, exceptions, and provider status are collected.",
+    '<span class="var"><b>process</b> = executed</span>'
+  ],
 
-    function showError(message) {
+  [
+    "Show result",
+    "stdout/stderr",
+    "TraceLab displays the provider result.",
+    "The console shows the real execution response.",
+    '<span class="var"><b>status</b> = complete</span>'
+  ]
 
-      errorBox.textContent =
-        message;
-
-      errorBox.classList.remove(
-        "hidden"
-      );
-
-    }
-
-
-    function setOutput(
-      text,
-      success = true
-    ) {
-
-      outputElement.textContent =
-        text === undefined ||
-        text === null ||
-        text === ""
-          ? "(no output)"
-          : String(text);
-
-
-      outputElement.classList.toggle(
-        "output-success",
-        success
-      );
-
-
-      outputElement.classList.toggle(
-        "output-error",
-        !success
-      );
-
-    }
+];
 
 
-    function updateCharacterCount() {
+/* =========================================================
+   FLOW STATE
+   ========================================================= */
 
-      charCount.textContent =
-        codeEditor.value.length
-          .toLocaleString() +
-        " characters";
-
-    }
-
-
-    /*
-    ============================================================
-    BROWSER PREVIEW
-    ============================================================
-    */
-
-    function showHTMLPreview(html) {
-
-      previewPanel.classList.remove(
-        "hidden"
-      );
-
-      previewFrame.srcdoc =
-        html;
-
-    }
+let activeFlow = flowDefinitions.python;
+let step = 0;
+let timer = null;
+let flowGeneration = 0;
 
 
-    function showCSSPreview(css) {
+/* =========================================================
+   FLOW HELPERS
+   ========================================================= */
 
-      previewPanel.classList.remove(
-        "hidden"
-      );
+function currentLanguage(){
+  return $("#language").value;
+}
+
+function getFlow(language){
+  return flowDefinitions[language] || hostedFlow;
+}
+
+function stopFlow(){
+
+  if(timer !== null){
+    clearInterval(timer);
+    timer = null;
+  }
+
+  $("#play").textContent = "▶ Play flow";
+  $("#play").classList.remove("playing");
+}
+
+function resetFlow(){
+
+  flowGeneration++;
+
+  stopFlow();
+
+  activeFlow =
+    getFlow(currentLanguage());
+
+  step = 0;
+
+  renderFlow();
+}
+
+function renderFlow(){
+
+  activeFlow =
+    getFlow(currentLanguage());
+
+  const total =
+    activeFlow.length;
+
+  if(step >= total){
+    step = 0;
+  }
+
+  if(step < 0){
+    step = total - 1;
+  }
+
+  const d =
+    activeFlow[step];
+
+  $("#badge").textContent =
+    `Step ${step + 1} of ${total}`;
+
+  $("#stepname").textContent =
+    d[0];
+
+  $("#lineref").textContent =
+    d[1];
+
+  $("#note").innerHTML =
+    `<b>${d[0]}</b> — ${d[2]}`;
+
+  $("#insight").innerHTML =
+    `<strong>${d[0]}.</strong> ${d[3]}`;
+
+  $("#vars").innerHTML =
+    d[4];
+
+  const positions =
+    [11,30,50,70,89];
+
+  $("#pulse").style.left =
+    `${positions[Math.min(step,4)]}%`;
+
+  nodes.forEach((node,index)=>{
+
+    node.className =
+      `node n${index+1}` +
+      (index < step ? " done" : "") +
+      (index === step ? " active" : "");
+
+  });
+
+  $("#tracks").innerHTML =
+    activeFlow.map((_,index)=>
+      `<i class="track${
+        index < step ? " done" : ""
+      }${
+        index === step ? " now" : ""
+      }"></i>`
+    ).join("");
+
+  $("#labels").innerHTML =
+    activeFlow.map(item =>
+      `<span>${item[0].split(" ")[0]}</span>`
+    ).join("");
+}
 
 
-      const html = `
-<!DOCTYPE html>
+/* =========================================================
+   FLOW PLAYBACK
+   ========================================================= */
 
+function playFlow(){
+
+  if(timer !== null){
+    stopFlow();
+    return;
+  }
+
+  const generation =
+    flowGeneration;
+
+  const languageWhenStarted =
+    currentLanguage();
+
+  $("#play").textContent =
+    "❚❚ Pause";
+
+  $("#play").classList.add(
+    "playing"
+  );
+
+  timer =
+    setInterval(()=>{
+
+      if(
+        generation !== flowGeneration ||
+        languageWhenStarted !== currentLanguage()
+      ){
+        stopFlow();
+        return;
+      }
+
+      step =
+        (step + 1) % activeFlow.length;
+
+      renderFlow();
+
+    }, Number($("#speed").value));
+}
+
+
+/* =========================================================
+   EDITOR
+   ========================================================= */
+
+function putCode(){
+
+  const lang =
+    currentLanguage();
+
+  const data =
+    codes[lang];
+
+  if(!data){
+    return;
+  }
+
+  $("#file").textContent =
+    data[0];
+
+  $("#code").value =
+    data[1];
+
+  numberLines();
+}
+
+function numberLines(){
+
+  const count =
+    Math.max(
+      1,
+      $("#code").value.split("\n").length
+    );
+
+  $("#nums").innerHTML =
+    Array.from(
+      {length:count},
+      (_,i)=>i+1
+    ).join("<br>");
+}
+
+
+/* =========================================================
+   MODE / PREVIEW
+   ========================================================= */
+
+function updateModeStatus(){
+
+  const lang =
+    currentLanguage();
+
+  const labels = {
+
+    html:
+      "HTML renders in the browser",
+
+    css:
+      "CSS renders in the browser",
+
+    python:
+      "Python runs locally in your browser",
+
+    javascript:
+      "JavaScript runs locally in a sandbox"
+
+  };
+
+  $("#modeStatus").textContent =
+    labels[lang] ||
+    "Live server execution via TraceLab backend";
+}
+
+function updateWebUI(){
+
+  const lang =
+    currentLanguage();
+
+  const browserPreview =
+    lang === "html" ||
+    lang === "css";
+
+  const openable =
+    browserPreview ||
+    lang === "javascript";
+
+  $("#openBrowser").style.display =
+    openable ? "inline-flex" : "none";
+
+  if(!browserPreview){
+    hidePreview();
+  }
+
+  updateModeStatus();
+}
+
+function buildFullDoc(lang,code){
+
+  if(lang === "html"){
+
+    return /<\s*html[\s>]/i.test(code)
+
+      ? code
+
+      : `<!doctype html>
 <html>
-
 <head>
+<meta charset="utf-8">
+<title>TraceLab Preview</title>
+</head>
+<body>
+${code}
+</body>
+</html>`;
 
-<meta charset="UTF-8">
+  }
 
-<style>
+  if(lang === "css"){
 
-${css}
-
-</style>
-
+    return `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TraceLab CSS Preview</title>
+<style>${code}</style>
 </head>
 
 <body>
 
-  <h1>
-    TraceLab CSS Preview
-  </h1>
+<h1>Heading</h1>
 
-  <p>
-    This preview uses the CSS from your editor.
-  </p>
+<p>
+Your CSS is applied to this preview.
+</p>
 
-  <button>
-    Example button
-  </button>
+<button>
+Sample button
+</button>
 
 </body>
-
 </html>`;
 
-```
-  previewFrame.srcdoc =
-    html;
+  }
+
+  if(lang === "javascript"){
+
+    return `<!doctype html>
+<html>
+<body>
+
+<p>
+JavaScript is running in a sandbox.
+</p>
+
+<script>
+
+const send =
+  (type,args)=>
+    parent.postMessage(
+      {
+        __tracelab:true,
+        type,
+        args:args.map(v=>{
+
+          try{
+            return typeof v === "object"
+              ? JSON.stringify(v)
+              : String(v);
+          }catch{
+            return String(v);
+          }
+
+        })
+      },
+      "*"
+    );
+
+console.log =
+  (...a)=>send("log",a);
+
+console.warn =
+  (...a)=>send("warn",a);
+
+console.error =
+  (...a)=>send("error",a);
+
+try{
+
+${code}
+
+send("done",[]);
+
+}catch(error){
+
+send(
+  "error",
+  [
+    error && error.stack
+      ? error.stack
+      : error.message
+  ]
+);
+
+send("done",[]);
 
 }
 
+<\/script>
 
-function hidePreview() {
+</body>
+</html>`;
 
-  previewPanel.classList.add(
-    "hidden"
-  );
+  }
 
-  previewFrame.srcdoc = "";
+  return "";
+}
 
+function renderPreview(lang,code){
+
+  $("#previewWrap").style.display =
+    "block";
+
+  $("#previewFrame").srcdoc =
+    buildFullDoc(lang,code);
+}
+
+function hidePreview(){
+
+  $("#previewWrap").style.display =
+    "none";
+
+  $("#previewFrame").srcdoc =
+    "about:blank";
 }
 
 
-/*
-============================================================
-JAVASCRIPT EXECUTION
-============================================================
-*/
+/* =========================================================
+   PYTHON EXECUTION
+   ========================================================= */
 
-function executeJavaScript(code) {
+let pyodidePromise = null;
 
-  return new Promise(
-    (resolve) => {
+function getPyodide(){
 
-      const channel =
-        "__tracelab_js__";
+  if(!pyodidePromise){
 
+    pyodidePromise =
+      new Promise((resolve,reject)=>{
 
-      const handler =
-        (event) => {
+        const start = ()=>{
 
-          if (
-            event.source !==
-            previewFrame.contentWindow
-          ) {
-
-            return;
-
-          }
-
-
-          if (
-            !event.data ||
-            event.data.channel !==
-            channel
-          ) {
-
-            return;
-
-          }
-
-
-          window.removeEventListener(
-            "message",
-            handler
-          );
-
-
-          resolve({
-
-            stdout:
-              event.data.stdout ||
-              "",
-
-            stderr:
-              event.data.stderr ||
-              "",
-
-            exception:
-              event.data.exception ||
-              ""
-
-          });
+          window
+            .loadPyodide({
+              indexURL:
+                "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/"
+            })
+            .then(resolve)
+            .catch(reject);
 
         };
 
+        if(window.loadPyodide){
 
-      window.addEventListener(
+          start();
+          return;
+
+        }
+
+        const script =
+          document.createElement("script");
+
+        script.src =
+          "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+
+        script.onload =
+          start;
+
+        script.onerror =
+          ()=>{
+            reject(
+              new Error(
+                "Could not load Pyodide."
+              )
+            );
+          };
+
+        document.head.appendChild(
+          script
+        );
+
+      });
+
+  }
+
+  return pyodidePromise;
+}
+
+async function runPython(code){
+
+  const logs = [];
+
+  try{
+
+    const py =
+      await getPyodide();
+
+    py.setStdout({
+      batched:value =>
+        logs.push(String(value))
+    });
+
+    py.setStderr({
+      batched:value =>
+        logs.push("✕ " + String(value))
+    });
+
+    await py.runPythonAsync(code);
+
+  }catch(error){
+
+    logs.push(
+      "✕ " +
+      String(
+        error &&
+        error.message
+          ? error.message
+          : error
+      )
+      .split("\n")
+      .pop()
+    );
+
+  }
+
+  return logs.length
+    ? logs
+    : [
+        "(No output — add print(...) to your program.)"
+      ];
+}
+
+
+/* =========================================================
+   JAVASCRIPT EXECUTION
+   ========================================================= */
+
+function runJavaScript(code){
+
+  return new Promise(resolve=>{
+
+    const logs = [];
+
+    let finished = false;
+
+    const iframe =
+      document.createElement("iframe");
+
+    iframe.style.display =
+      "none";
+
+    iframe.sandbox =
+      "allow-scripts";
+
+    function finish(){
+
+      if(finished){
+        return;
+      }
+
+      finished = true;
+
+      window.removeEventListener(
         "message",
         handler
       );
 
+      iframe.remove();
 
-      /*
-        Prevent the user's code from closing
-        the surrounding script tag.
-      */
-      const escapedCode =
-        code.replace(
-          /<\/script/gi,
-          "<\\/script"
-        );
-
-
-      previewPanel.classList.remove(
-        "hidden"
+      resolve(
+        logs.length
+          ? logs
+          : [
+              "(No output — add console.log(...) to your program.)"
+            ]
       );
+    }
 
+    function handler(event){
 
-      previewFrame.srcdoc = `
-```
+      if(
+        event.source !==
+          iframe.contentWindow
+      ){
+        return;
+      }
 
-<!DOCTYPE html>
+      if(
+        !event.data ||
+        !event.data.__tracelab
+      ){
+        return;
+      }
 
-<html>
+      if(
+        event.data.type === "done"
+      ){
 
-<head>
+        finish();
+        return;
 
-<meta charset="UTF-8">
+      }
 
-</head>
+      const prefix =
+        event.data.type === "error"
+          ? "✕ "
+          : event.data.type === "warn"
+            ? "⚠ "
+            : "";
 
-<body>
+      logs.push(
+        prefix +
+        event.data.args.join(" ")
+      );
+    }
 
-<script>
-
-(() => {
-
-  const output = [];
-
-
-  function capture(...args) {
-
-    output.push(
-
-      args
-        .map(value => {
-
-          try {
-
-            if (
-              typeof value ===
-              "object"
-            ) {
-
-              return JSON.stringify(
-                value
-              );
-
-            }
-
-            return String(value);
-
-          } catch {
-
-            return String(value);
-
-          }
-
-        })
-        .join(" ")
-
+    window.addEventListener(
+      "message",
+      handler
     );
 
-  }
+    iframe.srcdoc =
+      buildFullDoc(
+        "javascript",
+        code
+      );
 
-
-  console.log =
-    capture;
-
-  console.info =
-    capture;
-
-  console.warn =
-    capture;
-
-  console.error =
-    capture;
-
-
-  window.addEventListener(
-    "error",
-    event => {
-
-      parent.postMessage({
-
-        channel:
-          "${channel}",
-
-        stdout:
-          output.join("\\n"),
-
-        stderr:
-          event.message || "",
-
-        exception:
-          event.error
-            ? String(event.error)
-            : event.message || ""
-
-      }, "*");
-
-    }
-  );
-
-
-  window.addEventListener(
-    "unhandledrejection",
-    event => {
-
-      parent.postMessage({
-
-        channel:
-          "${channel}",
-
-        stdout:
-          output.join("\\n"),
-
-        stderr:
-          String(
-            event.reason || ""
-          ),
-
-        exception:
-          String(
-            event.reason || ""
-          )
-
-      }, "*");
-
-    }
-  );
-
-
-  try {
-
-    const source =
-      ${JSON.stringify(
-        escapedCode
-      )};
-
-
-    (0, eval)(source);
-
+    document.body.appendChild(
+      iframe
+    );
 
     setTimeout(
-      () => {
-
-        parent.postMessage({
-
-          channel:
-            "${channel}",
-
-          stdout:
-            output.join("\\n"),
-
-          stderr: "",
-
-          exception: ""
-
-        }, "*");
-
-      },
-      0
+      finish,
+      3000
     );
 
-
-  } catch (error) {
-
-    parent.postMessage({
-
-      channel:
-        "${channel}",
-
-      stdout:
-        output.join("\\n"),
-
-      stderr:
-        String(error),
-
-      exception:
-        String(error)
-
-    }, "*");
-
-  }
-
-})();
-
-</script>
-
-</body>
-
-</html>`;
-
-```
-    }
-
-  );
-
+  });
 }
 
 
-/*
-============================================================
-PYTHON / PYODIDE
-============================================================
-*/
-
-let pyodide = null;
-
-let pyodideLoading = null;
-
-
-async function loadPyodideOnce() {
-
-  if (pyodide) {
-
-    return pyodide;
-
-  }
-
-
-  if (pyodideLoading) {
-
-    return pyodideLoading;
-
-  }
-
-
-  pyodideLoading =
-    window.loadPyodide();
-
-
-  pyodide =
-    await pyodideLoading;
-
-
-  return pyodide;
-
-}
-
-
-async function executePython(
-  code,
-  stdin
-) {
-
-  const runtime =
-    await loadPyodideOnce();
-
-
-  runtime.globals.set(
-    "__tracelab_stdin__",
-    stdin || ""
-  );
-
-
-  const wrapper = `
-```
-
-import sys
-import io
-import contextlib
-
-__tracelab_old_stdin = sys.stdin
-
-sys.stdin = io.StringIO(
-**tracelab_stdin**
-)
-
-__tracelab_stdout = io.StringIO()
-
-__tracelab_stderr = io.StringIO()
-
-try:
-
-```
-with contextlib.redirect_stdout(
-    __tracelab_stdout
-), contextlib.redirect_stderr(
-    __tracelab_stderr
-):
-
-    exec(
-        compile(
-            ${JSON.stringify(code)},
-            "<tracelab>",
-            "exec"
-        ),
-        {}
-    )
-
-__tracelab_exception = ""
-```
-
-except Exception as __tracelab_error:
-
-```
-__tracelab_exception =
-    repr(__tracelab_error)
-```
-
-finally:
-
-```
-sys.stdin =
-    __tracelab_old_stdin
-```
-
-(
-__tracelab_stdout.getvalue(),
-__tracelab_stderr.getvalue(),
-__tracelab_exception
-)
-`;
-
-```
-  const result =
-    await runtime.runPythonAsync(
-      wrapper
-    );
-
-
-  const values =
-    result.toJs();
-
-
-  result.destroy();
-
-
-  return {
-
-    stdout:
-      values[0] || "",
-
-    stderr:
-      values[1] || "",
-
-    exception:
-      values[2] || ""
-
-  };
-
-}
-
-
-/*
-============================================================
-HOSTED LANGUAGES
-============================================================
-*/
-
-async function executeHosted(
-  language,
-  code,
-  stdin,
-  generation
-) {
-
-  const response =
-    await fetch(
-      EXECUTE_URL,
-      {
-
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-
-          language,
-
-          code,
-
-          stdin
-
-        })
-
-      }
-    );
-
-
-  let data;
-
-
-  try {
-
-    data =
-      await response.json();
-
-  } catch {
-
-    throw new Error(
-      "The execution server returned an invalid response."
-    );
-
-  }
-
-
-  /*
-    Ignore an old execution response.
-  */
-  if (
-    generation !==
-    executionGeneration
-  ) {
-
-    return null;
-
-  }
-
-
-  if (
-    !response.ok ||
-    !data.ok
-  ) {
-
-    throw new Error(
-      data.error ||
-      "The remote execution request failed."
-    );
-
-  }
-
-
-  return data;
-
-}
-
-
-/*
-============================================================
-RUN CODE
-============================================================
-*/
-
-async function runCode() {
-
-  const language =
-    languageSelect.value;
-
-
-  const code =
-    codeEditor.value;
-
-
-  const stdin =
-    stdinEditor.value;
-
-
-  /*
-    Every execution gets a unique generation.
-  */
-  const currentExecutionGeneration =
-    ++executionGeneration;
-
-
-  /*
-    Reset the animation before execution.
-  */
-  resetFlow();
-
-
-  /*
-    IMPORTANT:
-    We DO NOT automatically play the flow.
-  */
-
-
-  clearError();
-
-
-  if (!code.trim()) {
-
-    showError(
-      "Please enter some code first."
-    );
-
-    outputStatus.textContent =
-      "No code";
-
-    return;
-
-  }
-
-
-  runButton.disabled = true;
-
-  runButton.classList.add(
-    "loading"
-  );
-
-  runButton.textContent =
-    "⏳ Running...";
-
-
-  outputStatus.textContent =
-    "Executing...";
-
-
-  try {
-
-    let result;
-
-
-    /*
-    ========================================================
-    HTML
-    ========================================================
-    */
-
-    if (
-      language === "html"
-    ) {
-
-      showHTMLPreview(
-        code
+/* =========================================================
+   REMOTE EXECUTION
+   ========================================================= */
+
+async function runRemote(
+  lang,
+  code
+){
+
+  try{
+
+    const response =
+      await fetch(
+        EXECUTE_URL,
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "Accept":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              language:lang,
+              code:code,
+              stdin:""
+            })
+        }
       );
 
+    const data =
+      await response.json()
+        .catch(()=>({}));
 
-      result = {
+    if(!response.ok){
 
-        stdout:
-          "HTML rendered successfully in the browser preview.",
+      return {
+        ok:false,
 
-        stderr: "",
-
-        exception: ""
-
+        output:
+          `✕ ${
+            data.error ||
+            data.message ||
+            `HTTP ${response.status}`
+          }`
       };
 
     }
 
-
-    /*
-    ========================================================
-    CSS
-    ========================================================
-    */
-
-    else if (
-      language === "css"
-    ) {
-
-      showCSSPreview(
-        code
-      );
-
-
-      result = {
-
-        stdout:
-          "CSS rendered successfully in the browser preview.",
-
-        stderr: "",
-
-        exception: ""
-
-      };
-
-    }
-
-
-    /*
-    ========================================================
-    JAVASCRIPT
-    ========================================================
-    */
-
-    else if (
-      language === "javascript"
-    ) {
-
-      result =
-        await executeJavaScript(
-          code
-        );
-
-
-      if (
-        currentExecutionGeneration !==
-        executionGeneration
-      ) {
-
-        return;
-
-      }
-
-    }
-
-
-    /*
-    ========================================================
-    PYTHON
-    ========================================================
-    */
-
-    else if (
-      language === "python"
-    ) {
-
-      hidePreview();
-
-
-      result =
-        await executePython(
-          code,
-          stdin
-        );
-
-
-      if (
-        currentExecutionGeneration !==
-        executionGeneration
-      ) {
-
-        return;
-
-      }
-
-    }
-
-
-    /*
-    ========================================================
-    HOSTED LANGUAGES
-    ========================================================
-    */
-
-    else {
-
-      hidePreview();
-
-
-      result =
-        await executeHosted(
-          language,
-          code,
-          stdin,
-          currentExecutionGeneration
-        );
-
-
-      if (
-        result === null
-      ) {
-
-        return;
-
-      }
-
-    }
-
-
-    const stdout =
-      result.stdout || "";
-
-
-    const stderr =
-      result.stderr || "";
-
-
-    const exception =
-      result.exception || "";
-
-
-    /*
-    ========================================================
-    ERROR RESULT
-    ========================================================
-    */
-
-    if (
-      stderr ||
-      exception
-    ) {
-
-      const combined =
-        [
-          stdout,
-          stderr,
-          exception
-        ]
-          .filter(Boolean)
-          .join("\n");
-
-
-      setOutput(
-        combined,
-        false
-      );
-
-
-      outputStatus.textContent =
-        "Execution error";
-
-
-      showError(
-        exception ||
-        stderr ||
-        "The program reported an error."
-      );
-
-    }
-
-
-    /*
-    ========================================================
-    SUCCESS RESULT
-    ========================================================
-    */
-
-    else {
-
-      setOutput(
-        stdout,
-        true
-      );
-
-
-      outputStatus.textContent =
-        "Execution complete";
-
-    }
-
-
-    /*
-      IMPORTANT:
-
-      Leave animation at Step 1.
-
-      NEVER automatically call playFlow().
-    */
-    step = 0;
-
-    renderFlow();
-
-
-  } catch (error) {
-
-    if (
-      currentExecutionGeneration !==
-      executionGeneration
-    ) {
-
-      return;
-
-    }
-
-
-    setOutput(
-
-      error &&
-      error.message
-
-        ? error.message
-
-        : String(error),
-
-      false
-
-    );
-
-
-    outputStatus.textContent =
-      "Execution failed";
-
-
-    showError(
-
-      error &&
-      error.message
-
-        ? error.message
-
-        : "An unexpected error occurred."
-
-    );
-
-
-  } finally {
-
-    if (
-      currentExecutionGeneration ===
-      executionGeneration
-    ) {
-
-      runButton.disabled =
-        false;
-
-
-      runButton.classList.remove(
-        "loading"
-      );
-
-
-      runButton.textContent =
-        "▶ Run";
-
-    }
+    return {
+      ok:Boolean(data.ok),
+
+      output:
+        String(
+          data.output ||
+          "(No output.)"
+        )
+    };
+
+  }catch(error){
+
+    return {
+      ok:false,
+
+      output:
+        `✕ Could not reach TraceLab backend.\n${
+          error.message || error
+        }`
+    };
 
   }
-
 }
 
 
-/*
-============================================================
-LANGUAGE CHANGE
-============================================================
-*/
+/* =========================================================
+   BACKEND HEALTH
+   ========================================================= */
 
-function changeLanguage() {
+async function checkBackend(){
 
-  /*
-    Invalidate all previous executions.
-  */
-  executionGeneration++;
+  const el =
+    $("#serverStatus");
 
-
-  /*
-    Invalidate all old animation timers.
-  */
-  flowGeneration++;
-
-
-  stopFlow();
-
-
-  /*
-    Select the new language flow.
-  */
-  activeFlow =
-    getFlow(
-      languageSelect.value
-    );
-
-
-  /*
-    Always start at Step 1.
-  */
-  step = 0;
-
-
-  clearError();
-
-
-  const language =
-    languageSelect.value;
-
-
-  editorLanguage.textContent =
-    languageSelect.options[
-      languageSelect.selectedIndex
-    ].text;
-
-
-  updateCharacterCount();
-
-
-  /*
-    Browser preview is only relevant
-    to HTML, CSS and JavaScript.
-  */
-  if (
-    language !== "html" &&
-    language !== "css" &&
-    language !== "javascript"
-  ) {
-
-    hidePreview();
-
-  }
-
-
-  /*
-    Load example code for the
-    selected language.
-  */
-  codeEditor.value =
-    examples[language] || "";
-
-
-  stdinEditor.value =
-    "";
-
-
-  outputElement.textContent =
-    "Run your code to see the real output.";
-
-
-  outputStatus.textContent =
-    "Ready";
-
-
-  renderFlow();
-
-}
-
-
-/*
-============================================================
-BACKEND HEALTH CHECK
-============================================================
-*/
-
-async function checkBackend() {
-
-  try {
+  try{
 
     const response =
       await fetch(
         HEALTH_URL,
         {
-          method: "GET"
+          headers:{
+            "Accept":
+              "application/json"
+          },
+
+          cache:"no-store"
         }
       );
 
+    const data =
+      await response.json()
+        .catch(()=>({}));
 
-    if (!response.ok) {
+    if(
+      !response.ok ||
+      !data.ok
+    ){
 
       throw new Error(
-        "Backend unavailable"
+        data.error ||
+        `HTTP ${response.status}`
       );
 
     }
 
+    el.textContent =
+      data.executorConfigured
+        ? "● Backend online · compiler ready"
+        : "● Backend online · add API key";
 
-    const data =
-      await response.json();
+    el.className =
+      data.executorConfigured
+        ? "server-pill online"
+        : "server-pill warning";
 
+  }catch(error){
 
-    if (data.ok) {
+    el.textContent =
+      "● Backend offline";
 
-      backendStatus.textContent =
-        "Backend online";
-
-    } else {
-
-      backendStatus.textContent =
-        "Backend unavailable";
-
-    }
-
-  } catch {
-
-    backendStatus.textContent =
-      "Backend unavailable";
+    el.className =
+      "server-pill offline";
 
   }
-
 }
 
 
-/*
-============================================================
-EVENTS
-============================================================
-*/
+/* =========================================================
+   BACKEND DIAGNOSTIC
+   ========================================================= */
 
-languageSelect.addEventListener(
-  "change",
-  changeLanguage
-);
+async function testBackend(){
 
+  const button =
+    $("#serverTest");
 
-runButton.addEventListener(
-  "click",
-  runCode
-);
+  const old =
+    button.textContent;
 
+  button.disabled =
+    true;
 
-resetButton.addEventListener(
-  "click",
-  resetFlow
-);
+  button.textContent =
+    "Testing…";
 
+  $("#serverStatus").textContent =
+    "● Testing provider…";
 
-clearOutputButton.addEventListener(
-  "click",
-  () => {
+  $("#serverStatus").className =
+    "server-pill warning";
 
-    clearError();
+  try{
 
+    const response =
+      await fetch(
+        DIAGNOSTICS_URL,
+        {
+          method:"POST",
 
-    outputElement.textContent =
-      "Run your code to see the real output.";
+          headers:{
+            "Content-Type":
+              "application/json",
 
+            "Accept":
+              "application/json"
+          },
 
-    outputStatus.textContent =
-      "Ready";
+          body:"{}"
+        }
+      );
 
-  }
-);
+    const data =
+      await response.json()
+        .catch(()=>({}));
 
+    if(data.ok){
 
-playButton.addEventListener(
-  "click",
-  playFlow
-);
+      $("#serverStatus").textContent =
+        "● Backend online · provider ready";
 
+      $("#serverStatus").className =
+        "server-pill online";
 
-nextButton.addEventListener(
-  "click",
-  () => {
+      $("#output").textContent =
+        "✓ Backend test passed\n" +
+        "✓ C++ provider returned 21";
 
-    stopFlow();
+    }else{
 
-    nextFlowStep();
+      $("#serverStatus").textContent =
+        "● Provider test failed";
 
-  }
-);
+      $("#serverStatus").className =
+        "server-pill warning";
 
-
-prevButton.addEventListener(
-  "click",
-  () => {
-
-    stopFlow();
-
-    previousFlowStep();
-
-  }
-);
-
-
-codeEditor.addEventListener(
-  "input",
-  updateCharacterCount
-);
-
-
-/*
-  TAB SUPPORT
-*/
-codeEditor.addEventListener(
-  "keydown",
-  (event) => {
-
-    if (
-      event.key !== "Tab"
-    ) {
-
-      return;
+      $("#output").textContent =
+        "✕ Backend test failed\n" +
+        (
+          data.error ||
+          "Check Render environment variables and logs."
+        );
 
     }
 
+  }catch(error){
 
-    event.preventDefault();
+    $("#serverStatus").textContent =
+      "● Backend offline";
+
+    $("#serverStatus").className =
+      "server-pill offline";
+
+    $("#output").textContent =
+      "✕ Could not reach backend\n" +
+      (error.message || error);
+
+  }finally{
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      old;
+
+  }
+}
 
 
-    const start =
-      codeEditor.selectionStart;
+/* =========================================================
+   MAIN LOGIC FINDER
+   ========================================================= */
+
+function explainLogic(){
+
+  const lines =
+    $("#code").value.split("\n");
+
+  const lang =
+    currentLanguage();
+
+  const patterns = {
+
+    python:
+      /^(def |class |for |while |if |elif |else:|try:)/,
+
+    javascript:
+      /^(function |class |for |while |if |else|switch |try |const |let |var )/,
+
+    typescript:
+      /^(function |class |for |while |if |else|switch |interface |type |const |let |var )/,
+
+    c:
+      /^(int main|for |while |if |switch |void |int |float |double )/,
+
+    cpp:
+      /^(int main|for |while |if |switch |class |void |int |auto )/,
+
+    java:
+      /^(class |public static|for |while |if |switch |try )/,
+
+    go:
+      /^(func |for |if |switch |type )/,
+
+    kotlin:
+      /^(fun |for |while |if |when |class )/,
+
+    swift:
+      /^(func |for |while |if |switch |class |struct )/,
+
+    ruby:
+      /^(def |class |module |for |while |if |unless |.*do \|)/,
+
+    php:
+      /^(<\?php|function |class |foreach |for |while |if )/,
+
+    perl:
+      /^(use |my |for |while |if |sub )/,
+
+    bash:
+      /^(#!|for |while |if |function )/,
+
+    sql:
+      /^(select |insert |update |delete |create |with )/i
+
+  };
+
+  const re =
+    patterns[lang];
+
+  const hits =
+    re
+      ? lines
+          .map((line,i)=>({
+            line,
+            i
+          }))
+          .filter(x =>
+            re.test(x.line.trim())
+          )
+      : [];
+
+  const first =
+    hits[0] || {
+      line:
+        lines.find(
+          x => x.trim()
+        ) || "Program entry",
+
+      i:0
+    };
+
+  $("#logicSummary").innerHTML =
+    `<strong>Main path found.</strong> ${
+      lines.length
+    } line(s), ${
+      hits.length
+    } important block(s). First important point: line ${
+      first.i + 1
+    }.`;
+
+  $("#logicCode").textContent =
+    lines
+      .slice(
+        Math.max(0, first.i - 1),
+        Math.min(
+          lines.length,
+          first.i + 7
+        )
+      )
+      .map(
+        (line,index)=>
+          String(
+            Math.max(
+              0,
+              first.i - 1
+            ) + index + 1
+          ).padStart(3," ") +
+          "  " +
+          line
+      )
+      .join("\n");
+
+  $("#focus").textContent =
+    "✓ Main logic explained";
+}
 
 
-    const end =
-      codeEditor.selectionEnd;
+/* =========================================================
+   AUTO-DETECT
+   ========================================================= */
 
+function detectLanguage(){
 
-    codeEditor.value =
-      codeEditor.value.substring(
-        0,
-        start
-      ) +
-      "  " +
-      codeEditor.value.substring(
-        end
+  const code =
+    $("#code").value.toLowerCase();
+
+  const markers = {
+
+    html:[
+      "<!doctype html",
+      "<html",
+      "<body",
+      "<div",
+      "<p>"
+    ],
+
+    css:[
+      "font-family:",
+      "background:",
+      "margin:",
+      "padding:",
+      "border-radius:"
+    ],
+
+    python:[
+      "def ",
+      "print(",
+      "import ",
+      "elif "
+    ],
+
+    javascript:[
+      "console.log",
+      "=>",
+      "const ",
+      "let "
+    ],
+
+    typescript:[
+      "interface ",
+      "type ",
+      "number[]",
+      ": number"
+    ],
+
+    cpp:[
+      "#include <iostream>",
+      "std::",
+      "cout"
+    ],
+
+    c:[
+      "#include <stdio",
+      "printf"
+    ],
+
+    java:[
+      "public static",
+      "system.out",
+      "class "
+    ],
+
+    go:[
+      "package main",
+      "fmt.print"
+    ],
+
+    kotlin:[
+      "fun main",
+      "println"
+    ],
+
+    swift:[
+      "import foundation",
+      "func ",
+      "print("
+    ],
+
+    ruby:[
+      "puts ",
+      "do |"
+    ],
+
+    php:[
+      "<?php",
+      "$total",
+      "echo "
+    ],
+
+    perl:[
+      "use strict",
+      "my $",
+      "print "
+    ],
+
+    bash:[
+      "#!/bin",
+      "echo ",
+      "$(("
+    ],
+
+    sql:[
+      "select ",
+      "create table"
+    ]
+
+  };
+
+  let best =
+    "python";
+
+  let bestScore =
+    0;
+
+  for(
+    const [lang,words]
+    of Object.entries(markers)
+  ){
+
+    const score =
+      words.reduce(
+        (sum,word)=>
+          sum +
+          (
+            code.includes(word)
+              ? 1
+              : 0
+          ),
+        0
       );
 
+    if(score > bestScore){
 
-    codeEditor.selectionStart =
-      codeEditor.selectionEnd =
-        start + 2;
+      bestScore =
+        score;
+
+      best =
+        lang;
+
+    }
+
+  }
+
+  if(!bestScore){
+
+    $("#status").textContent =
+      "● Need more code to detect";
+
+    $("#output").textContent =
+      "Auto-detect could not find a strong language signature.";
+
+    return;
+  }
+
+  $("#language").value =
+    best;
+
+  resetFlow();
+
+  updateWebUI();
+
+  $("#status").textContent =
+    `✦ Detected ${
+      $("#language").selectedOptions[0].text
+    }`;
+
+  $("#output").textContent =
+    "Language detected. Your code was not changed. " +
+    "Click Run to execute it.";
+}
 
 
-    updateCharacterCount();
+/* =========================================================
+   MAIN RUN FUNCTION
+   ========================================================= */
+
+async function runProgram(){
+
+  flowGeneration++;
+
+  stopFlow();
+
+  activeFlow =
+    getFlow(currentLanguage());
+
+  step = 0;
+
+  renderFlow();
+
+  explainLogic();
+
+  const lang =
+    currentLanguage();
+
+  const code =
+    $("#code").value;
+
+  const label =
+    $("#language").selectedOptions[0].text;
+
+  $("#run").disabled =
+    true;
+
+  $("#status").textContent =
+    "● Running…";
+
+  try{
+
+    if(!code.trim()){
+
+      $("#output").textContent =
+        "✕ Your code is empty.";
+
+      $("#status").textContent =
+        "● Nothing to run";
+
+      return;
+    }
+
+
+    /* PYTHON */
+
+    if(lang === "python"){
+
+      hidePreview();
+
+      const logs =
+        await runPython(code);
+
+      $("#output").textContent =
+        logs.join("\n");
+
+      $("#status").textContent =
+        logs.some(
+          x => x.startsWith("✕")
+        )
+          ? "● Execution failed"
+          : "● Executed live";
+
+      return;
+    }
+
+
+    /* JAVASCRIPT */
+
+    if(lang === "javascript"){
+
+      hidePreview();
+
+      const logs =
+        await runJavaScript(code);
+
+      $("#output").textContent =
+        logs.join("\n");
+
+      $("#status").textContent =
+        logs.some(
+          x => x.startsWith("✕")
+        )
+          ? "● Execution failed"
+          : "● Executed live";
+
+      return;
+    }
+
+
+    /* HTML / CSS */
+
+    if(
+      lang === "html" ||
+      lang === "css"
+    ){
+
+      renderPreview(
+        lang,
+        code
+      );
+
+      $("#output").textContent =
+        "✓ Rendered in the sandboxed preview.";
+
+      $("#status").textContent =
+        "● Preview ready";
+
+      return;
+    }
+
+
+    /* HOSTED LANGUAGES */
+
+    hidePreview();
+
+    $("#status").textContent =
+      `● Compiling and running ${label}…`;
+
+    const result =
+      await runRemote(
+        lang,
+        code
+      );
+
+    $("#output").textContent =
+      result.output;
+
+    $("#status").textContent =
+      result.ok
+        ? "● Executed live"
+        : "● Execution failed";
+
+  }catch(error){
+
+    $("#output").textContent =
+      "✕ Unexpected frontend error\n" +
+      (
+        error.stack ||
+        error.message ||
+        error
+      );
+
+    $("#status").textContent =
+      "● Error";
+
+    console.error(error);
+
+  }finally{
+
+    $("#run").disabled =
+      false;
+
+    /*
+      IMPORTANT:
+      Do NOT automatically start the flow here.
+      It remains paused at step 1.
+    */
+
+    renderFlow();
+
+  }
+}
+
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+
+$("#run")
+  .addEventListener(
+    "click",
+    runProgram
+  );
+
+$("#play")
+  .addEventListener(
+    "click",
+    playFlow
+  );
+
+$("#serverTest")
+  .addEventListener(
+    "click",
+    testBackend
+  );
+
+$("#next")
+  .addEventListener(
+    "click",
+    ()=>{
+      stopFlow();
+
+      step =
+        (step + 1) %
+        activeFlow.length;
+
+      renderFlow();
+    }
+  );
+
+$("#prev")
+  .addEventListener(
+    "click",
+    ()=>{
+      stopFlow();
+
+      step =
+        (step - 1 + activeFlow.length) %
+        activeFlow.length;
+
+      renderFlow();
+    }
+  );
+
+$("#focus")
+  .addEventListener(
+    "click",
+    explainLogic
+  );
+
+$("#detect")
+  .addEventListener(
+    "click",
+    detectLanguage
+  );
+
+
+/* RESET */
+
+$("#reset")
+  .addEventListener(
+    "click",
+    ()=>{
+      resetFlow();
+
+      putCode();
+
+      updateWebUI();
+
+      hidePreview();
+
+      $("#status").textContent =
+        "● Ready";
+
+      $("#output").textContent =
+        "Example restored. Click Run to execute it.";
+
+      $("#focus").textContent =
+        "⌘ Explain main logic";
+    }
+  );
+
+
+/* LANGUAGE CHANGE */
+
+$("#language")
+  .addEventListener(
+    "change",
+    ()=>{
+
+      /*
+        Completely invalidate the previous flow.
+      */
+
+      flowGeneration++;
+
+      stopFlow();
+
+      putCode();
+
+      activeFlow =
+        getFlow(
+          currentLanguage()
+        );
+
+      step = 0;
+
+      renderFlow();
+
+      updateWebUI();
+
+      hidePreview();
+
+      $("#status").textContent =
+        "● Ready";
+
+      $("#output").textContent =
+        "Language changed. The flow was reset for the selected language.";
+
+      $("#focus").textContent =
+        "⌘ Explain main logic";
+
+    }
+  );
+
+
+/* CODE EDIT */
+
+$("#code")
+  .addEventListener(
+    "input",
+    ()=>{
+      numberLines();
+
+      stopFlow();
+
+      $("#focus").textContent =
+        "⌘ Explain main logic";
+
+      $("#detect").textContent =
+        "✦ Auto-detect";
+    }
+  );
+
+
+/* OPEN BROWSER */
+
+$("#openBrowser")
+  .addEventListener(
+    "click",
+    ()=>{
+
+      const lang =
+        currentLanguage();
+
+      const code =
+        $("#code").value;
+
+      const blob =
+        new Blob(
+          [
+            buildFullDoc(
+              lang,
+              code
+            )
+          ],
+          {
+            type:"text/html"
+          }
+        );
+
+      const url =
+        URL.createObjectURL(blob);
+
+      window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+      setTimeout(
+        ()=>{
+          URL.revokeObjectURL(url);
+        },
+        60000
+      );
+
+    }
+  );
+
+
+/* MOBILE MENU */
+
+$("#menuBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      const open =
+        $("#siteNav")
+          .classList
+          .toggle("open");
+
+      $("#menuBtn")
+        .setAttribute(
+          "aria-expanded",
+          String(open)
+        );
+    }
+  );
+
+$("#siteNav")
+  .querySelectorAll("a")
+  .forEach(
+    link =>
+      link.addEventListener(
+        "click",
+        ()=>{
+          $("#siteNav")
+            .classList
+            .remove("open");
+
+          $("#menuBtn")
+            .setAttribute(
+              "aria-expanded",
+              "false"
+            );
+        }
+      )
+  );
+
+
+/* CTRL + ENTER */
+
+document.addEventListener(
+  "keydown",
+  event => {
+
+    if(
+      (event.ctrlKey || event.metaKey) &&
+      event.key === "Enter"
+    ){
+
+      event.preventDefault();
+
+      runProgram();
+
+    }
 
   }
 );
 
 
-/*
-============================================================
-INITIALIZATION
-============================================================
-*/
+/* =========================================================
+   STARTUP
+   ========================================================= */
+
+$("#year").textContent =
+  new Date().getFullYear();
+
+putCode();
+
+updateWebUI();
 
 activeFlow =
   getFlow(
-    languageSelect.value
+    currentLanguage()
   );
-
 
 step = 0;
 
-
-codeEditor.value =
-  examples[
-    languageSelect.value
-  ];
-
-
 renderFlow();
 
-
-updateCharacterCount();
-
+explainLogic();
 
 checkBackend();
-```
 
-  </script>
+setInterval(
+  checkBackend,
+  30000
+);
+
+</script>
 
 </body>
 </html>
