@@ -11,10 +11,7 @@
   content="TraceLab is an interactive code playground with real execution across 16 programming languages."
 >
 
-<meta
-  name="theme-color"
-  content="#5277f5"
->
+<meta name="theme-color" content="#5277f5">
 
 <style>
 :root{
@@ -27,7 +24,6 @@
   --pale:#eff2ff;
   --danger:#df5f67;
   --warning:#b07a12;
-  --white:#fff;
 }
 
 *{
@@ -47,8 +43,7 @@ body{
 
 button,
 select,
-textarea,
-input{
+textarea{
   font:inherit;
 }
 
@@ -268,7 +263,7 @@ h1 span{
   pointer-events:none;
 }
 
-textarea{
+#code{
   width:100%;
   height:100%;
   min-height:380px;
@@ -290,14 +285,13 @@ textarea{
 .stdin-label{
   display:block;
   margin-bottom:7px;
-  color:#9099aa;
-  text-transform:uppercase;
-  letter-spacing:1px;
-  font-size:10px;
+  color:#707b91;
+  font-size:11px;
   font-weight:800;
 }
 
 #stdin{
+  display:block;
   width:100%;
   min-height:72px;
   resize:vertical;
@@ -310,8 +304,13 @@ textarea{
   font:12px/1.5 monospace;
 }
 
+#stdin::placeholder{
+  color:#a4adbd;
+}
+
 #stdin:focus{
   border-color:#bfcaff;
+  box-shadow:0 0 0 2px #eff2ff;
 }
 
 .runbar{
@@ -388,8 +387,16 @@ textarea{
   margin-bottom:10px;
 }
 
-.ok{
+.status-ready{
   color:#28a87f;
+}
+
+.status-error{
+  color:var(--danger);
+}
+
+.status-running{
+  color:#5570e9;
 }
 
 .console pre{
@@ -398,7 +405,21 @@ textarea{
   font:12px/21px monospace;
   white-space:pre-wrap;
   overflow:auto;
-  max-height:200px;
+  max-height:220px;
+}
+
+.preview{
+  padding:14px 18px;
+  border-top:1px solid var(--line);
+  background:#fbfcff;
+}
+
+.preview iframe{
+  width:100%;
+  height:240px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#fff;
 }
 
 .visual{
@@ -468,7 +489,9 @@ textarea{
 .node small{
   position:absolute;
   top:74px;
-  white-space:nowrap;
+  width:105px;
+  text-align:center;
+  white-space:normal;
   color:#6e7890;
   font-size:10px;
   font-weight:800;
@@ -478,25 +501,11 @@ textarea{
   font-size:20px;
 }
 
-.n1{
-  left:11%;
-}
-
-.n2{
-  left:30%;
-}
-
-.n3{
-  left:50%;
-}
-
-.n4{
-  left:70%;
-}
-
-.n5{
-  left:89%;
-}
+.n1{left:11%}
+.n2{left:30%}
+.n3{left:50%}
+.n4{left:70%}
+.n5{left:89%}
 
 .node.active{
   border-color:var(--blue);
@@ -585,15 +594,15 @@ textarea{
   display:flex;
   justify-content:space-between;
   margin-top:7px;
-  color:#9ba4b4;
-  font-size:9px;
-  font-weight:700;
   gap:5px;
 }
 
 .labels span{
-  text-align:center;
   flex:1;
+  text-align:center;
+  color:#9ba4b4;
+  font-size:9px;
+  font-weight:700;
 }
 
 .controls{
@@ -625,26 +634,6 @@ textarea{
 
 .playing{
   background:var(--blue)!important;
-}
-
-.preview{
-  padding:14px 18px;
-  border-top:1px solid var(--line);
-  background:#fbfcff;
-}
-
-.preview iframe{
-  width:100%;
-  height:240px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#fff;
-}
-
-#openBrowser{
-  color:#28a87f;
-  border-color:#bfe9d9;
-  background:#f2fbf8;
 }
 
 .lower{
@@ -968,10 +957,6 @@ textarea{
 }
 
 @media(max-width:480px){
-  main{
-    padding-top:28px;
-  }
-
   .node{
     width:48px;
     height:48px;
@@ -982,9 +967,7 @@ textarea{
   .node small{
     top:57px;
     font-size:9px;
-    white-space:normal;
-    width:60px;
-    text-align:center;
+    width:70px;
   }
 
   .node span{
@@ -1041,6 +1024,7 @@ textarea{
     <button
       class="menu-btn"
       id="menuBtn"
+      type="button"
       aria-label="Open menu"
       aria-expanded="false"
     >
@@ -1074,13 +1058,7 @@ textarea{
 
 <section class="workspace" id="playground">
 
-
-  <!-- =====================================================
-       EDITOR
-  ====================================================== -->
-
   <div class="editor">
-
 
     <div class="bar">
 
@@ -1089,25 +1067,24 @@ textarea{
         <span id="file">main.py</span>
       </div>
 
-
       <div class="bar-actions">
 
         <button
           class="detect"
           id="detect"
+          type="button"
         >
           ✦ Auto-detect
         </button>
 
-
         <button
           class="detect"
           id="openBrowser"
+          type="button"
           style="display:none"
         >
           ↗ Open in browser
         </button>
-
 
         <select
           class="lang"
@@ -1116,86 +1093,31 @@ textarea{
         >
 
           <optgroup label="Web">
-
-            <option value="html">
-              HTML
-            </option>
-
-            <option value="css">
-              CSS
-            </option>
-
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
           </optgroup>
-
 
           <optgroup label="Popular">
-
-            <option value="python" selected>
-              Python 3
-            </option>
-
-            <option value="javascript">
-              JavaScript
-            </option>
-
-            <option value="typescript">
-              TypeScript
-            </option>
-
-            <option value="c">
-              C
-            </option>
-
-            <option value="cpp">
-              C++
-            </option>
-
-            <option value="java">
-              Java
-            </option>
-
-            <option value="go">
-              Go
-            </option>
-
+            <option value="python" selected>Python 3</option>
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+            <option value="java">Java</option>
+            <option value="go">Go</option>
           </optgroup>
-
 
           <optgroup label="Modern & mobile">
-
-            <option value="kotlin">
-              Kotlin
-            </option>
-
-            <option value="swift">
-              Swift
-            </option>
-
+            <option value="kotlin">Kotlin</option>
+            <option value="swift">Swift</option>
           </optgroup>
 
-
           <optgroup label="Scripting & data">
-
-            <option value="ruby">
-              Ruby
-            </option>
-
-            <option value="php">
-              PHP
-            </option>
-
-            <option value="perl">
-              Perl
-            </option>
-
-            <option value="bash">
-              Bash
-            </option>
-
-            <option value="sql">
-              SQL
-            </option>
-
+            <option value="ruby">Ruby</option>
+            <option value="php">PHP</option>
+            <option value="perl">Perl</option>
+            <option value="bash">Bash</option>
+            <option value="sql">SQL</option>
           </optgroup>
 
         </select>
@@ -1227,12 +1149,12 @@ textarea{
         class="stdin-label"
         for="stdin"
       >
-        Program input · optional
+        Enter the input here
       </label>
 
       <textarea
         id="stdin"
-        placeholder="Enter input for programs that use stdin..."
+        placeholder="Enter the input here..."
         spellcheck="false"
         aria-label="Program input"
       ></textarea>
@@ -1245,6 +1167,7 @@ textarea{
       <button
         class="run"
         id="run"
+        type="button"
       >
         ▶ Run &amp; visualize
       </button>
@@ -1252,6 +1175,7 @@ textarea{
       <button
         class="reset"
         id="reset"
+        type="button"
       >
         ↻ Reset
       </button>
@@ -1282,8 +1206,8 @@ textarea{
         </span>
 
         <span
-          class="ok"
           id="status"
+          class="status-ready"
         >
           ● Ready
         </span>
@@ -1323,10 +1247,6 @@ textarea{
 
   </div>
 
-
-  <!-- =====================================================
-       VISUALIZER
-  ====================================================== -->
 
   <div class="visual">
 
@@ -1438,6 +1358,7 @@ textarea{
           <button
             class="circle"
             id="prev"
+            type="button"
             aria-label="Previous step"
           >
             ←
@@ -1446,6 +1367,7 @@ textarea{
           <button
             class="circle"
             id="next"
+            type="button"
             aria-label="Next step"
           >
             →
@@ -1454,6 +1376,7 @@ textarea{
           <button
             class="play"
             id="play"
+            type="button"
           >
             ▶ Play flow
           </button>
@@ -1464,7 +1387,7 @@ textarea{
         <select
           class="speed"
           id="speed"
-          aria-label="Flow playback speed"
+          aria-label="Flow speed"
         >
 
           <option value="1400">
@@ -1534,6 +1457,7 @@ textarea{
       <button
         class="focus"
         id="focus"
+        type="button"
       >
         ⌘ Explain main logic
       </button>
@@ -1550,9 +1474,7 @@ textarea{
     <pre
       class="logic-code"
       id="logicCode"
-    >
-Run the program or explain the main logic.
-    </pre>
+    >Run the program or explain the main logic.</pre>
 
   </div>
 
@@ -1583,18 +1505,12 @@ Run the program or explain the main logic.
 
 
 <p class="hint">
-  Use
-  <b>← →</b>
-  to move through the visual flow,
+  Use <b>← →</b> to move through the visual flow,
   or use <b>Play flow</b>.
 </p>
 
 </main>
 
-
-<!-- =========================================================
-     HOW IT WORKS
-========================================================== -->
 
 <section
   class="sections"
@@ -1608,7 +1524,8 @@ Run the program or explain the main logic.
     </h2>
 
     <p>
-      Write code, run it for real, then inspect the execution flow.
+      Write code, enter input when needed, run it for real,
+      then inspect the execution flow.
     </p>
 
   </div>
@@ -1618,9 +1535,7 @@ Run the program or explain the main logic.
 
     <div class="step-card">
 
-      <span class="num">
-        1
-      </span>
+      <span class="num">1</span>
 
       <h3>
         Write or paste code
@@ -1635,9 +1550,7 @@ Run the program or explain the main logic.
 
     <div class="step-card">
 
-      <span class="num">
-        2
-      </span>
+      <span class="num">2</span>
 
       <h3>
         Pick a language
@@ -1652,17 +1565,15 @@ Run the program or explain the main logic.
 
     <div class="step-card">
 
-      <span class="num">
-        3
-      </span>
+      <span class="num">3</span>
 
       <h3>
         Run it
       </h3>
 
       <p>
-        Browser languages execute locally. Hosted languages are sent
-        to the TraceLab backend for real execution.
+        Browser languages execute locally. Hosted languages
+        execute through the TraceLab backend.
       </p>
 
     </div>
@@ -1671,10 +1582,6 @@ Run the program or explain the main logic.
 
 </section>
 
-
-<!-- =========================================================
-     CAPABILITIES
-========================================================== -->
 
 <section
   class="sections"
@@ -1688,7 +1595,7 @@ Run the program or explain the main logic.
     </h2>
 
     <p>
-      The playground distinguishes browser execution from hosted execution.
+      TraceLab distinguishes local browser execution from hosted execution.
     </p>
 
   </div>
@@ -1707,7 +1614,8 @@ Run the program or explain the main logic.
       </h3>
 
       <p>
-        Executes locally in the browser using Pyodide.
+        Executes locally in the browser using Pyodide,
+        including standard input.
       </p>
 
     </div>
@@ -1724,7 +1632,7 @@ Run the program or explain the main logic.
       </h3>
 
       <p>
-        Executes in a sandboxed iframe in the browser.
+        Executes inside a sandboxed iframe.
       </p>
 
     </div>
@@ -1741,7 +1649,7 @@ Run the program or explain the main logic.
       </h3>
 
       <p>
-        Render directly inside the browser preview.
+        Render directly in the browser preview.
       </p>
 
     </div>
@@ -1758,8 +1666,8 @@ Run the program or explain the main logic.
       </h3>
 
       <p>
-        TypeScript, C, C++, Java, Go, Kotlin, Swift, Ruby,
-        PHP, Perl, Bash, and SQL use the TraceLab execution backend.
+        TypeScript, C, C++, Java, Go, Kotlin, Swift,
+        Ruby, PHP, Perl, Bash, and SQL use the backend.
       </p>
 
     </div>
@@ -1768,10 +1676,6 @@ Run the program or explain the main logic.
 
 </section>
 
-
-<!-- =========================================================
-     FAQ
-========================================================== -->
 
 <section
   class="sections"
@@ -1796,8 +1700,8 @@ Run the program or explain the main logic.
       </h3>
 
       <p>
-        Yes. Browser languages execute locally and the hosted languages
-        are sent to the configured execution provider through the backend.
+        Yes. Browser languages execute locally and hosted languages
+        are sent to the TraceLab backend for real execution.
       </p>
 
     </div>
@@ -1810,8 +1714,8 @@ Run the program or explain the main logic.
       </h3>
 
       <p>
-        The browser sends the source to the TraceLab backend only when
-        you run a hosted language.
+        The browser sends hosted-language source to the backend
+        when Run is pressed.
       </p>
 
     </div>
@@ -1824,8 +1728,8 @@ Run the program or explain the main logic.
       </h3>
 
       <p>
-        The visual flow explains the execution stages. It is separate
-        from the actual compiler/runtime execution.
+        The visual flow is an explanatory execution-flow view.
+        It is separate from the actual compiler/runtime output.
       </p>
 
     </div>
@@ -1834,12 +1738,12 @@ Run the program or explain the main logic.
     <div class="faq-item">
 
       <h3>
-        Does TraceLab support stdin?
+        Can programs receive input?
       </h3>
 
       <p>
-        Yes. Hosted programs can receive the text entered in the
-        Program input box.
+        Yes. Enter the input in the input box before pressing Run.
+        Python and hosted languages receive that input through stdin.
       </p>
 
     </div>
@@ -1855,9 +1759,7 @@ Run the program or explain the main logic.
 
     <div class="brand">
 
-      <div class="mark">
-        &gt;_
-      </div>
+      <div class="mark">&gt;_</div>
 
       TraceLab
 
@@ -1888,8 +1790,7 @@ Run the program or explain the main logic.
 
 
   <p class="foot-note">
-    TraceLab supports 16 languages with real execution for
-    browser and hosted runtimes.
+    TraceLab supports 16 languages with local and hosted execution.
     © <span id="year"></span>
   </p>
 
@@ -1908,18 +1809,22 @@ const TRACELAB_BACKEND =
   "https://tracelab-free.onrender.com";
 
 const TRACELAB_EXECUTOR_URL =
-  TRACELAB_BACKEND + "/api/execute";
+  `${TRACELAB_BACKEND}/api/execute`;
 
 
 /* =========================================================
-   HELPERS
+   DOM
 ========================================================= */
 
-const $ = selector =>
-  document.querySelector(selector);
+const $ =
+  selector =>
+    document.querySelector(selector);
 
 const nodes =
   [...document.querySelectorAll(".node")];
+
+const tracks =
+  [...document.querySelectorAll(".track")];
 
 
 /* =========================================================
@@ -1928,7 +1833,7 @@ const nodes =
 
 const codes = {
 
-  html: [
+  html:[
     "index.html",
     [
       "<!doctype html>",
@@ -1944,7 +1849,7 @@ const codes = {
     ]
   ],
 
-  css: [
+  css:[
     "style.css",
     [
       "body {",
@@ -1966,7 +1871,7 @@ const codes = {
     ]
   ],
 
-  python: [
+  python:[
     "main.py",
     [
       "numbers = [3, 7, 2, 9]",
@@ -1979,7 +1884,7 @@ const codes = {
     ]
   ],
 
-  javascript: [
+  javascript:[
     "main.js",
     [
       "const numbers = [3, 7, 2, 9];",
@@ -1993,7 +1898,7 @@ const codes = {
     ]
   ],
 
-  typescript: [
+  typescript:[
     "main.ts",
     [
       "const numbers: number[] = [3, 7, 2, 9];",
@@ -2002,7 +1907,7 @@ const codes = {
     ]
   ],
 
-  c: [
+  c:[
     "main.c",
     [
       "#include <stdio.h>",
@@ -2010,14 +1915,16 @@ const codes = {
       "int main(void) {",
       "    int numbers[] = {3, 7, 2, 9};",
       "    int total = 0;",
-      "    for (int i = 0; i < 4; i++) total += numbers[i];",
+      "    for (int i = 0; i < 4; i++) {",
+      "        total += numbers[i];",
+      "    }",
       "    printf(\"%d\\n\", total);",
       "    return 0;",
       "}"
     ]
   ],
 
-  cpp: [
+  cpp:[
     "main.cpp",
     [
       "#include <iostream>",
@@ -2025,28 +1932,32 @@ const codes = {
       "int main() {",
       "    int numbers[] = {3, 7, 2, 9};",
       "    int total = 0;",
-      "    for (int number : numbers) total += number;",
+      "    for (int number : numbers) {",
+      "        total += number;",
+      "    }",
       "    std::cout << total << \"\\n\";",
       "    return 0;",
       "}"
     ]
   ],
 
-  java: [
+  java:[
     "Main.java",
     [
       "class Main {",
       "  public static void main(String[] args) {",
       "    int[] numbers = {3, 7, 2, 9};",
       "    int total = 0;",
-      "    for (int number : numbers) total += number;",
+      "    for (int number : numbers) {",
+      "      total += number;",
+      "    }",
       "    System.out.println(total);",
       "  }",
       "}"
     ]
   ],
 
-  go: [
+  go:[
     "main.go",
     [
       "package main",
@@ -2064,19 +1975,21 @@ const codes = {
     ]
   ],
 
-  kotlin: [
+  kotlin:[
     "Main.kt",
     [
       "fun main() {",
       "  val numbers = intArrayOf(3, 7, 2, 9)",
       "  var total = 0",
-      "  for (number in numbers) total += number",
+      "  for (number in numbers) {",
+      "    total += number",
+      "  }",
       "  println(total)",
       "}"
     ]
   ],
 
-  swift: [
+  swift:[
     "main.swift",
     [
       "let numbers = [3, 7, 2, 9]",
@@ -2090,7 +2003,7 @@ const codes = {
     ]
   ],
 
-  ruby: [
+  ruby:[
     "main.rb",
     [
       "numbers = [3, 7, 2, 9]",
@@ -2104,20 +2017,22 @@ const codes = {
     ]
   ],
 
-  php: [
+  php:[
     "main.php",
     [
       "<?php",
       "$numbers = [3, 7, 2, 9];",
       "$total = 0;",
+      "",
       "foreach ($numbers as $number) {",
       "    $total += $number;",
       "}",
+      "",
       "echo $total, PHP_EOL;"
     ]
   ],
 
-  perl: [
+  perl:[
     "main.pl",
     [
       "my @numbers = (3, 7, 2, 9);",
@@ -2129,7 +2044,7 @@ const codes = {
     ]
   ],
 
-  bash: [
+  bash:[
     "main.sh",
     [
       "total=0",
@@ -2140,7 +2055,7 @@ const codes = {
     ]
   ],
 
-  sql: [
+  sql:[
     "main.sql",
     [
       "SELECT 3 + 7 + 2 + 9 AS total;"
@@ -2156,176 +2071,197 @@ const codes = {
 
 const flowDefinitions = {
 
-  html: [
+  python:[
     [
-      "Parse HTML",
-      "document",
-      "<b>Parse HTML</b> — the browser reads the document source.",
-      "<strong>HTML execution.</strong> The browser turns the markup into document nodes.",
-      '<span class="var"><b>DOM</b> = building</span>'
+      "Start",
+      "line 1",
+      "<b>Start</b> — Python begins executing the source.",
+      "<strong>Execution begins.</strong> The program starts reading its instructions.",
+      '<span class="var"><b>status</b> = started</span>'
     ],
-
     [
-      "Build DOM",
-      "elements",
-      "<b>Build DOM</b> — elements become document nodes.",
-      "<strong>Structure.</strong> Parent-child relationships are established.",
-      '<span class="var"><b>nodes</b> = created</span>'
-    ],
-
-    [
-      "Resolve content",
-      "body",
-      "<b>Resolve content</b> — text and attributes become page content.",
-      "<strong>Content ready.</strong> The browser prepares content for layout.",
-      '<span class="var"><b>content</b> = ready</span>'
-    ],
-
-    [
-      "Layout",
-      "render tree",
-      "<b>Layout</b> — the browser calculates geometry.",
-      "<strong>Layout.</strong> Positions and sizes are calculated.",
-      '<span class="var"><b>layout</b> = calculated</span>'
-    ],
-
-    [
-      "Render",
-      "browser",
-      "<b>Render</b> — the browser paints the final page.",
-      "<strong>Preview ready.</strong> The rendered document appears in the sandbox.",
-      '<span class="var"><b>status</b> = rendered</span>'
-    ]
-  ],
-
-  css: [
-    [
-      "Parse CSS",
-      "stylesheet",
-      "<b>Parse CSS</b> — stylesheet rules are read.",
-      "<strong>CSS execution.</strong> Selectors and declarations are parsed.",
-      '<span class="var"><b>rules</b> = parsed</span>'
-    ],
-
-    [
-      "Match selectors",
-      "selectors",
-      "<b>Match selectors</b> — rules are matched to elements.",
-      "<strong>Matching.</strong> The browser determines applicable rules.",
-      '<span class="var"><b>matches</b> = found</span>'
-    ],
-
-    [
-      "Cascade",
-      "cascade",
-      "<b>Cascade</b> — conflicts are resolved.",
-      "<strong>Computed styles.</strong> Specificity and source order determine final values.",
-      '<span class="var"><b>styles</b> = resolved</span>'
-    ],
-
-    [
-      "Layout",
-      "layout",
-      "<b>Layout</b> — styled elements receive geometry.",
-      "<strong>Geometry.</strong> Positions and sizes are calculated.",
-      '<span class="var"><b>layout</b> = calculated</span>'
-    ],
-
-    [
-      "Paint",
-      "pixels",
-      "<b>Paint</b> — the browser draws the page.",
-      "<strong>Preview ready.</strong> The styled page is visible in the sandbox.",
-      '<span class="var"><b>status</b> = painted</span>'
-    ]
-  ],
-
-  javascript: [
-    [
-      "Parse script",
-      "source",
-      "<b>Parse script</b> — JavaScript reads the source.",
-      "<strong>JavaScript execution.</strong> The sandbox prepares the script.",
-      '<span class="var"><b>engine</b> = ready</span>'
-    ],
-
-    [
-      "Create bindings",
+      "Setup",
       "lines 1–2",
-      "<b>Create bindings</b> — variables are initialized.",
-      "<strong>Scope created.</strong> numbers and total enter scope.",
+      "<b>Setup</b> — numbers and total are initialized.",
+      "<strong>Variables ready.</strong> The list is created and total starts at zero.",
       '<span class="var"><b>total</b> = 0</span>'
     ],
-
     [
-      "Run loop",
+      "Loop",
       "line 4",
-      "<b>Run loop</b> — the loop reads the next value.",
-      "<strong>Loop.</strong> The next number becomes available.",
+      "<b>Loop</b> — Python reads a number from the list.",
+      "<strong>Iteration.</strong> The loop processes one value at a time.",
       '<span class="var"><b>number</b> = 3</span>'
     ],
-
     [
-      "Update total",
+      "Update",
       "line 5",
-      "<b>Update total</b> — the accumulator changes.",
-      "<strong>Assignment.</strong> total receives the updated value.",
+      "<b>Update</b> — the current number is added to total.",
+      "<strong>Accumulator.</strong> total changes after the addition.",
       '<span class="var"><b>total</b> = 3</span>'
     ],
-
     [
-      "Console output",
+      "Output",
       "line 8",
-      "<b>Console output</b> — console.log produces output.",
-      "<strong>Completed.</strong> The sandbox captured real console output.",
+      "<b>Output</b> — Python prints the final value.",
+      "<strong>Complete.</strong> The program sends its result to stdout.",
       '<span class="var"><b>status</b> = complete</span>'
     ]
   ],
 
-  typescript: [
+  javascript:[
     [
-      "Parse TypeScript",
+      "Start",
       "source",
-      "<b>Parse TypeScript</b> — the hosted runtime processes the source.",
-      "<strong>Hosted execution.</strong> TypeScript is sent to the backend.",
+      "<b>Start</b> — the JavaScript engine reads the script.",
+      "<strong>Execution begins.</strong> The sandbox prepares the program.",
+      '<span class="var"><b>engine</b> = ready</span>'
+    ],
+    [
+      "Setup",
+      "lines 1–2",
+      "<b>Setup</b> — numbers and total are created.",
+      "<strong>Scope ready.</strong> The variables are available to the loop.",
+      '<span class="var"><b>total</b> = 0</span>'
+    ],
+    [
+      "Loop",
+      "line 4",
+      "<b>Loop</b> — the next number is read.",
+      "<strong>Iteration.</strong> The sandbox executes the loop body.",
+      '<span class="var"><b>number</b> = 3</span>'
+    ],
+    [
+      "Update",
+      "line 5",
+      "<b>Update</b> — total receives the new value.",
+      "<strong>Assignment.</strong> The accumulator changes.",
+      '<span class="var"><b>total</b> = 3</span>'
+    ],
+    [
+      "Output",
+      "line 8",
+      "<b>Output</b> — console.log emits the result.",
+      "<strong>Complete.</strong> The sandbox captures console output.",
+      '<span class="var"><b>status</b> = complete</span>'
+    ]
+  ],
+
+  html:[
+    [
+      "Parse",
+      "HTML source",
+      "<b>Parse</b> — the browser reads the HTML source.",
+      "<strong>Markup processing.</strong> The document is interpreted.",
+      '<span class="var"><b>DOM</b> = building</span>'
+    ],
+    [
+      "Build DOM",
+      "elements",
+      "<b>Build DOM</b> — elements become document nodes.",
+      "<strong>Structure.</strong> Parent-child relationships are created.",
+      '<span class="var"><b>nodes</b> = created</span>'
+    ],
+    [
+      "Layout",
+      "render tree",
+      "<b>Layout</b> — page geometry is calculated.",
+      "<strong>Geometry.</strong> Positions and sizes are determined.",
+      '<span class="var"><b>layout</b> = calculated</span>'
+    ],
+    [
+      "Paint",
+      "browser",
+      "<b>Paint</b> — the browser draws the page.",
+      "<strong>Rendering.</strong> The preview is painted.",
+      '<span class="var"><b>status</b> = painted</span>'
+    ],
+    [
+      "Preview",
+      "iframe",
+      "<b>Preview</b> — the result appears in the sandbox.",
+      "<strong>Complete.</strong> The rendered page is visible.",
+      '<span class="var"><b>status</b> = rendered</span>'
+    ]
+  ],
+
+  css:[
+    [
+      "Parse",
+      "stylesheet",
+      "<b>Parse</b> — CSS rules are read.",
+      "<strong>Stylesheet processing.</strong> Declarations are parsed.",
+      '<span class="var"><b>rules</b> = parsed</span>'
+    ],
+    [
+      "Match",
+      "selectors",
+      "<b>Match</b> — selectors are matched against elements.",
+      "<strong>Matching.</strong> Applicable rules are found.",
+      '<span class="var"><b>matches</b> = found</span>'
+    ],
+    [
+      "Cascade",
+      "computed style",
+      "<b>Cascade</b> — competing declarations are resolved.",
+      "<strong>Styles.</strong> Final values are selected.",
+      '<span class="var"><b>styles</b> = resolved</span>'
+    ],
+    [
+      "Layout",
+      "render tree",
+      "<b>Layout</b> — styled elements receive geometry.",
+      "<strong>Geometry.</strong> Positions and sizes are calculated.",
+      '<span class="var"><b>layout</b> = calculated</span>'
+    ],
+    [
+      "Paint",
+      "pixels",
+      "<b>Paint</b> — the browser draws the styled page.",
+      "<strong>Complete.</strong> The CSS preview is visible.",
+      '<span class="var"><b>status</b> = painted</span>'
+    ]
+  ],
+
+  typescript:[
+    [
+      "Submit",
+      "source",
+      "<b>Submit</b> — TypeScript is sent to the hosted runtime.",
+      "<strong>Backend execution.</strong> TraceLab submits the source.",
       '<span class="var"><b>runtime</b> = TypeScript</span>'
     ],
-
     [
-      "Create values",
-      "line 1",
-      "<b>Create values</b> — the number array is created.",
-      "<strong>Data ready.</strong> numbers contains four values.",
-      '<span class="var"><b>numbers</b> = [3,7,2,9]</span>'
+      "Prepare",
+      "main.ts",
+      "<b>Prepare</b> — the runtime prepares the source file.",
+      "<strong>Source ready.</strong> The provider receives the program.",
+      '<span class="var"><b>source</b> = ready</span>'
     ],
-
     [
-      "Reduce values",
-      "line 2",
-      "<b>Reduce values</b> — reduce processes the array.",
-      "<strong>Accumulation.</strong> Each number contributes to the total.",
-      '<span class="var"><b>sum</b> = accumulating</span>'
+      "Compile",
+      "provider",
+      "<b>Compile</b> — the hosted provider processes TypeScript.",
+      "<strong>Compiler stage.</strong> The source is processed.",
+      '<span class="var"><b>status</b> = compiling</span>'
     ],
-
     [
-      "Compute total",
-      "line 2",
-      "<b>Compute total</b> — reduce returns the final sum.",
-      "<strong>Result.</strong> The calculated total is 21.",
-      '<span class="var"><b>total</b> = 21</span>'
+      "Execute",
+      "program",
+      "<b>Execute</b> — the program runs.",
+      "<strong>Runtime.</strong> Output is captured.",
+      '<span class="var"><b>process</b> = running</span>'
     ],
-
     [
-      "Console output",
+      "Output",
       "line 3",
-      "<b>Console output</b> — console.log prints the result.",
-      "<strong>Completed.</strong> The backend returns the actual output.",
+      "<b>Output</b> — the result returns to TraceLab.",
+      "<strong>Complete.</strong> Actual provider output is displayed.",
       '<span class="var"><b>status</b> = complete</span>'
     ]
   ]
 
 };
-
 
 const genericFlow = [
 
@@ -2338,34 +2274,34 @@ const genericFlow = [
   ],
 
   [
-    "Prepare source",
+    "Submit",
     "source file",
-    "<b>Prepare source</b> — TraceLab creates the provider source file.",
-    "<strong>Submission.</strong> The source is sent to the hosted execution backend.",
+    "<b>Submit</b> — the source is sent to the backend.",
+    "<strong>Submission.</strong> Render forwards the program to the execution provider.",
     '<span class="var"><b>source</b> = submitted</span>'
   ],
 
   [
-    "Compile / interpret",
+    "Compile",
     "provider",
-    "<b>Compile / interpret</b> — the external runtime processes the source.",
-    "<strong>Provider stage.</strong> Compilation or interpretation happens remotely.",
+    "<b>Compile / interpret</b> — the hosted runtime processes the source.",
+    "<strong>Provider stage.</strong> Compilation or interpretation occurs remotely.",
     '<span class="var"><b>status</b> = running</span>'
   ],
 
   [
     "Execute",
     "program",
-    "<b>Execute</b> — the program runs in the hosted runtime.",
-    "<strong>Execution.</strong> stdout, stderr and runtime errors are collected.",
+    "<b>Execute</b> — the program runs.",
+    "<strong>Execution.</strong> stdout and runtime errors are collected.",
     '<span class="var"><b>process</b> = executed</span>'
   ],
 
   [
-    "Show result",
-    "output",
-    "<b>Show result</b> — TraceLab displays the provider result.",
-    "<strong>Completed.</strong> The console contains actual execution output.",
+    "Output",
+    "result",
+    "<b>Output</b> — TraceLab displays the returned result.",
+    "<strong>Complete.</strong> The actual execution result is shown.",
     '<span class="var"><b>status</b> = complete</span>'
   ]
 
@@ -2377,60 +2313,15 @@ const genericFlow = [
 ========================================================= */
 
 let step = 0;
-let timer = null;
-let executionGeneration = 0;
+let flowTimer = null;
+let executionId = 0;
 
 
 /* =========================================================
-   EDITOR
+   GET FLOW
 ========================================================= */
 
-function putCode(){
-
-  const lang =
-    $("#language").value;
-
-  const data =
-    codes[lang];
-
-  if(!data){
-    return;
-  }
-
-  $("#file").textContent =
-    data[0];
-
-  $("#code").value =
-    data[1].join("\n");
-
-  $("#stdin").value = "";
-
-  numberLines();
-
-}
-
-
-function numberLines(){
-
-  const value =
-    $("#code").value;
-
-  const lines =
-    value.split("\n");
-
-  $("#nums").innerHTML =
-    lines.map(
-      (_,i) => i + 1
-    ).join("<br>");
-
-}
-
-
-/* =========================================================
-   FLOW
-========================================================= */
-
-function getActiveFlow(){
+function getFlow(){
 
   return (
     flowDefinitions[
@@ -2442,24 +2333,32 @@ function getActiveFlow(){
 }
 
 
+/* =========================================================
+   RENDER FLOW
+========================================================= */
+
 function render(){
 
-  const active =
-    getActiveFlow();
+  const flow =
+    getFlow();
 
   const total =
-    active.length;
+    flow.length;
 
-  if(step < 0){
+
+  if(
+    step < 0 ||
+    step >= total
+  ){
+
     step = 0;
+
   }
 
-  if(step >= total){
-    step = total - 1;
-  }
 
   const data =
-    active[step];
+    flow[step];
+
 
   $("#badge").textContent =
     `Step ${step + 1} of ${total}`;
@@ -2479,8 +2378,10 @@ function render(){
   $("#vars").innerHTML =
     data[4];
 
+
   const positions =
     [11,30,50,70,89];
+
 
   $("#pulse").style.left =
     `${positions[Math.min(step,4)]}%`;
@@ -2491,260 +2392,182 @@ function render(){
 
       node.className =
         `node n${index + 1}` +
-        (index < step ? " done" : "") +
-        (index === step ? " active" : "");
+        (
+          index < step
+            ? " done"
+            : ""
+        ) +
+        (
+          index === step
+            ? " active"
+            : ""
+        );
 
     }
   );
 
 
-  document
-    .querySelectorAll(".track")
-    .forEach(
-      (track,index) => {
+  tracks.forEach(
+    (track,index) => {
 
-        track.className =
-          "track" +
-          (index < step ? " done" : "") +
-          (index === step ? " now" : "");
+      track.className =
+        "track" +
+        (
+          index < step
+            ? " done"
+            : ""
+        ) +
+        (
+          index === step
+            ? " now"
+            : ""
+        );
 
-      }
-    );
+    }
+  );
 
 
-  const labels =
-    document.querySelector(
-      "#labels"
-    );
+  $("#labels").innerHTML =
+    flow
+      .map(
+        item =>
+          `<span>${escapeHtml(item[0])}</span>`
+      )
+      .join("");
 
-  if(labels){
 
-    labels.innerHTML =
-      active
-        .map(
-          item =>
-            `<span>${item[0]}</span>`
-        )
-        .join("");
+  for(
+    let i = 0;
+    i < 5;
+    i++
+  ){
+
+    const label =
+      document.querySelector(
+        `#nodeLabel${i + 1}`
+      );
+
+    if(label){
+
+      label.textContent =
+        flow[i]
+          ? flow[i][0]
+          : "";
+
+    }
 
   }
-
-
-  active
-    .slice(0,5)
-    .forEach(
-      (item,index) => {
-
-        const label =
-          document.querySelector(
-            `#nodeLabel${index + 1}`
-          );
-
-        if(label){
-          label.textContent =
-            item[0];
-        }
-
-      }
-    );
 
 }
 
 
 /* =========================================================
-   LANGUAGE DETECTION
+   ESCAPE
 ========================================================= */
 
-function detectLanguage(){
+function escapeHtml(value){
 
-  const code =
+  return String(value)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+/* =========================================================
+   LINE NUMBERS
+========================================================= */
+
+function numberLines(){
+
+  const lines =
     $("#code")
       .value
-      .toLowerCase();
-
-  const markers = {
-
-    html:[
-      "<!doctype html",
-      "<html",
-      "<body",
-      "<div",
-      "<p>"
-    ],
-
-    css:[
-      "font-family:",
-      "background:",
-      "margin:",
-      "padding:",
-      "border-radius:"
-    ],
-
-    python:[
-      "def ",
-      "print(",
-      "import "
-    ],
-
-    javascript:[
-      "console.log",
-      "=>",
-      "const "
-    ],
-
-    typescript:[
-      "interface ",
-      "number[]",
-      ": number",
-      "string[]"
-    ],
-
-    cpp:[
-      "#include <iostream>",
-      "std::",
-      "cout"
-    ],
-
-    c:[
-      "#include <stdio",
-      "printf("
-    ],
-
-    java:[
-      "public static",
-      "system.out",
-      "class "
-    ],
-
-    go:[
-      "package main",
-      "fmt.print"
-    ],
-
-    kotlin:[
-      "fun main",
-      "println"
-    ],
-
-    swift:[
-      "import foundation",
-      "func ",
-      "print("
-    ],
-
-    ruby:[
-      "puts ",
-      "do |"
-    ],
-
-    php:[
-      "<?php",
-      "$total",
-      "echo "
-    ],
-
-    perl:[
-      "my $",
-      "print "
-    ],
-
-    bash:[
-      "#!/bin",
-      "echo ",
-      "$(("
-    ],
-
-    sql:[
-      "select ",
-      "create table"
-    ]
-
-  };
+      .split("\n");
 
 
-  let best =
-    "python";
-
-  let bestScore =
-    0;
-
-
-  Object.entries(markers)
-    .forEach(
-      ([language,words]) => {
-
-        const score =
-          words.reduce(
-            (total,word) =>
-              total +
-              (code.includes(word) ? 1 : 0),
-            0
-          );
-
-        if(score > bestScore){
-
-          bestScore =
-            score;
-
-          best =
-            language;
-
-        }
-
-      }
-    );
-
-
-  if(bestScore < 1){
-
-    $("#status").textContent =
-      "● Detection unavailable";
-
-    $("#output").textContent =
-      "Auto-detect could not identify the language.";
-
-    return;
-
-  }
-
-
-  $("#language").value =
-    best;
-
-  putCode();
-
-  render();
-
-  updateWebUI();
-
-  const label =
-    $("#language")
-      .options[
-        $("#language").selectedIndex
-      ].text;
-
-  $("#status").textContent =
-    `✦ Detected ${label}`;
-
-  $("#output").textContent =
-    `✦ ${label} detected.\nRun the program to execute it.`;
-
-  $("#detect").textContent =
-    `✓ ${label}`;
+  $("#nums").innerHTML =
+    lines
+      .map(
+        (_,index) =>
+          index + 1
+      )
+      .join("<br>");
 
 }
 
 
 /* =========================================================
-   WEB PREVIEW
+   LOAD EXAMPLE
 ========================================================= */
 
-function buildFullDoc(
-  lang,
+function putCode(){
+
+  const language =
+    $("#language").value;
+
+
+  const data =
+    codes[language];
+
+
+  if(!data){
+    return;
+  }
+
+
+  $("#file").textContent =
+    data[0];
+
+  $("#code").value =
+    data[1].join("\n");
+
+  $("#stdin").value =
+    "";
+
+  numberLines();
+
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+function setStatus(
+  text,
+  type = "ready"
+){
+
+  $("#status").textContent =
+    text;
+
+
+  $("#status").className =
+    type === "error"
+      ? "status-error"
+      : type === "running"
+        ? "status-running"
+        : "status-ready";
+
+}
+
+
+/* =========================================================
+   WEB DOCUMENT
+========================================================= */
+
+function buildFullDocument(
+  language,
   code
 ){
 
-  if(lang === "html"){
+  if(
+    language === "html"
+  ){
 
     if(
       /<\s*html[\s>]/i.test(code)
@@ -2753,6 +2576,7 @@ function buildFullDoc(
       return code;
 
     }
+
 
     return `
 <!doctype html>
@@ -2770,7 +2594,9 @@ ${code}
   }
 
 
-  if(lang === "css"){
+  if(
+    language === "css"
+  ){
 
     return `
 <!doctype html>
@@ -2793,35 +2619,17 @@ ${code}
   }
 
 
-  if(lang === "javascript"){
-
-    return `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-</head>
-<body>
-<p style="font:13px sans-serif;color:#667">
-JavaScript executes in the sandbox.
-</p>
-<script>
-${code}
-<\/script>
-</body>
-</html>
-`;
-
-  }
-
-
-  return code;
+  return "";
 
 }
 
 
+/* =========================================================
+   PREVIEW
+========================================================= */
+
 function renderPreview(
-  lang,
+  language,
   code
 ){
 
@@ -2830,10 +2638,11 @@ function renderPreview(
     .display =
     "block";
 
+
   $("#previewFrame")
     .srcdoc =
-    buildFullDoc(
-      lang,
+    buildFullDocument(
+      language,
       code
     );
 
@@ -2847,6 +2656,7 @@ function hidePreview(){
     .display =
     "none";
 
+
   $("#previewFrame")
     .srcdoc =
     "about:blank";
@@ -2856,30 +2666,19 @@ function hidePreview(){
 
 function updateWebUI(){
 
-  const lang =
+  const language =
     $("#language").value;
 
-  const isWeb =
-    lang === "html" ||
-    lang === "css" ||
-    lang === "javascript";
+
+  const isPreview =
+    language === "html" ||
+    language === "css";
 
 
-  $("#openBrowser")
-    .style
-    .display =
-    isWeb
-      ? "inline-flex"
-      : "none";
-
-
-  if(
-    lang === "html" ||
-    lang === "css"
-  ){
+  if(isPreview){
 
     renderPreview(
-      lang,
+      language,
       $("#code").value
     );
 
@@ -2890,15 +2689,13 @@ function updateWebUI(){
   }
 
 
-  updateModeStatus();
+  $("#openBrowser")
+    .style
+    .display =
+      isPreview
+        ? "inline-flex"
+        : "none";
 
-}
-
-
-function updateModeStatus(){
-
-  const lang =
-    $("#language").value;
 
   const labels = {
 
@@ -2916,16 +2713,16 @@ function updateModeStatus(){
 
   };
 
-  $("#modeStatus")
-    .textContent =
-    labels[lang] ||
+
+  $("#modeStatus").textContent =
+    labels[language] ||
     "Live server execution via TraceLab backend";
 
 }
 
 
 /* =========================================================
-   PYTHON / PYODIDE
+   PYODIDE
 ========================================================= */
 
 let pyodidePromise =
@@ -2945,32 +2742,40 @@ function getPyodide(){
     new Promise(
       (resolve,reject) => {
 
-        function load(){
+        const load =
+          () => {
 
-          if(!window.loadPyodide){
+            if(
+              typeof window.loadPyodide !==
+              "function"
+            ){
 
-            reject(
-              new Error(
-                "Pyodide did not load."
-              )
-            );
+              reject(
+                new Error(
+                  "Pyodide loader is unavailable."
+                )
+              );
 
-            return;
+              return;
 
-          }
-
-          window
-            .loadPyodide({
-              indexURL:
-                "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/"
-            })
-            .then(resolve)
-            .catch(reject);
-
-        }
+            }
 
 
-        if(window.loadPyodide){
+            window
+              .loadPyodide({
+                indexURL:
+                  "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/"
+              })
+              .then(resolve)
+              .catch(reject);
+
+          };
+
+
+        if(
+          typeof window.loadPyodide ===
+          "function"
+        ){
 
           load();
 
@@ -2984,19 +2789,26 @@ function getPyodide(){
             "script"
           );
 
+
         script.src =
           "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
+
 
         script.onload =
           load;
 
+
         script.onerror =
-          () =>
+          () => {
+
             reject(
               new Error(
-                "Could not load the Python runtime from Pyodide."
+                "Could not load Pyodide."
               )
             );
+
+          };
+
 
         document.head.appendChild(
           script
@@ -3012,7 +2824,8 @@ function getPyodide(){
 
 
 async function runPythonCode(
-  code
+  code,
+  stdinText
 ){
 
   const logs = [];
@@ -3025,20 +2838,67 @@ async function runPythonCode(
 
 
     py.setStdout({
+
       batched:
-        text =>
+        text => {
+
           logs.push(
             String(text)
-          )
+          );
+
+        }
+
     });
 
 
     py.setStderr({
+
       batched:
-        text =>
+        text => {
+
           logs.push(
             `stderr: ${String(text)}`
-          )
+          );
+
+        }
+
+    });
+
+
+    const inputLines =
+      String(
+        stdinText || ""
+      )
+      .split(/\r?\n/);
+
+
+    let inputIndex =
+      0;
+
+
+    py.setStdin({
+
+      stdin: () => {
+
+        if(
+          inputIndex >=
+          inputLines.length
+        ){
+
+          return undefined;
+
+        }
+
+        return (
+          inputLines[
+            inputIndex++
+          ]
+        );
+
+      },
+
+      isatty:false
+
     });
 
 
@@ -3050,7 +2910,10 @@ async function runPythonCode(
   }catch(error){
 
     logs.push(
-      `✕ ${String(error)}`
+      `✕ Python execution failed: ${
+        error?.message ||
+        String(error)
+      }`
     );
 
   }
@@ -3078,26 +2941,133 @@ function runJavaScriptCode(
 
       const logs = [];
 
-      let done =
+      let finished =
         false;
+
 
       const iframe =
         document.createElement(
           "iframe"
         );
 
+
       iframe.style.display =
         "none";
+
 
       iframe.sandbox =
         "allow-scripts";
 
 
-      const source = `
+      function finish(){
+
+        if(finished){
+          return;
+        }
+
+
+        finished =
+          true;
+
+
+        window.removeEventListener(
+          "message",
+          onMessage
+        );
+
+
+        if(
+          iframe.parentNode
+        ){
+
+          iframe.remove();
+
+        }
+
+
+        resolve(
+          logs.length
+            ? logs
+            : [
+                "(No output — add console.log(...) to see output.)"
+              ]
+        );
+
+      }
+
+
+      function onMessage(event){
+
+        if(
+          event.source !==
+          iframe.contentWindow
+        ){
+
+          return;
+
+        }
+
+
+        const data =
+          event.data;
+
+
+        if(
+          !data ||
+          data.__tracelab !== true
+        ){
+
+          return;
+
+        }
+
+
+        if(
+          data.type === "done"
+        ){
+
+          finish();
+
+          return;
+
+        }
+
+
+        const prefix =
+          data.type === "error"
+            ? "✕ "
+            : data.type === "warn"
+              ? "⚠ "
+              : "";
+
+
+        const args =
+          Array.isArray(
+            data.args
+          )
+            ? data.args
+            : [String(data.args ?? "")];
+
+
+        logs.push(
+          prefix +
+          args.join(" ")
+        );
+
+      }
+
+
+      window.addEventListener(
+        "message",
+        onMessage
+      );
+
+
+      const source =
+`
 <!doctype html>
 <html>
 <body>
-
 <script>
 
 const send = (type,args) => {
@@ -3112,7 +3082,8 @@ const send = (type,args) => {
           try{
 
             if(
-              typeof value === "object"
+              typeof value === "object" &&
+              value !== null
             ){
 
               return JSON.stringify(
@@ -3121,15 +3092,11 @@ const send = (type,args) => {
 
             }
 
-            return String(
-              value
-            );
+            return String(value);
 
           }catch{
 
-            return String(
-              value
-            );
+            return String(value);
 
           }
 
@@ -3169,10 +3136,8 @@ send(
 send(
   "error",
   [
-    error &&
-    error.message
-      ? error.message
-      : String(error)
+    error?.message ||
+    String(error)
   ]
 );
 
@@ -3184,88 +3149,9 @@ send(
 }
 
 <\/script>
-
 </body>
 </html>
 `;
-
-
-      function finish(){
-
-        if(done){
-          return;
-        }
-
-        done =
-          true;
-
-        window.removeEventListener(
-          "message",
-          handler
-        );
-
-
-        if(
-          iframe.parentNode
-        ){
-
-          iframe.remove();
-
-        }
-
-
-        resolve(
-          logs.length
-            ? logs
-            : [
-                "(No output — add console.log(...) to see output.)"
-              ]
-        );
-
-      }
-
-
-      function handler(event){
-
-        if(
-          !event.data ||
-          !event.data.__tracelab
-        ){
-          return;
-        }
-
-
-        if(
-          event.data.type === "done"
-        ){
-
-          finish();
-
-          return;
-
-        }
-
-
-        const prefix =
-          event.data.type === "error"
-            ? "✕ "
-            : event.data.type === "warn"
-              ? "⚠ "
-              : "";
-
-
-        logs.push(
-          prefix +
-          event.data.args.join(" ")
-        );
-
-      }
-
-
-      window.addEventListener(
-        "message",
-        handler
-      );
 
 
       iframe.srcdoc =
@@ -3279,7 +3165,7 @@ send(
 
       setTimeout(
         finish,
-        3000
+        5000
       );
 
     }
@@ -3293,11 +3179,22 @@ send(
 ========================================================= */
 
 async function runRemoteCode(
-  lang,
+  language,
   code,
-  stdin,
-  label
+  stdin
 ){
+
+  const controller =
+    new AbortController();
+
+
+  const timeout =
+    setTimeout(
+      () =>
+        controller.abort(),
+      20000
+    );
+
 
   try{
 
@@ -3317,41 +3214,54 @@ async function runRemoteCode(
 
           body:
             JSON.stringify({
-              language:lang,
-              code:code,
-              stdin:stdin
-            })
+              language,
+              code,
+              stdin
+            }),
+
+          signal:
+            controller.signal
         }
       );
 
 
-    let data = {};
+    const text =
+      await response.text();
+
+
+    let data;
 
 
     try{
 
       data =
-        await response.json();
+        JSON.parse(text);
 
     }catch{
 
-      data = {};
+      data = {
+        error:text
+      };
 
     }
 
 
-    if(!response.ok){
+    if(
+      !response.ok
+    ){
 
       return {
+
         ok:false,
 
         output:
-          `✕ ${label} execution failed\n` +
+          `✕ Backend execution failed\n` +
           (
             data.error ||
             data.message ||
             `HTTP ${response.status}`
           )
+
       };
 
     }
@@ -3360,7 +3270,7 @@ async function runRemoteCode(
     return {
 
       ok:
-        Boolean(data.ok),
+        data.ok === true,
 
       output:
         String(
@@ -3370,7 +3280,7 @@ async function runRemoteCode(
 
       runtime:
         data.runtime ||
-        label,
+        language,
 
       executionTime:
         data.executionTime ??
@@ -3385,6 +3295,23 @@ async function runRemoteCode(
 
   }catch(error){
 
+    if(
+      error?.name ===
+      "AbortError"
+    ){
+
+      return {
+
+        ok:false,
+
+        output:
+          "✕ Execution timed out. Please try a shorter program."
+
+      };
+
+    }
+
+
     return {
 
       ok:false,
@@ -3397,6 +3324,12 @@ async function runRemoteCode(
         )
 
     };
+
+  }finally{
+
+    clearTimeout(
+      timeout
+    );
 
   }
 
@@ -3413,32 +3346,19 @@ async function checkBackend(){
     $("#serverStatus");
 
 
-  if(
-    location.protocol === "file:"
-  ){
-
-    status.textContent =
-      "● Local file · deploy to web";
-
-    status.className =
-      "server-pill warning";
-
-    return;
-
-  }
-
-
   try{
 
     const response =
       await fetch(
-        `${TRACELAB_BACKEND}/api/health`,
+        `${TRACELAB_BACKEND}/api/health?t=${Date.now()}`,
         {
           method:"GET",
+
           headers:{
             "Accept":
               "application/json"
           },
+
           cache:"no-store"
         }
       );
@@ -3496,24 +3416,27 @@ async function checkBackend(){
 
 
 /* =========================================================
-   FLOW CONTROLS
+   FLOW PLAYBACK
 ========================================================= */
 
-function stop(){
+function stopFlow(){
 
-  if(timer){
+  if(flowTimer){
 
     clearInterval(
-      timer
+      flowTimer
     );
 
   }
 
-  timer =
+
+  flowTimer =
     null;
+
 
   $("#play").textContent =
     "▶ Play flow";
+
 
   $("#play")
     .classList
@@ -3522,42 +3445,44 @@ function stop(){
 }
 
 
-function play(){
+function playFlow(){
 
-  if(timer){
+  if(flowTimer){
 
-    stop();
+    stopFlow();
 
     return;
 
   }
 
 
-  const currentLanguage =
+  const language =
     $("#language").value;
 
-  const active =
-    getActiveFlow();
+
+  const flow =
+    getFlow();
 
 
   $("#play").textContent =
     "❚❚ Pause";
+
 
   $("#play")
     .classList
     .add("playing");
 
 
-  timer =
+  flowTimer =
     setInterval(
       () => {
 
         if(
-          currentLanguage !==
+          language !==
           $("#language").value
         ){
 
-          stop();
+          stopFlow();
 
           return;
 
@@ -3566,7 +3491,7 @@ function play(){
 
         step =
           (step + 1) %
-          active.length;
+          flow.length;
 
 
         render();
@@ -3576,6 +3501,216 @@ function play(){
         $("#speed").value
       )
     );
+
+}
+
+
+/* =========================================================
+   AUTO DETECT
+========================================================= */
+
+function detectLanguage(){
+
+  const source =
+    $("#code")
+      .value
+      .toLowerCase();
+
+
+  const markers = {
+
+    html:[
+      "<!doctype html",
+      "<html",
+      "<body",
+      "<div"
+    ],
+
+    css:[
+      "font-family:",
+      "background:",
+      "border-radius:"
+    ],
+
+    python:[
+      "def ",
+      "print(",
+      "import "
+    ],
+
+    javascript:[
+      "console.log",
+      "const ",
+      "let ",
+      "=>"
+    ],
+
+    typescript:[
+      "interface ",
+      ": number",
+      ": string",
+      "number[]"
+    ],
+
+    c:[
+      "#include <stdio",
+      "printf("
+    ],
+
+    cpp:[
+      "#include <iostream>",
+      "std::",
+      "cout"
+    ],
+
+    java:[
+      "public static void main",
+      "system.out",
+      "class "
+    ],
+
+    go:[
+      "package main",
+      "fmt."
+    ],
+
+    kotlin:[
+      "fun main",
+      "println"
+    ],
+
+    swift:[
+      "func ",
+      "print("
+    ],
+
+    ruby:[
+      "puts ",
+      " do |"
+    ],
+
+    php:[
+      "<?php",
+      "echo ",
+      "$"
+    ],
+
+    perl:[
+      "my $",
+      "print "
+    ],
+
+    bash:[
+      "#!/bin",
+      "echo ",
+      "$(("
+    ],
+
+    sql:[
+      "select ",
+      "create table"
+    ]
+
+  };
+
+
+  let best =
+    "python";
+
+  let bestScore =
+    0;
+
+
+  for(
+    const [
+      language,
+      words
+    ] of Object.entries(markers)
+  ){
+
+    let score =
+      0;
+
+
+    for(
+      const word of words
+    ){
+
+      if(
+        source.includes(word)
+      ){
+
+        score++;
+
+      }
+
+    }
+
+
+    if(
+      score >
+      bestScore
+    ){
+
+      bestScore =
+        score;
+
+      best =
+        language;
+
+    }
+
+  }
+
+
+  if(
+    bestScore === 0
+  ){
+
+    setStatus(
+      "● Could not detect",
+      "error"
+    );
+
+
+    $("#output").textContent =
+      "Auto-detect could not identify the language.";
+
+    return;
+
+  }
+
+
+  $("#language").value =
+    best;
+
+
+  putCode();
+
+  render();
+
+  updateWebUI();
+
+
+  const label =
+    $("#language")
+      .options[
+        $("#language").selectedIndex
+      ]
+      .text;
+
+
+  setStatus(
+    `✦ Detected ${label}`
+  );
+
+
+  $("#output").textContent =
+    `${label} detected.\nRun the program to execute it.`;
+
+
+  $("#detect").textContent =
+    `✓ ${label}`;
 
 }
 
@@ -3591,24 +3726,26 @@ function explainLogic(){
       .value
       .split("\n");
 
-  const hits = [];
+
+  const matches = [];
+
+
+  const pattern =
+    /^(def |function |class |for |while |if |else if|elif |switch |try |public static|int main|func main|fun main)/;
 
 
   lines.forEach(
     (line,index) => {
 
-      const text =
-        line.trim();
-
-
       if(
-        /^(def |function |class |for |while |if |else if|elif |switch |try |public static|int main|func main|fun main|main\s*\()/
-          .test(text)
+        pattern.test(
+          line.trim()
+        )
       ){
 
-        hits.push([
+        matches.push([
           index,
-          text
+          line.trim()
         ]);
 
       }
@@ -3618,7 +3755,7 @@ function explainLogic(){
 
 
   const first =
-    hits[0] ||
+    matches[0] ||
     [
       0,
       lines.find(
@@ -3634,24 +3771,27 @@ function explainLogic(){
 
 
   if(
-    /for |while /
-      .test(first[1])
+    /^(for |while )/.test(
+      first[1]
+    )
   ){
 
     kind =
       "loop";
 
   }else if(
-    /if |switch /
-      .test(first[1])
+    /^(if |else if|elif |switch )/.test(
+      first[1]
+    )
   ){
 
     kind =
       "decision";
 
   }else if(
-    /def |function |class |func |fun /
-      .test(first[1])
+    /^(def |function |class |func |fun )/.test(
+      first[1]
+    )
   ){
 
     kind =
@@ -3663,13 +3803,13 @@ function explainLogic(){
   $("#logicSummary").innerHTML =
     `<strong>Main path found.</strong> ` +
     `This ${lines.length}-line program has ` +
-    `${hits.length} detected control-flow block` +
-    `${hits.length === 1 ? "" : "s"}. ` +
+    `${matches.length} detected control-flow block` +
+    `${matches.length === 1 ? "" : "s"}. ` +
     `The first important ${kind} appears on line ` +
     `${first[0] + 1}.`;
 
 
-  const selected =
+  $("#logicCode").textContent =
     lines
       .slice(
         Math.max(
@@ -3687,17 +3827,14 @@ function explainLogic(){
             Math.max(
               0,
               first[0] - 1
-            ) + index + 1
+            ) +
+            index +
+            1
           ).padStart(3," ") +
           "  " +
           line
       )
       .join("\n");
-
-
-  $("#logicCode")
-    .textContent =
-    selected;
 
 
   $("#focus").textContent =
@@ -3707,68 +3844,29 @@ function explainLogic(){
 
 
 /* =========================================================
-   BUTTONS
-========================================================= */
-
-$("#play").onclick =
-  play;
-
-
-$("#next").onclick =
-  () => {
-
-    stop();
-
-    const total =
-      getActiveFlow().length;
-
-    step =
-      (step + 1) %
-      total;
-
-    render();
-
-  };
-
-
-$("#prev").onclick =
-  () => {
-
-    stop();
-
-    const total =
-      getActiveFlow().length;
-
-    step =
-      (step - 1 + total) %
-      total;
-
-    render();
-
-  };
-
-
-/* =========================================================
    RUN
 ========================================================= */
 
 $("#run").onclick =
   async () => {
 
-    stop();
+    stopFlow();
 
-    step = 0;
+
+    const currentExecution =
+      ++executionId;
+
+
+    step =
+      0;
+
 
     render();
 
     explainLogic();
 
 
-    const myGeneration =
-      ++executionGeneration;
-
-
-    const lang =
+    const language =
       $("#language").value;
 
 
@@ -3780,12 +3878,23 @@ $("#run").onclick =
       $("#stdin").value;
 
 
-    const label =
-      $("#language")
-        .options[
-          $("#language").selectedIndex
-        ]
-        .text;
+    if(
+      !code.trim()
+    ){
+
+      $("#output").textContent =
+        "✕ Your code is empty.";
+
+
+      setStatus(
+        "● Nothing to run",
+        "error"
+      );
+
+
+      return;
+
+    }
 
 
     $("#run").disabled =
@@ -3794,33 +3903,50 @@ $("#run").onclick =
 
     try{
 
+      /* =============================================
+         HTML / CSS
+      ============================================= */
+
       if(
-        !code.trim()
+        language === "html" ||
+        language === "css"
       ){
 
-        $("#output").textContent =
-          "✕ Your code is empty.";
+        renderPreview(
+          language,
+          code
+        );
 
-        $("#status").textContent =
-          "● Nothing to run";
+
+        $("#output").textContent =
+          "Rendered below in the live preview.";
+
+
+        setStatus(
+          "● Preview ready"
+        );
+
 
         return;
 
       }
 
 
-      /* -----------------------------------------------
+      /* =============================================
          JAVASCRIPT
-      ------------------------------------------------ */
+      ============================================= */
 
       if(
-        lang === "javascript"
+        language === "javascript"
       ){
 
-        $("#status").textContent =
-          "● Running JavaScript…";
-
         hidePreview();
+
+
+        setStatus(
+          "● Running JavaScript…",
+          "running"
+        );
 
 
         const logs =
@@ -3830,8 +3956,8 @@ $("#run").onclick =
 
 
         if(
-          myGeneration !==
-          executionGeneration
+          currentExecution !==
+          executionId
         ){
 
           return;
@@ -3843,13 +3969,21 @@ $("#run").onclick =
           logs.join("\n");
 
 
-        $("#status").textContent =
+        const failed =
           logs.some(
             line =>
               line.startsWith("✕")
-          )
+          );
+
+
+        setStatus(
+          failed
             ? "● Execution failed"
-            : "● Executed live";
+            : "● Executed live",
+          failed
+            ? "error"
+            : "ready"
+        );
 
 
         return;
@@ -3857,29 +3991,33 @@ $("#run").onclick =
       }
 
 
-      /* -----------------------------------------------
+      /* =============================================
          PYTHON
-      ------------------------------------------------ */
+      ============================================= */
 
       if(
-        lang === "python"
+        language === "python"
       ){
-
-        $("#status").textContent =
-          "● Starting Python…";
 
         hidePreview();
 
 
+        setStatus(
+          "● Starting Python…",
+          "running"
+        );
+
+
         const logs =
           await runPythonCode(
-            code
+            code,
+            stdin
           );
 
 
         if(
-          myGeneration !==
-          executionGeneration
+          currentExecution !==
+          executionId
         ){
 
           return;
@@ -3891,71 +4029,60 @@ $("#run").onclick =
           logs.join("\n");
 
 
-        $("#status").textContent =
+        const failed =
           logs.some(
             line =>
               line.startsWith("✕")
-          )
+          );
+
+
+        setStatus(
+          failed
             ? "● Python execution failed"
-            : "● Executed live";
-
-
-        return;
-
-      }
-
-
-      /* -----------------------------------------------
-         HTML / CSS
-      ------------------------------------------------ */
-
-      if(
-        lang === "html" ||
-        lang === "css"
-      ){
-
-        renderPreview(
-          lang,
-          code
+            : "● Executed live",
+          failed
+            ? "error"
+            : "ready"
         );
 
 
-        $("#output").textContent =
-          "Rendered below in the live preview.";
-
-
-        $("#status").textContent =
-          "● Preview ready";
-
-
         return;
 
       }
 
 
-      /* -----------------------------------------------
+      /* =============================================
          HOSTED LANGUAGES
-      ------------------------------------------------ */
+      ============================================= */
 
       hidePreview();
 
 
-      $("#status").textContent =
-        `● Compiling and running ${label}…`;
+      const label =
+        $("#language")
+          .options[
+            $("#language").selectedIndex
+          ]
+          .text;
+
+
+      setStatus(
+        `● Compiling and running ${label}…`,
+        "running"
+      );
 
 
       const result =
         await runRemoteCode(
-          lang,
+          language,
           code,
-          stdin,
-          label
+          stdin
         );
 
 
       if(
-        myGeneration !==
-        executionGeneration
+        currentExecution !==
+        executionId
       ){
 
         return;
@@ -3965,6 +4092,24 @@ $("#run").onclick =
 
       $("#output").textContent =
         result.output;
+
+
+      if(
+        result.ok
+      ){
+
+        setStatus(
+          "● Executed live"
+        );
+
+      }else{
+
+        setStatus(
+          "● Execution failed",
+          "error"
+        );
+
+      }
 
 
       if(
@@ -3982,13 +4127,6 @@ $("#run").onclick =
 
       }
 
-
-      $("#status").textContent =
-        result.ok
-          ? "● Executed live"
-          : "● Execution failed";
-
-
     }catch(error){
 
       $("#output").textContent =
@@ -4000,26 +4138,25 @@ $("#run").onclick =
         );
 
 
-      $("#status").textContent =
-        "● Error";
+      setStatus(
+        "● Error",
+        "error"
+      );
 
 
       console.error(
         error
       );
 
-
     }finally{
 
       if(
-        myGeneration ===
-        executionGeneration
+        currentExecution ===
+        executionId
       ){
 
         $("#run").disabled =
           false;
-
-        stop();
 
       }
 
@@ -4029,27 +4166,182 @@ $("#run").onclick =
 
 
 /* =========================================================
-   OPEN BROWSER
+   RESET
+========================================================= */
+
+$("#reset").onclick =
+  () => {
+
+    executionId++;
+
+    stopFlow();
+
+    step =
+      0;
+
+    putCode();
+
+    render();
+
+    updateWebUI();
+
+    explainLogic();
+
+
+    $("#output").textContent =
+      "Ready.";
+
+
+    setStatus(
+      "● Ready"
+    );
+
+  };
+
+
+/* =========================================================
+   LANGUAGE CHANGE
+========================================================= */
+
+$("#language").onchange =
+  () => {
+
+    executionId++;
+
+    stopFlow();
+
+    step =
+      0;
+
+    putCode();
+
+    render();
+
+    updateWebUI();
+
+    explainLogic();
+
+
+    const language =
+      $("#language").value;
+
+
+    setStatus(
+      "● Ready"
+    );
+
+
+    if(
+      language === "html" ||
+      language === "css"
+    ){
+
+      $("#output").textContent =
+        "Browser preview updated.";
+
+    }else if(
+      language === "python"
+    ){
+
+      $("#output").textContent =
+        "Python selected. Run to execute locally.";
+
+    }else if(
+      language === "javascript"
+    ){
+
+      $("#output").textContent =
+        "JavaScript selected. Run to execute locally.";
+
+    }else{
+
+      $("#output").textContent =
+        "Hosted language selected. Run to execute through TraceLab.";
+
+    }
+
+  };
+
+
+/* =========================================================
+   CODE INPUT
+========================================================= */
+
+$("#code").oninput =
+  () => {
+
+    numberLines();
+
+    $("#detect").textContent =
+      "✦ Auto-detect";
+
+
+    explainLogic();
+
+
+    const language =
+      $("#language").value;
+
+
+    if(
+      language === "html" ||
+      language === "css"
+    ){
+
+      renderPreview(
+        language,
+        $("#code").value
+      );
+
+    }
+
+  };
+
+
+/* =========================================================
+   INPUT BOX
+========================================================= */
+
+$("#stdin").oninput =
+  () => {
+
+    $("#stdin").classList.remove(
+      "input-error"
+    );
+
+  };
+
+
+/* =========================================================
+   OPEN IN BROWSER
 ========================================================= */
 
 $("#openBrowser").onclick =
   () => {
 
-    const lang =
+    const language =
       $("#language").value;
+
 
     const code =
       $("#code").value;
 
 
+    const documentText =
+      buildFullDocument(
+        language,
+        code
+      );
+
+
+    if(!documentText){
+      return;
+    }
+
+
     const blob =
       new Blob(
-        [
-          buildFullDoc(
-            lang,
-            code
-          )
-        ],
+        [documentText],
         {
           type:"text/html"
         }
@@ -4081,8 +4373,40 @@ $("#openBrowser").onclick =
 
 
 /* =========================================================
-   LOGIC
+   FLOW BUTTONS
 ========================================================= */
+
+$("#play").onclick =
+  playFlow;
+
+
+$("#next").onclick =
+  () => {
+
+    stopFlow();
+
+    step =
+      (step + 1) %
+      getFlow().length;
+
+    render();
+
+  };
+
+
+$("#prev").onclick =
+  () => {
+
+    stopFlow();
+
+    step =
+      (step - 1 + getFlow().length) %
+      getFlow().length;
+
+    render();
+
+  };
+
 
 $("#focus").onclick =
   explainLogic;
@@ -4090,141 +4414,6 @@ $("#focus").onclick =
 
 $("#detect").onclick =
   detectLanguage;
-
-
-/* =========================================================
-   RESET
-========================================================= */
-
-$("#reset").onclick =
-  () => {
-
-    executionGeneration++;
-
-    stop();
-
-    step = 0;
-
-    putCode();
-
-    render();
-
-    hidePreview();
-
-    updateWebUI();
-
-    explainLogic();
-
-    $("#status").textContent =
-      "● Ready";
-
-    $("#output").textContent =
-      "Ready.";
-
-
-    $("#modeStatus").textContent =
-      "Code reset to the built-in example.";
-
-  };
-
-
-/* =========================================================
-   LANGUAGE CHANGE
-========================================================= */
-
-$("#language").onchange =
-  () => {
-
-    executionGeneration++;
-
-    stop();
-
-    step = 0;
-
-    putCode();
-
-    render();
-
-    updateWebUI();
-
-    explainLogic();
-
-
-    $("#status").textContent =
-      "● Ready";
-
-
-    const lang =
-      $("#language").value;
-
-
-    if(
-      lang === "python"
-    ){
-
-      $("#output").textContent =
-        "Python selected. Run to execute locally.";
-
-    }else if(
-      lang === "javascript"
-    ){
-
-      $("#output").textContent =
-        "JavaScript selected. Run to execute locally.";
-
-    }else if(
-      lang === "html" ||
-      lang === "css"
-    ){
-
-      $("#output").textContent =
-        "Browser preview updated.";
-
-    }else{
-
-      $("#output").textContent =
-        "Hosted language selected. Run to execute through TraceLab.";
-
-    }
-
-  };
-
-
-/* =========================================================
-   CODE INPUT
-========================================================= */
-
-$("#code").oninput =
-  () => {
-
-    numberLines();
-
-    stop();
-
-    $("#focus").textContent =
-      "⌘ Explain main logic";
-
-    $("#detect").textContent =
-      "✦ Auto-detect";
-
-
-    const lang =
-      $("#language").value;
-
-
-    if(
-      lang === "html" ||
-      lang === "css"
-    ){
-
-      renderPreview(
-        lang,
-        $("#code").value
-      );
-
-    }
-
-  };
 
 
 /* =========================================================
@@ -4277,32 +4466,7 @@ $("#siteNav")
 
 
 /* =========================================================
-   STARTUP
-========================================================= */
-
-$("#year").textContent =
-  new Date().getFullYear();
-
-
-putCode();
-
-render();
-
-explainLogic();
-
-updateWebUI();
-
-checkBackend();
-
-
-setInterval(
-  checkBackend,
-  30000
-);
-
-
-/* =========================================================
-   CTRL + ENTER
+   KEYBOARD SHORTCUT
 ========================================================= */
 
 document.addEventListener(
@@ -4322,6 +4486,30 @@ document.addEventListener(
     }
 
   }
+);
+
+
+/* =========================================================
+   STARTUP
+========================================================= */
+
+$("#year").textContent =
+  new Date().getFullYear();
+
+putCode();
+
+render();
+
+explainLogic();
+
+updateWebUI();
+
+checkBackend();
+
+
+setInterval(
+  checkBackend,
+  30000
 );
 
 </script>
