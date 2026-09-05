@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>TraceLab | Learn code by watching it run</title>
 
@@ -24,6 +24,9 @@
   --pale:#eff2ff;
   --danger:#df5f67;
   --warning:#b07a12;
+  --input-bg:#fffaf0;
+  --input-border:#e2ad31;
+  --white:#ffffff;
 }
 
 *{
@@ -179,7 +182,7 @@ h1 span{
 }
 
 .editor{
-  min-height:700px;
+  min-height:720px;
   border-right:1px solid var(--line);
   display:flex;
   flex-direction:column;
@@ -277,40 +280,131 @@ h1 span{
 }
 
 .stdin-wrap{
-  padding:12px 16px;
+  padding:14px 16px 15px;
   border-top:1px solid var(--line);
   background:#fbfcff;
+  transition:
+    background .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+}
+
+.stdin-wrap.needs-input{
+  background:var(--input-bg);
+  box-shadow:inset 5px 0 0 var(--input-border);
+}
+
+.stdin-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:8px;
 }
 
 .stdin-label{
-  display:block;
-  margin-bottom:7px;
   color:#707b91;
   font-size:11px;
   font-weight:800;
 }
 
+.stdin-wrap.needs-input .stdin-label{
+  color:#8b6205;
+}
+
+.input-alert{
+  display:none;
+  color:#9a6a00;
+  font-size:10px;
+  font-weight:800;
+  text-align:right;
+}
+
+.stdin-wrap.needs-input .input-alert{
+  display:block;
+  animation:inputBlink 1s ease-in-out infinite;
+}
+
+.input-prompt{
+  display:none;
+  margin:0 0 8px;
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #efd38a;
+  background:#fff6d9;
+  color:#805a00;
+  font:12px/1.45 monospace;
+  font-weight:700;
+}
+
+.stdin-wrap.needs-input .input-prompt{
+  display:block;
+  animation:inputBlink 1.15s ease-in-out infinite;
+}
+
 #stdin{
   display:block;
   width:100%;
-  min-height:72px;
+  min-height:78px;
   resize:vertical;
-  padding:10px 12px;
+  padding:11px 12px;
   border:1px solid var(--line);
   border-radius:9px;
   outline:0;
   background:#fff;
   color:#2b3852;
   font:12px/1.5 monospace;
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
 }
 
 #stdin::placeholder{
   color:#a4adbd;
 }
 
+.stdin-wrap.needs-input #stdin{
+  border-color:var(--input-border);
+  background:#fffdf6;
+  box-shadow:
+    0 0 0 3px #f4e3b2,
+    0 0 16px #e2ad3140;
+  animation:inputGlow 1.35s ease-in-out infinite;
+}
+
 #stdin:focus{
-  border-color:#bfcaff;
-  box-shadow:0 0 0 2px #eff2ff;
+  border-color:#8ca3f7;
+}
+
+.stdin-wrap.needs-input #stdin:focus{
+  border-color:#d09518;
+  box-shadow:
+    0 0 0 3px #f2dfad,
+    0 0 16px #e2ad3140;
+  animation:none;
+}
+
+@keyframes inputBlink{
+  0%,100%{
+    opacity:1;
+  }
+  50%{
+    opacity:.35;
+  }
+}
+
+@keyframes inputGlow{
+  0%,100%{
+    box-shadow:
+      0 0 0 3px #f4e3b2,
+      0 0 10px #e2ad3125;
+  }
+  50%{
+    box-shadow:
+      0 0 0 4px #e8ca72,
+      0 0 20px #e2ad3150;
+  }
 }
 
 .runbar{
@@ -345,7 +439,7 @@ h1 span{
   margin-left:auto;
   font-size:11px;
   color:#9aa3b3;
-  max-width:260px;
+  max-width:300px;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -405,7 +499,7 @@ h1 span{
   font:12px/21px monospace;
   white-space:pre-wrap;
   overflow:auto;
-  max-height:220px;
+  max-height:240px;
 }
 
 .preview{
@@ -445,7 +539,8 @@ h1 span{
   position:relative;
   overflow:hidden;
   border-bottom:1px solid var(--line);
-  background-image:radial-gradient(#d8deea 1px,transparent 1px);
+  background-image:
+    radial-gradient(#d8deea 1px,transparent 1px);
   background-size:19px 19px;
 }
 
@@ -510,7 +605,10 @@ h1 span{
 .node.active{
   border-color:var(--blue);
   background:#edf1ff;
-  transform:translateX(-50%) translateY(-8px) scale(1.08);
+  transform:
+    translateX(-50%)
+    translateY(-8px)
+    scale(1.08);
   box-shadow:0 10px 25px #5277f538;
 }
 
@@ -883,6 +981,7 @@ h1 span{
 }
 
 @media(max-width:1050px){
+
   .lower{
     grid-template-columns:1fr 1fr;
   }
@@ -894,9 +993,11 @@ h1 span{
   .cap-grid{
     grid-template-columns:1fr 1fr;
   }
+
 }
 
 @media(max-width:860px){
+
   .nav{
     position:absolute;
     top:72px;
@@ -954,9 +1055,11 @@ h1 span{
   .faq-grid{
     grid-template-columns:1fr;
   }
+
 }
 
 @media(max-width:480px){
+
   .node{
     width:48px;
     height:48px;
@@ -998,6 +1101,7 @@ h1 span{
     flex-wrap:wrap;
     justify-content:flex-end;
   }
+
 }
 </style>
 </head>
@@ -1019,7 +1123,13 @@ h1 span{
   </nav>
 
   <div class="top-actions">
-    <a class="cta" href="#playground">Start coding</a>
+
+    <a
+      class="cta"
+      href="#playground"
+    >
+      Start coding
+    </a>
 
     <button
       class="menu-btn"
@@ -1030,6 +1140,7 @@ h1 span{
     >
       ☰
     </button>
+
   </div>
 
 </header>
@@ -1056,16 +1167,25 @@ h1 span{
 </section>
 
 
-<section class="workspace" id="playground">
+<section
+  class="workspace"
+  id="playground"
+>
 
   <div class="editor">
 
     <div class="bar">
 
       <div class="file">
+
         <i></i>
-        <span id="file">main.py</span>
+
+        <span id="file">
+          main.py
+        </span>
+
       </div>
+
 
       <div class="bar-actions">
 
@@ -1077,6 +1197,7 @@ h1 span{
           ✦ Auto-detect
         </button>
 
+
         <button
           class="detect"
           id="openBrowser"
@@ -1086,6 +1207,7 @@ h1 span{
           ↗ Open in browser
         </button>
 
+
         <select
           class="lang"
           id="language"
@@ -1093,31 +1215,89 @@ h1 span{
         >
 
           <optgroup label="Web">
-            <option value="html">HTML</option>
-            <option value="css">CSS</option>
+
+            <option value="html">
+              HTML
+            </option>
+
+            <option value="css">
+              CSS
+            </option>
+
           </optgroup>
+
 
           <optgroup label="Popular">
-            <option value="python" selected>Python 3</option>
-            <option value="javascript">JavaScript</option>
-            <option value="typescript">TypeScript</option>
-            <option value="c">C</option>
-            <option value="cpp">C++</option>
-            <option value="java">Java</option>
-            <option value="go">Go</option>
+
+            <option
+              value="python"
+              selected
+            >
+              Python 3
+            </option>
+
+            <option value="javascript">
+              JavaScript
+            </option>
+
+            <option value="typescript">
+              TypeScript
+            </option>
+
+            <option value="c">
+              C
+            </option>
+
+            <option value="cpp">
+              C++
+            </option>
+
+            <option value="java">
+              Java
+            </option>
+
+            <option value="go">
+              Go
+            </option>
+
           </optgroup>
+
 
           <optgroup label="Modern & mobile">
-            <option value="kotlin">Kotlin</option>
-            <option value="swift">Swift</option>
+
+            <option value="kotlin">
+              Kotlin
+            </option>
+
+            <option value="swift">
+              Swift
+            </option>
+
           </optgroup>
 
+
           <optgroup label="Scripting & data">
-            <option value="ruby">Ruby</option>
-            <option value="php">PHP</option>
-            <option value="perl">Perl</option>
-            <option value="bash">Bash</option>
-            <option value="sql">SQL</option>
+
+            <option value="ruby">
+              Ruby
+            </option>
+
+            <option value="php">
+              PHP
+            </option>
+
+            <option value="perl">
+              Perl
+            </option>
+
+            <option value="bash">
+              Bash
+            </option>
+
+            <option value="sql">
+              SQL
+            </option>
+
           </optgroup>
 
         </select>
@@ -1143,20 +1323,42 @@ h1 span{
     </div>
 
 
-    <div class="stdin-wrap">
+    <div
+      class="stdin-wrap"
+      id="stdinWrap"
+    >
 
-      <label
-        class="stdin-label"
-        for="stdin"
-      >
-        Enter the input here
-      </label>
+      <div class="stdin-head">
+
+        <label
+          class="stdin-label"
+          id="stdinLabel"
+          for="stdin"
+        >
+          Enter the input here
+        </label>
+
+        <span
+          class="input-alert"
+          id="inputAlert"
+        >
+          USER INPUT HERE
+        </span>
+
+      </div>
+
+
+      <div
+        class="input-prompt"
+        id="inputPrompt"
+      ></div>
+
 
       <textarea
         id="stdin"
         placeholder="Enter the input here..."
         spellcheck="false"
-        aria-label="Program input"
+        aria-label="User program input"
       ></textarea>
 
     </div>
@@ -1172,6 +1374,7 @@ h1 span{
         ▶ Run &amp; visualize
       </button>
 
+
       <button
         class="reset"
         id="reset"
@@ -1180,12 +1383,14 @@ h1 span{
         ↻ Reset
       </button>
 
+
       <span
         class="saved"
         id="modeStatus"
       >
         Python runs locally in your browser
       </span>
+
 
       <span
         class="server-pill"
@@ -1214,6 +1419,7 @@ h1 span{
 
       </div>
 
+
       <pre id="output">Ready.</pre>
 
     </div>
@@ -1231,11 +1437,12 @@ h1 span{
           Live preview
         </span>
 
-        <span style="color:#8792a8">
+        <span>
           Sandboxed browser preview
         </span>
 
       </div>
+
 
       <iframe
         id="previewFrame"
@@ -1270,6 +1477,7 @@ h1 span{
 
       <div class="line"></div>
 
+
       <div
         class="pulse"
         id="pulse"
@@ -1277,28 +1485,67 @@ h1 span{
 
 
       <div class="node n1 active">
-        <small id="nodeLabel1">Start</small>
-        <span>⚡</span>
+
+        <small id="nodeLabel1">
+          Start
+        </small>
+
+        <span>
+          ⚡
+        </span>
+
       </div>
+
 
       <div class="node n2">
-        <small id="nodeLabel2">Setup</small>
-        <span>📦</span>
+
+        <small id="nodeLabel2">
+          Setup
+        </small>
+
+        <span>
+          📦
+        </span>
+
       </div>
+
 
       <div class="node n3">
-        <small id="nodeLabel3">Loop</small>
-        <span>↻</span>
+
+        <small id="nodeLabel3">
+          Loop
+        </small>
+
+        <span>
+          ↻
+        </span>
+
       </div>
+
 
       <div class="node n4">
-        <small id="nodeLabel4">Update</small>
-        <span>＋</span>
+
+        <small id="nodeLabel4">
+          Update
+        </small>
+
+        <span>
+          ＋
+        </span>
+
       </div>
 
+
       <div class="node n5">
-        <small id="nodeLabel5">Output</small>
-        <span>⌁</span>
+
+        <small id="nodeLabel5">
+          Output
+        </small>
+
+        <span>
+          ⌁
+        </span>
+
       </div>
 
 
@@ -1331,11 +1578,13 @@ h1 span{
         class="tracks"
         id="tracks"
       >
+
         <i class="track now"></i>
         <i class="track"></i>
         <i class="track"></i>
         <i class="track"></i>
         <i class="track"></i>
+
       </div>
 
 
@@ -1343,11 +1592,13 @@ h1 span{
         class="labels"
         id="labels"
       >
+
         <span>Start</span>
         <span>Setup</span>
         <span>Loop</span>
         <span>Update</span>
         <span>Output</span>
+
       </div>
 
 
@@ -1364,6 +1615,7 @@ h1 span{
             ←
           </button>
 
+
           <button
             class="circle"
             id="next"
@@ -1372,6 +1624,7 @@ h1 span{
           >
             →
           </button>
+
 
           <button
             class="play"
@@ -1466,7 +1719,7 @@ h1 span{
 
 
     <p id="logicSummary">
-      TraceLab identifies common loops, decisions,
+      TraceLab identifies loops, decisions,
       functions, and program entry points.
     </p>
 
@@ -1490,16 +1743,45 @@ h1 span{
     16 supported
   </span>
 
-  <span class="chip">HTML / CSS</span>
-  <span class="chip">Python</span>
-  <span class="chip">JavaScript</span>
-  <span class="chip">TypeScript</span>
-  <span class="chip">C / C++</span>
-  <span class="chip">Java / Go</span>
-  <span class="chip">Kotlin / Swift</span>
-  <span class="chip">Ruby / PHP</span>
-  <span class="chip">Perl / Bash</span>
-  <span class="chip">SQL</span>
+  <span class="chip">
+    HTML / CSS
+  </span>
+
+  <span class="chip">
+    Python
+  </span>
+
+  <span class="chip">
+    JavaScript
+  </span>
+
+  <span class="chip">
+    TypeScript
+  </span>
+
+  <span class="chip">
+    C / C++
+  </span>
+
+  <span class="chip">
+    Java / Go
+  </span>
+
+  <span class="chip">
+    Kotlin / Swift
+  </span>
+
+  <span class="chip">
+    Ruby / PHP
+  </span>
+
+  <span class="chip">
+    Perl / Bash
+  </span>
+
+  <span class="chip">
+    SQL
+  </span>
 
 </div>
 
@@ -1524,8 +1806,8 @@ h1 span{
     </h2>
 
     <p>
-      Write code, enter input when needed, run it for real,
-      then inspect the execution flow.
+      Write code, enter input when requested,
+      run it for real, and inspect the execution flow.
     </p>
 
   </div>
@@ -1535,7 +1817,9 @@ h1 span{
 
     <div class="step-card">
 
-      <span class="num">1</span>
+      <span class="num">
+        1
+      </span>
 
       <h3>
         Write or paste code
@@ -1550,7 +1834,9 @@ h1 span{
 
     <div class="step-card">
 
-      <span class="num">2</span>
+      <span class="num">
+        2
+      </span>
 
       <h3>
         Pick a language
@@ -1565,15 +1851,17 @@ h1 span{
 
     <div class="step-card">
 
-      <span class="num">3</span>
+      <span class="num">
+        3
+      </span>
 
       <h3>
         Run it
       </h3>
 
       <p>
-        Browser languages execute locally. Hosted languages
-        execute through the TraceLab backend.
+        Browser languages execute locally.
+        Hosted languages execute through the TraceLab backend.
       </p>
 
     </div>
@@ -1595,7 +1883,8 @@ h1 span{
     </h2>
 
     <p>
-      TraceLab distinguishes local browser execution from hosted execution.
+      TraceLab distinguishes local browser execution
+      from hosted execution.
     </p>
 
   </div>
@@ -1615,7 +1904,7 @@ h1 span{
 
       <p>
         Executes locally in the browser using Pyodide,
-        including standard input.
+        including program input.
       </p>
 
     </div>
@@ -1700,36 +1989,8 @@ h1 span{
       </h3>
 
       <p>
-        Yes. Browser languages execute locally and hosted languages
-        are sent to the TraceLab backend for real execution.
-      </p>
-
-    </div>
-
-
-    <div class="faq-item">
-
-      <h3>
-        Where does hosted code run?
-      </h3>
-
-      <p>
-        The browser sends hosted-language source to the backend
-        when Run is pressed.
-      </p>
-
-    </div>
-
-
-    <div class="faq-item">
-
-      <h3>
-        Is the flow a debugger?
-      </h3>
-
-      <p>
-        The visual flow is an explanatory execution-flow view.
-        It is separate from the actual compiler/runtime output.
+        Yes. Browser languages execute locally and hosted
+        languages are sent to the TraceLab backend.
       </p>
 
     </div>
@@ -1742,8 +2003,36 @@ h1 span{
       </h3>
 
       <p>
-        Yes. Enter the input in the input box before pressing Run.
-        Python and hosted languages receive that input through stdin.
+        Yes. TraceLab highlights the input area when the
+        program contains a recognized input operation.
+      </p>
+
+    </div>
+
+
+    <div class="faq-item">
+
+      <h3>
+        Does Python input work?
+      </h3>
+
+      <p>
+        Python input() is connected to the input field
+        through the Pyodide standard-input handler.
+      </p>
+
+    </div>
+
+
+    <div class="faq-item">
+
+      <h3>
+        Where does hosted code run?
+      </h3>
+
+      <p>
+        Hosted source is sent to the TraceLab backend,
+        which forwards it to the configured execution provider.
       </p>
 
     </div>
@@ -1759,7 +2048,9 @@ h1 span{
 
     <div class="brand">
 
-      <div class="mark">&gt;_</div>
+      <div class="mark">
+        &gt;_
+      </div>
 
       TraceLab
 
@@ -1813,7 +2104,7 @@ const TRACELAB_EXECUTOR_URL =
 
 
 /* =========================================================
-   DOM
+   DOM HELPERS
 ========================================================= */
 
 const $ =
@@ -1839,10 +2130,10 @@ const codes = {
       "<!doctype html>",
       "<html>",
       "  <head>",
-      "    <title>My Page</title>",
+      "    <title>TraceLab</title>",
       "  </head>",
       "  <body>",
-      "    <h1>Hello, world!</h1>",
+      "    <h1>Hello, TraceLab!</h1>",
       "    <p>Edit this HTML and click Run.</p>",
       "  </body>",
       "</html>"
@@ -1944,14 +2235,14 @@ const codes = {
   java:[
     "Main.java",
     [
+      "import java.util.Scanner;",
+      "",
       "class Main {",
       "  public static void main(String[] args) {",
-      "    int[] numbers = {3, 7, 2, 9};",
-      "    int total = 0;",
-      "    for (int number : numbers) {",
-      "      total += number;",
-      "    }",
-      "    System.out.println(total);",
+      "    Scanner sc = new Scanner(System.in);",
+      "    System.out.print(\"Enter a number: \");",
+      "    int n = sc.nextInt();",
+      "    System.out.println(n * 2);",
       "  }",
       "}"
     ]
@@ -1965,12 +2256,10 @@ const codes = {
       "import \"fmt\"",
       "",
       "func main() {",
-      "  numbers := []int{3, 7, 2, 9}",
-      "  total := 0",
-      "  for _, number := range numbers {",
-      "    total += number",
-      "  }",
-      "  fmt.Println(total)",
+      "  var n int",
+      "  fmt.Print(\"Enter a number: \")",
+      "  fmt.Scan(&n)",
+      "  fmt.Println(n * 2)",
       "}"
     ]
   ],
@@ -1979,12 +2268,9 @@ const codes = {
     "Main.kt",
     [
       "fun main() {",
-      "  val numbers = intArrayOf(3, 7, 2, 9)",
-      "  var total = 0",
-      "  for (number in numbers) {",
-      "    total += number",
-      "  }",
-      "  println(total)",
+      "  print(\"Enter a number: \")",
+      "  val n = readLine()!!.toInt()",
+      "  println(n * 2)",
       "}"
     ]
   ],
@@ -1992,28 +2278,18 @@ const codes = {
   swift:[
     "main.swift",
     [
-      "let numbers = [3, 7, 2, 9]",
-      "var total = 0",
-      "",
-      "for number in numbers {",
-      "    total += number",
-      "}",
-      "",
-      "print(total)"
+      "print(\"Enter a number: \", terminator: \"\")",
+      "let n = Int(readLine()!)!",
+      "print(n * 2)"
     ]
   ],
 
   ruby:[
     "main.rb",
     [
-      "numbers = [3, 7, 2, 9]",
-      "total = 0",
-      "",
-      "numbers.each do |number|",
-      "  total += number",
-      "end",
-      "",
-      "puts total"
+      "print \"Enter a number: \"",
+      "n = gets.to_i",
+      "puts n * 2"
     ]
   ],
 
@@ -2021,37 +2297,27 @@ const codes = {
     "main.php",
     [
       "<?php",
-      "$numbers = [3, 7, 2, 9];",
-      "$total = 0;",
-      "",
-      "foreach ($numbers as $number) {",
-      "    $total += $number;",
-      "}",
-      "",
-      "echo $total, PHP_EOL;"
+      "echo \"Enter a number: \";",
+      "$n = trim(fgets(STDIN));",
+      "echo ($n * 2) . PHP_EOL;"
     ]
   ],
 
   perl:[
     "main.pl",
     [
-      "my @numbers = (3, 7, 2, 9);",
-      "my $total = 0;",
-      "for my $number (@numbers) {",
-      "    $total += $number;",
-      "}",
-      "print \"$total\\n\";"
+      "print \"Enter a number: \";",
+      "my $n = <STDIN>;",
+      "chomp $n;",
+      "print ($n * 2), \"\\n\";"
     ]
   ],
 
   bash:[
     "main.sh",
     [
-      "total=0",
-      "for number in 3 7 2 9; do",
-      "  total=$((total + number))",
-      "done",
-      "echo \"$total\""
+      "read -p \"Enter a number: \" n",
+      "echo $((n * 2))"
     ]
   ],
 
@@ -2074,37 +2340,41 @@ const flowDefinitions = {
   python:[
     [
       "Start",
-      "line 1",
-      "<b>Start</b> — Python begins executing the source.",
-      "<strong>Execution begins.</strong> The program starts reading its instructions.",
+      "program start",
+      "<b>Start</b> — Python begins executing the program.",
+      "<strong>Execution begins.</strong> Python starts reading the source.",
       '<span class="var"><b>status</b> = started</span>'
     ],
+
     [
       "Setup",
-      "lines 1–2",
-      "<b>Setup</b> — numbers and total are initialized.",
-      "<strong>Variables ready.</strong> The list is created and total starts at zero.",
+      "variables",
+      "<b>Setup</b> — variables and data are initialized.",
+      "<strong>Variables ready.</strong> The program prepares its values.",
       '<span class="var"><b>total</b> = 0</span>'
     ],
+
     [
-      "Loop",
-      "line 4",
-      "<b>Loop</b> — Python reads a number from the list.",
-      "<strong>Iteration.</strong> The loop processes one value at a time.",
-      '<span class="var"><b>number</b> = 3</span>'
+      "Input / loop",
+      "program flow",
+      "<b>Input / loop</b> — Python processes input or iteration.",
+      "<strong>Program work.</strong> The runtime evaluates the next operation.",
+      '<span class="var"><b>state</b> = processing</span>'
     ],
+
     [
       "Update",
-      "line 5",
-      "<b>Update</b> — the current number is added to total.",
-      "<strong>Accumulator.</strong> total changes after the addition.",
-      '<span class="var"><b>total</b> = 3</span>'
+      "calculation",
+      "<b>Update</b> — the program changes its working values.",
+      "<strong>Calculation.</strong> New values are stored.",
+      '<span class="var"><b>state</b> = updated</span>'
     ],
+
     [
       "Output",
-      "line 8",
-      "<b>Output</b> — Python prints the final value.",
-      "<strong>Complete.</strong> The program sends its result to stdout.",
+      "stdout",
+      "<b>Output</b> — the result is written to stdout.",
+      "<strong>Complete.</strong> TraceLab shows the resulting output.",
       '<span class="var"><b>status</b> = complete</span>'
     ]
   ],
@@ -2112,37 +2382,41 @@ const flowDefinitions = {
   javascript:[
     [
       "Start",
-      "source",
-      "<b>Start</b> — the JavaScript engine reads the script.",
-      "<strong>Execution begins.</strong> The sandbox prepares the program.",
+      "script",
+      "<b>Start</b> — JavaScript enters the sandbox.",
+      "<strong>Execution begins.</strong> The script is loaded.",
       '<span class="var"><b>engine</b> = ready</span>'
     ],
+
     [
       "Setup",
-      "lines 1–2",
-      "<b>Setup</b> — numbers and total are created.",
-      "<strong>Scope ready.</strong> The variables are available to the loop.",
-      '<span class="var"><b>total</b> = 0</span>'
+      "variables",
+      "<b>Setup</b> — variables are initialized.",
+      "<strong>Scope ready.</strong> Program values are available.",
+      '<span class="var"><b>state</b> = ready</span>'
     ],
+
     [
-      "Loop",
-      "line 4",
-      "<b>Loop</b> — the next number is read.",
-      "<strong>Iteration.</strong> The sandbox executes the loop body.",
-      '<span class="var"><b>number</b> = 3</span>'
+      "Input / loop",
+      "program flow",
+      "<b>Input / loop</b> — the program processes its next operation.",
+      "<strong>Processing.</strong> The sandbox continues execution.",
+      '<span class="var"><b>state</b> = processing</span>'
     ],
+
     [
       "Update",
-      "line 5",
-      "<b>Update</b> — total receives the new value.",
-      "<strong>Assignment.</strong> The accumulator changes.",
-      '<span class="var"><b>total</b> = 3</span>'
+      "calculation",
+      "<b>Update</b> — program values change.",
+      "<strong>Assignment.</strong> New values are stored.",
+      '<span class="var"><b>state</b> = updated</span>'
     ],
+
     [
       "Output",
-      "line 8",
-      "<b>Output</b> — console.log emits the result.",
-      "<strong>Complete.</strong> The sandbox captures console output.",
+      "console",
+      "<b>Output</b> — console output is captured.",
+      "<strong>Complete.</strong> The sandbox sends the result back.",
       '<span class="var"><b>status</b> = complete</span>'
     ]
   ],
@@ -2150,37 +2424,41 @@ const flowDefinitions = {
   html:[
     [
       "Parse",
-      "HTML source",
+      "HTML",
       "<b>Parse</b> — the browser reads the HTML source.",
       "<strong>Markup processing.</strong> The document is interpreted.",
       '<span class="var"><b>DOM</b> = building</span>'
     ],
+
     [
       "Build DOM",
       "elements",
       "<b>Build DOM</b> — elements become document nodes.",
-      "<strong>Structure.</strong> Parent-child relationships are created.",
+      "<strong>Structure ready.</strong> Parent-child relationships are created.",
       '<span class="var"><b>nodes</b> = created</span>'
     ],
+
     [
       "Layout",
       "render tree",
-      "<b>Layout</b> — page geometry is calculated.",
-      "<strong>Geometry.</strong> Positions and sizes are determined.",
+      "<b>Layout</b> — geometry is calculated.",
+      "<strong>Geometry ready.</strong> Elements receive positions and sizes.",
       '<span class="var"><b>layout</b> = calculated</span>'
     ],
+
     [
       "Paint",
       "browser",
       "<b>Paint</b> — the browser draws the page.",
-      "<strong>Rendering.</strong> The preview is painted.",
+      "<strong>Rendering.</strong> Pixels are prepared.",
       '<span class="var"><b>status</b> = painted</span>'
     ],
+
     [
       "Preview",
       "iframe",
-      "<b>Preview</b> — the result appears in the sandbox.",
-      "<strong>Complete.</strong> The rendered page is visible.",
+      "<b>Preview</b> — the rendered page appears.",
+      "<strong>Complete.</strong> The browser preview displays the result.",
       '<span class="var"><b>status</b> = rendered</span>'
     ]
   ],
@@ -2193,20 +2471,23 @@ const flowDefinitions = {
       "<strong>Stylesheet processing.</strong> Declarations are parsed.",
       '<span class="var"><b>rules</b> = parsed</span>'
     ],
+
     [
       "Match",
       "selectors",
-      "<b>Match</b> — selectors are matched against elements.",
+      "<b>Match</b> — selectors are matched.",
       "<strong>Matching.</strong> Applicable rules are found.",
       '<span class="var"><b>matches</b> = found</span>'
     ],
+
     [
       "Cascade",
       "computed style",
       "<b>Cascade</b> — competing declarations are resolved.",
-      "<strong>Styles.</strong> Final values are selected.",
+      "<strong>Styles ready.</strong> Final values are selected.",
       '<span class="var"><b>styles</b> = resolved</span>'
     ],
+
     [
       "Layout",
       "render tree",
@@ -2214,11 +2495,12 @@ const flowDefinitions = {
       "<strong>Geometry.</strong> Positions and sizes are calculated.",
       '<span class="var"><b>layout</b> = calculated</span>'
     ],
+
     [
       "Paint",
       "pixels",
-      "<b>Paint</b> — the browser draws the styled page.",
-      "<strong>Complete.</strong> The CSS preview is visible.",
+      "<b>Paint</b> — the browser draws the result.",
+      "<strong>Complete.</strong> The preview is visible.",
       '<span class="var"><b>status</b> = painted</span>'
     ]
   ],
@@ -2227,34 +2509,38 @@ const flowDefinitions = {
     [
       "Submit",
       "source",
-      "<b>Submit</b> — TypeScript is sent to the hosted runtime.",
+      "<b>Submit</b> — TypeScript is sent to the backend.",
       "<strong>Backend execution.</strong> TraceLab submits the source.",
       '<span class="var"><b>runtime</b> = TypeScript</span>'
     ],
+
     [
       "Prepare",
       "main.ts",
-      "<b>Prepare</b> — the runtime prepares the source file.",
-      "<strong>Source ready.</strong> The provider receives the program.",
+      "<b>Prepare</b> — the provider receives the source.",
+      "<strong>Source ready.</strong> The program is prepared.",
       '<span class="var"><b>source</b> = ready</span>'
     ],
+
     [
       "Compile",
       "provider",
-      "<b>Compile</b> — the hosted provider processes TypeScript.",
-      "<strong>Compiler stage.</strong> The source is processed.",
+      "<b>Compile</b> — the hosted runtime processes the source.",
+      "<strong>Compiler stage.</strong> The source is compiled.",
       '<span class="var"><b>status</b> = compiling</span>'
     ],
+
     [
       "Execute",
       "program",
-      "<b>Execute</b> — the program runs.",
-      "<strong>Runtime.</strong> Output is captured.",
+      "<b>Execute</b> — the compiled program runs.",
+      "<strong>Runtime.</strong> Output is collected.",
       '<span class="var"><b>process</b> = running</span>'
     ],
+
     [
       "Output",
-      "line 3",
+      "result",
       "<b>Output</b> — the result returns to TraceLab.",
       "<strong>Complete.</strong> Actual provider output is displayed.",
       '<span class="var"><b>status</b> = complete</span>'
@@ -2262,6 +2548,7 @@ const flowDefinitions = {
   ]
 
 };
+
 
 const genericFlow = [
 
@@ -2277,14 +2564,14 @@ const genericFlow = [
     "Submit",
     "source file",
     "<b>Submit</b> — the source is sent to the backend.",
-    "<strong>Submission.</strong> Render forwards the program to the execution provider.",
+    "<strong>Submission.</strong> The backend forwards the program.",
     '<span class="var"><b>source</b> = submitted</span>'
   ],
 
   [
     "Compile",
     "provider",
-    "<b>Compile / interpret</b> — the hosted runtime processes the source.",
+    "<b>Compile / interpret</b> — the runtime processes the program.",
     "<strong>Provider stage.</strong> Compilation or interpretation occurs remotely.",
     '<span class="var"><b>status</b> = running</span>'
   ],
@@ -2293,15 +2580,15 @@ const genericFlow = [
     "Execute",
     "program",
     "<b>Execute</b> — the program runs.",
-    "<strong>Execution.</strong> stdout and runtime errors are collected.",
+    "<strong>Execution.</strong> Output and errors are collected.",
     '<span class="var"><b>process</b> = executed</span>'
   ],
 
   [
     "Output",
     "result",
-    "<b>Output</b> — TraceLab displays the returned result.",
-    "<strong>Complete.</strong> The actual execution result is shown.",
+    "<b>Output</b> — the result is displayed.",
+    "<strong>Complete.</strong> The execution result appears in the console.",
     '<span class="var"><b>status</b> = complete</span>'
   ]
 
@@ -2318,7 +2605,7 @@ let executionId = 0;
 
 
 /* =========================================================
-   GET FLOW
+   FLOW
 ========================================================= */
 
 function getFlow(){
@@ -2332,10 +2619,6 @@ function getFlow(){
 
 }
 
-
-/* =========================================================
-   RENDER FLOW
-========================================================= */
 
 function render(){
 
@@ -2447,6 +2730,7 @@ function render(){
         `#nodeLabel${i + 1}`
       );
 
+
     if(label){
 
       label.textContent =
@@ -2462,7 +2746,7 @@ function render(){
 
 
 /* =========================================================
-   ESCAPE
+   ESCAPE HTML
 ========================================================= */
 
 function escapeHtml(value){
@@ -2473,62 +2757,6 @@ function escapeHtml(value){
     .replaceAll(">","&gt;")
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
-
-}
-
-
-/* =========================================================
-   LINE NUMBERS
-========================================================= */
-
-function numberLines(){
-
-  const lines =
-    $("#code")
-      .value
-      .split("\n");
-
-
-  $("#nums").innerHTML =
-    lines
-      .map(
-        (_,index) =>
-          index + 1
-      )
-      .join("<br>");
-
-}
-
-
-/* =========================================================
-   LOAD EXAMPLE
-========================================================= */
-
-function putCode(){
-
-  const language =
-    $("#language").value;
-
-
-  const data =
-    codes[language];
-
-
-  if(!data){
-    return;
-  }
-
-
-  $("#file").textContent =
-    data[0];
-
-  $("#code").value =
-    data[1].join("\n");
-
-  $("#stdin").value =
-    "";
-
-  numberLines();
 
 }
 
@@ -2557,7 +2785,409 @@ function setStatus(
 
 
 /* =========================================================
-   WEB DOCUMENT
+   EDITOR
+========================================================= */
+
+function numberLines(){
+
+  const lines =
+    $("#code")
+      .value
+      .split("\n");
+
+
+  $("#nums").innerHTML =
+    lines
+      .map(
+        (_,index) =>
+          index + 1
+      )
+      .join("<br>");
+
+}
+
+
+function putCode(){
+
+  const language =
+    $("#language").value;
+
+
+  const data =
+    codes[language];
+
+
+  if(!data){
+    return;
+  }
+
+
+  $("#file").textContent =
+    data[0];
+
+
+  $("#code").value =
+    data[1].join("\n");
+
+
+  $("#stdin").value =
+    "";
+
+
+  numberLines();
+
+  updateInputUI();
+
+}
+
+
+/* =========================================================
+   INPUT DETECTION
+========================================================= */
+
+function detectInputRequest(){
+
+  const language =
+    $("#language").value;
+
+  const code =
+    $("#code").value;
+
+
+  /* Python */
+
+  if(language === "python"){
+
+    const prompted =
+      code.match(
+        /\binput\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/
+      );
+
+
+    if(prompted){
+
+      return {
+        needsInput:true,
+        prompt:prompted[2] ||
+          "Python is asking for input."
+      };
+
+    }
+
+
+    if(
+      /\binput\s*\(/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"Python is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* JavaScript */
+
+  if(language === "javascript"){
+
+    const prompted =
+      code.match(
+        /\bprompt\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/
+      );
+
+
+    if(prompted){
+
+      return {
+        needsInput:true,
+        prompt:prompted[2] ||
+          "JavaScript is asking for input."
+      };
+
+    }
+
+
+    if(
+      /\bprompt\s*\(/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"JavaScript is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* C */
+
+  if(language === "c"){
+
+    if(
+      /\bscanf\s*\(|\bfgets\s*\(|\bgetchar\s*\(/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"C is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* C++ */
+
+  if(language === "cpp"){
+
+    if(
+      /\bcin\s*>>|\bgetline\s*\(/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"C++ is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* Java */
+
+  if(language === "java"){
+
+    if(
+      /Scanner|BufferedReader|System\.in|nextInt\s*\(|nextLine\s*\(/.test(code)
+    ){
+
+      const prompt =
+        code.match(
+          /System\.out\.print(?:ln)?\s*\(\s*(["'])(.*?)\1\s*\)/
+        );
+
+
+      return {
+        needsInput:true,
+        prompt:
+          prompt
+            ? prompt[2]
+            : "Java is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* Go */
+
+  if(language === "go"){
+
+    if(
+      /fmt\.(Scan|Scanln|Scanf)/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"Go is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* Kotlin */
+
+  if(language === "kotlin"){
+
+    if(
+      /readLine\s*\(|Scanner/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"Kotlin is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* Swift */
+
+  if(language === "swift"){
+
+    if(
+      /readLine\s*\(/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"Swift is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* Ruby */
+
+  if(language === "ruby"){
+
+    if(
+      /\bgets\b/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"Ruby is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* PHP */
+
+  if(language === "php"){
+
+    if(
+      /STDIN|fgets\s*\(\s*STDIN/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"PHP is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* Perl */
+
+  if(language === "perl"){
+
+    if(
+      /<STDIN>|STDIN/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"Perl is asking for input."
+      };
+
+    }
+
+  }
+
+
+  /* Bash */
+
+  if(language === "bash"){
+
+    if(
+      /\bread\b/.test(code)
+    ){
+
+      return {
+        needsInput:true,
+        prompt:"Bash is asking for input."
+      };
+
+    }
+
+  }
+
+
+  return {
+    needsInput:false,
+    prompt:""
+  };
+
+}
+
+
+function updateInputUI(){
+
+  const result =
+    detectInputRequest();
+
+
+  const wrap =
+    $("#stdinWrap");
+
+  const label =
+    $("#stdinLabel");
+
+  const input =
+    $("#stdin");
+
+  const prompt =
+    $("#inputPrompt");
+
+
+  if(
+    result.needsInput
+  ){
+
+    wrap.classList.add(
+      "needs-input"
+    );
+
+
+    label.textContent =
+      "User input here";
+
+
+    input.placeholder =
+      result.prompt ||
+      "Enter the requested value here...";
+
+
+    prompt.textContent =
+      result.prompt ||
+      "This program is asking for input.";
+
+
+  }else{
+
+    wrap.classList.remove(
+      "needs-input"
+    );
+
+
+    label.textContent =
+      "Enter the input here";
+
+
+    input.placeholder =
+      "Enter the input here...";
+
+
+    prompt.textContent =
+      "";
+
+  }
+
+}
+
+
+/* =========================================================
+   WEB PREVIEW
 ========================================================= */
 
 function buildFullDocument(
@@ -2624,10 +3254,6 @@ ${code}
 }
 
 
-/* =========================================================
-   PREVIEW
-========================================================= */
-
 function renderPreview(
   language,
   code
@@ -2670,12 +3296,12 @@ function updateWebUI(){
     $("#language").value;
 
 
-  const isPreview =
+  const preview =
     language === "html" ||
     language === "css";
 
 
-  if(isPreview){
+  if(preview){
 
     renderPreview(
       language,
@@ -2692,7 +3318,7 @@ function updateWebUI(){
   $("#openBrowser")
     .style
     .display =
-      isPreview
+      preview
         ? "inline-flex"
         : "none";
 
@@ -2717,6 +3343,9 @@ function updateWebUI(){
   $("#modeStatus").textContent =
     labels[language] ||
     "Live server execution via TraceLab backend";
+
+
+  updateInputUI();
 
 }
 
@@ -2823,6 +3452,10 @@ function getPyodide(){
 }
 
 
+/* =========================================================
+   PYTHON EXECUTION
+========================================================= */
+
 async function runPythonCode(
   code,
   stdinText
@@ -2889,7 +3522,8 @@ async function runPythonCode(
 
         }
 
-        return (
+
+        return String(
           inputLines[
             inputIndex++
           ]
@@ -2909,11 +3543,13 @@ async function runPythonCode(
 
   }catch(error){
 
+    const message =
+      error?.message ||
+      String(error);
+
+
     logs.push(
-      `✕ Python execution failed: ${
-        error?.message ||
-        String(error)
-      }`
+      `✕ Python execution failed: ${message}`
     );
 
   }
@@ -2929,11 +3565,12 @@ async function runPythonCode(
 
 
 /* =========================================================
-   JAVASCRIPT
+   JAVASCRIPT EXECUTION
 ========================================================= */
 
 function runJavaScriptCode(
-  code
+  code,
+  stdinText
 ){
 
   return new Promise(
@@ -2945,6 +3582,13 @@ function runJavaScriptCode(
         false;
 
 
+      const inputLines =
+        String(
+          stdinText || ""
+        )
+        .split(/\r?\n/);
+
+
       const iframe =
         document.createElement(
           "iframe"
@@ -2954,7 +3598,6 @@ function runJavaScriptCode(
       iframe.style.display =
         "none";
 
-
       iframe.sandbox =
         "allow-scripts";
 
@@ -2962,7 +3605,9 @@ function runJavaScriptCode(
       function finish(){
 
         if(finished){
+
           return;
+
         }
 
 
@@ -3046,7 +3691,11 @@ function runJavaScriptCode(
             data.args
           )
             ? data.args
-            : [String(data.args ?? "")];
+            : [
+                String(
+                  data.args ?? ""
+                )
+              ];
 
 
         logs.push(
@@ -3068,9 +3717,16 @@ function runJavaScriptCode(
 <!doctype html>
 <html>
 <body>
+
 <script>
 
-const send = (type,args) => {
+const inputLines =
+${JSON.stringify(inputLines)};
+
+let inputIndex = 0;
+
+
+function send(type,args){
 
   parent.postMessage(
     {
@@ -3086,9 +3742,7 @@ const send = (type,args) => {
               value !== null
             ){
 
-              return JSON.stringify(
-                value
-              );
+              return JSON.stringify(value);
 
             }
 
@@ -3106,7 +3760,7 @@ const send = (type,args) => {
     "*"
   );
 
-};
+}
 
 
 console.log =
@@ -3120,6 +3774,41 @@ console.error =
 console.warn =
   (...args) =>
     send("warn",args);
+
+
+window.prompt =
+  message => {
+
+    if(
+      inputIndex >=
+      inputLines.length
+    ){
+
+      throw new Error(
+        "Input required. Enter the requested value in the TraceLab input box."
+      );
+
+    }
+
+
+    const messageText =
+      message ||
+      "Enter input:";
+
+
+    send(
+      "log",
+      [String(messageText)]
+    );
+
+
+    return String(
+      inputLines[
+        inputIndex++
+      ]
+    );
+
+  };
 
 
 try{
@@ -3149,6 +3838,7 @@ send(
 }
 
 <\/script>
+
 </body>
 </html>
 `;
@@ -3188,7 +3878,7 @@ async function runRemoteCode(
     new AbortController();
 
 
-  const timeout =
+  const timer =
     setTimeout(
       () =>
         controller.abort(),
@@ -3305,7 +3995,7 @@ async function runRemoteCode(
         ok:false,
 
         output:
-          "✕ Execution timed out. Please try a shorter program."
+          "✕ Execution timed out. Try a shorter program."
 
       };
 
@@ -3328,7 +4018,7 @@ async function runRemoteCode(
   }finally{
 
     clearTimeout(
-      timeout
+      timer
     );
 
   }
@@ -3342,7 +4032,7 @@ async function runRemoteCode(
 
 async function checkBackend(){
 
-  const status =
+  const element =
     $("#serverStatus");
 
 
@@ -3385,18 +4075,18 @@ async function checkBackend(){
       data.executorConfigured
     ){
 
-      status.textContent =
+      element.textContent =
         "● Backend online · compiler ready";
 
-      status.className =
+      element.className =
         "server-pill online";
 
     }else{
 
-      status.textContent =
+      element.textContent =
         "● Backend online · API key missing";
 
-      status.className =
+      element.className =
         "server-pill warning";
 
     }
@@ -3404,10 +4094,10 @@ async function checkBackend(){
 
   }catch(error){
 
-    status.textContent =
+    element.textContent =
       "● Backend offline";
 
-    status.className =
+    element.className =
       "server-pill offline";
 
   }
@@ -3416,7 +4106,7 @@ async function checkBackend(){
 
 
 /* =========================================================
-   FLOW PLAYBACK
+   FLOW CONTROLS
 ========================================================= */
 
 function stopFlow(){
@@ -3458,7 +4148,6 @@ function playFlow(){
 
   const language =
     $("#language").value;
-
 
   const flow =
     getFlow();
@@ -3535,14 +4224,15 @@ function detectLanguage(){
     python:[
       "def ",
       "print(",
+      "input(",
       "import "
     ],
 
     javascript:[
       "console.log",
+      "prompt(",
       "const ",
-      "let ",
-      "=>"
+      "let "
     ],
 
     typescript:[
@@ -3554,19 +4244,21 @@ function detectLanguage(){
 
     c:[
       "#include <stdio",
-      "printf("
+      "printf(",
+      "scanf("
     ],
 
     cpp:[
       "#include <iostream>",
       "std::",
-      "cout"
+      "cout",
+      "cin"
     ],
 
     java:[
       "public static void main",
       "system.out",
-      "class "
+      "scanner"
     ],
 
     go:[
@@ -3576,26 +4268,29 @@ function detectLanguage(){
 
     kotlin:[
       "fun main",
+      "readline",
       "println"
     ],
 
     swift:[
       "func ",
+      "readline()",
       "print("
     ],
 
     ruby:[
       "puts ",
-      " do |"
+      "gets"
     ],
 
     php:[
       "<?php",
       "echo ",
-      "$"
+      "stdin"
     ],
 
     perl:[
+      "<stdin>",
       "my $",
       "print "
     ],
@@ -3603,7 +4298,7 @@ function detectLanguage(){
     bash:[
       "#!/bin",
       "echo ",
-      "$(("
+      "read "
     ],
 
     sql:[
@@ -3616,6 +4311,7 @@ function detectLanguage(){
 
   let best =
     "python";
+
 
   let bestScore =
     0;
@@ -3707,10 +4403,6 @@ function detectLanguage(){
 
   $("#output").textContent =
     `${label} detected.\nRun the program to execute it.`;
-
-
-  $("#detect").textContent =
-    `✓ ${label}`;
 
 }
 
@@ -3812,22 +4504,13 @@ function explainLogic(){
   $("#logicCode").textContent =
     lines
       .slice(
-        Math.max(
-          0,
-          first[0] - 1
-        ),
-        Math.min(
-          lines.length,
-          first[0] + 7
-        )
+        Math.max(0, first[0] - 1),
+        Math.min(lines.length, first[0] + 7)
       )
       .map(
         (line,index) =>
           String(
-            Math.max(
-              0,
-              first[0] - 1
-            ) +
+            Math.max(0, first[0] - 1) +
             index +
             1
           ).padStart(3," ") +
@@ -3878,6 +4561,10 @@ $("#run").onclick =
       $("#stdin").value;
 
 
+    const inputRequest =
+      detectInputRequest();
+
+
     if(
       !code.trim()
     ){
@@ -3897,15 +4584,55 @@ $("#run").onclick =
     }
 
 
+    /*
+      If the program clearly requests input but
+      the user has not entered anything yet, stop
+      here and direct attention to the blinking box.
+    */
+
+    if(
+      inputRequest.needsInput &&
+      !stdin.trim()
+    ){
+
+      updateInputUI();
+
+
+      $("#stdinWrap")
+        .classList
+        .add("needs-input");
+
+
+      $("#output").textContent =
+        inputRequest.prompt +
+        "\n\n" +
+        "Enter the requested value in the highlighted input box, then press Run again.";
+
+
+      setStatus(
+        "● Input required",
+        "error"
+      );
+
+
+      $("#stdin").focus();
+
+
+      return;
+
+    }
+
+
     $("#run").disabled =
       true;
 
 
     try{
 
-      /* =============================================
+
+      /* =========================================
          HTML / CSS
-      ============================================= */
+      ========================================== */
 
       if(
         language === "html" ||
@@ -3932,9 +4659,9 @@ $("#run").onclick =
       }
 
 
-      /* =============================================
+      /* =========================================
          JAVASCRIPT
-      ============================================= */
+      ========================================== */
 
       if(
         language === "javascript"
@@ -3951,7 +4678,8 @@ $("#run").onclick =
 
         const logs =
           await runJavaScriptCode(
-            code
+            code,
+            stdin
           );
 
 
@@ -3991,9 +4719,9 @@ $("#run").onclick =
       }
 
 
-      /* =============================================
+      /* =========================================
          PYTHON
-      ============================================= */
+      ========================================== */
 
       if(
         language === "python"
@@ -4051,9 +4779,9 @@ $("#run").onclick =
       }
 
 
-      /* =============================================
+      /* =========================================
          HOSTED LANGUAGES
-      ============================================= */
+      ========================================== */
 
       hidePreview();
 
@@ -4127,6 +4855,7 @@ $("#run").onclick =
 
       }
 
+
     }catch(error){
 
       $("#output").textContent =
@@ -4147,6 +4876,7 @@ $("#run").onclick =
       console.error(
         error
       );
+
 
     }finally{
 
@@ -4272,11 +5002,15 @@ $("#code").oninput =
 
     numberLines();
 
+
     $("#detect").textContent =
       "✦ Auto-detect";
 
 
     explainLogic();
+
+
+    updateInputUI();
 
 
     const language =
@@ -4299,15 +5033,21 @@ $("#code").oninput =
 
 
 /* =========================================================
-   INPUT BOX
+   USER INPUT
 ========================================================= */
 
 $("#stdin").oninput =
   () => {
 
-    $("#stdin").classList.remove(
-      "input-error"
-    );
+    if(
+      $("#stdin").value.trim()
+    ){
+
+      $("#stdinWrap")
+        .classList
+        .add("needs-input");
+
+    }
 
   };
 
@@ -4335,7 +5075,9 @@ $("#openBrowser").onclick =
 
 
     if(!documentText){
+
       return;
+
     }
 
 
@@ -4362,10 +5104,13 @@ $("#openBrowser").onclick =
 
 
     setTimeout(
-      () =>
+      () => {
+
         URL.revokeObjectURL(
           url
-        ),
+        );
+
+      },
       60000
     );
 
@@ -4466,7 +5211,7 @@ $("#siteNav")
 
 
 /* =========================================================
-   KEYBOARD SHORTCUT
+   CTRL + ENTER
 ========================================================= */
 
 document.addEventListener(
@@ -4495,6 +5240,7 @@ document.addEventListener(
 
 $("#year").textContent =
   new Date().getFullYear();
+
 
 putCode();
 
