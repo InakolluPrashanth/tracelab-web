@@ -1467,7 +1467,7 @@ h1 span{
         class="badge"
         id="badge"
       >
-        Step 1 of 5
+        Ready
       </span>
 
     </div>
@@ -1487,11 +1487,11 @@ h1 span{
       <div class="node n1 active">
 
         <small id="nodeLabel1">
-          Step 1
+          Start
         </small>
 
-        <span>
-          ⚡
+        <span id="nodeIcon1">
+          ▶
         </span>
 
       </div>
@@ -1500,11 +1500,11 @@ h1 span{
       <div class="node n2">
 
         <small id="nodeLabel2">
-          Step 2
+          Get input
         </small>
 
-        <span>
-          📦
+        <span id="nodeIcon2">
+          ⌨
         </span>
 
       </div>
@@ -1513,11 +1513,11 @@ h1 span{
       <div class="node n3">
 
         <small id="nodeLabel3">
-          Step 3
+          Process
         </small>
 
-        <span>
-          ↻
+        <span id="nodeIcon3">
+          ⚙
         </span>
 
       </div>
@@ -1526,11 +1526,11 @@ h1 span{
       <div class="node n4">
 
         <small id="nodeLabel4">
-          Step 4
+          Decide
         </small>
 
-        <span>
-          ＋
+        <span id="nodeIcon4">
+          ◆
         </span>
 
       </div>
@@ -1539,11 +1539,11 @@ h1 span{
       <div class="node n5">
 
         <small id="nodeLabel5">
-          Step 5
+          Show result
         </small>
 
-        <span>
-          ⌁
+        <span id="nodeIcon5">
+          ✓
         </span>
 
       </div>
@@ -1564,7 +1564,7 @@ h1 span{
       <div class="toptime">
 
         <strong id="stepname">
-          Current program
+          Ready to run
         </strong>
 
         <span id="lineref">
@@ -1593,11 +1593,11 @@ h1 span{
         id="labels"
       >
 
-        <span>Step 1</span>
-        <span>Step 2</span>
-        <span>Step 3</span>
-        <span>Step 4</span>
-        <span>Step 5</span>
+        <span>Start</span>
+        <span>Get input</span>
+        <span>Process</span>
+        <span>Decide</span>
+        <span>Show result</span>
 
       </div>
 
@@ -1691,7 +1691,11 @@ h1 span{
     <div
       class="variables"
       id="vars"
-    ></div>
+    >
+      <span class="var">
+        <b>status</b> = ready
+      </span>
+    </div>
 
   </div>
 
@@ -2104,7 +2108,7 @@ const TRACELAB_EXECUTOR_URL =
 
 
 /* =========================================================
-   DOM HELPERS
+   DOM
 ========================================================= */
 
 const $ =
@@ -2120,6 +2124,11 @@ const tracks =
 const nodeLabels =
   [...document.querySelectorAll(
     "#nodeLabel1,#nodeLabel2,#nodeLabel3,#nodeLabel4,#nodeLabel5"
+  )];
+
+const nodeIcons =
+  [...document.querySelectorAll(
+    "#nodeIcon1,#nodeIcon2,#nodeIcon3,#nodeIcon4,#nodeIcon5"
   )];
 
 
@@ -2337,27 +2346,60 @@ const codes = {
 
 
 /* =========================================================
-   LANGUAGE LABELS
+   USER FRIENDLY STEP TYPES
 ========================================================= */
 
-const languageLabels = {
+const STEP_STYLES = {
 
-  html:"HTML",
-  css:"CSS",
-  python:"Python 3",
-  javascript:"JavaScript",
-  typescript:"TypeScript",
-  c:"C",
-  cpp:"C++",
-  java:"Java",
-  go:"Go",
-  kotlin:"Kotlin",
-  swift:"Swift",
-  ruby:"Ruby",
-  php:"PHP",
-  perl:"Perl",
-  bash:"Bash",
-  sql:"SQL"
+  start:{
+    label:"Start",
+    icon:"▶"
+  },
+
+  input:{
+    label:"Get input",
+    icon:"⌨"
+  },
+
+  process:{
+    label:"Work with data",
+    icon:"⚙"
+  },
+
+  condition:{
+    label:"Make a decision",
+    icon:"◆"
+  },
+
+  loop:{
+    label:"Repeat the step",
+    icon:"↻"
+  },
+
+  output:{
+    label:"Show result",
+    icon:"✓"
+  },
+
+  declaration:{
+    label:"Set things up",
+    icon:"▣"
+  },
+
+  statement:{
+    label:"Run this line",
+    icon:"•"
+  },
+
+  finished:{
+    label:"Finished",
+    icon:"✓"
+  },
+
+  error:{
+    label:"Fix the error",
+    icon:"!"
+  }
 
 };
 
@@ -2372,25 +2414,11 @@ let flowTimer = null;
 
 let executionId = 0;
 
-/*
-  This is the important replacement for the old
-  hard-coded flowDefinitions/genericFlow.
-
-  Every Run creates a NEW flow from the current program.
-*/
 let currentProgramFlow = [];
-
-let lastExecution = {
-  ok:false,
-  output:"",
-  language:"",
-  source:"",
-  runtimeTrace:[]
-};
 
 
 /* =========================================================
-   ESCAPE HTML
+   ESCAPE
 ========================================================= */
 
 function escapeHtml(value){
@@ -2417,7 +2445,6 @@ function setStatus(
   $("#status").textContent =
     text;
 
-
   $("#status").className =
     type === "error"
       ? "status-error"
@@ -2429,7 +2456,7 @@ function setStatus(
 
 
 /* =========================================================
-   CODE / LINE HELPERS
+   SOURCE LINES
 ========================================================= */
 
 function getSourceLines(code){
@@ -2440,6 +2467,10 @@ function getSourceLines(code){
 
 }
 
+
+/* =========================================================
+   CLASSIFY CURRENT LINE
+========================================================= */
 
 function classifyLine(
   line,
@@ -2453,8 +2484,33 @@ function classifyLine(
   if(!text){
 
     return {
-      kind:"blank",
-      label:"Blank"
+      kind:"statement",
+      label:"Run this line"
+    };
+
+  }
+
+
+  if(
+    /^#/.test(text) &&
+    language === "python"
+  ){
+
+    return {
+      kind:"comment",
+      label:"Comment"
+    };
+
+  }
+
+
+  if(
+    /^\/\//.test(text)
+  ){
+
+    return {
+      kind:"comment",
+      label:"Comment"
     };
 
   }
@@ -2465,24 +2521,12 @@ function classifyLine(
   ){
 
     if(
-      /^#/.test(text)
-    ){
-
-      return {
-        kind:"comment",
-        label:"Comment"
-      };
-
-    }
-
-
-    if(
       /\binput\s*\(/.test(text)
     ){
 
       return {
         kind:"input",
-        label:"Read input"
+        label:"Get input"
       };
 
     }
@@ -2494,7 +2538,7 @@ function classifyLine(
 
       return {
         kind:"output",
-        label:"Print output"
+        label:"Show result"
       };
 
     }
@@ -2506,7 +2550,7 @@ function classifyLine(
 
       return {
         kind:"loop",
-        label:"Loop"
+        label:"Repeat the step"
       };
 
     }
@@ -2518,7 +2562,7 @@ function classifyLine(
 
       return {
         kind:"condition",
-        label:"Condition"
+        label:"Make a decision"
       };
 
     }
@@ -2531,24 +2575,12 @@ function classifyLine(
   ){
 
     if(
-      /^\/\//.test(text)
-    ){
-
-      return {
-        kind:"comment",
-        label:"Comment"
-      };
-
-    }
-
-
-    if(
       /\bprompt\s*\(/.test(text)
     ){
 
       return {
         kind:"input",
-        label:"Read input"
+        label:"Get input"
       };
 
     }
@@ -2560,31 +2592,7 @@ function classifyLine(
 
       return {
         kind:"output",
-        label:"Console output"
-      };
-
-    }
-
-
-    if(
-      /^\s*(for|while)\b/.test(text)
-    ){
-
-      return {
-        kind:"loop",
-        label:"Loop"
-      };
-
-    }
-
-
-    if(
-      /^\s*(if|else|switch)\b/.test(text)
-    ){
-
-      return {
-        kind:"condition",
-        label:"Condition"
+        label:"Show result"
       };
 
     }
@@ -2593,36 +2601,12 @@ function classifyLine(
 
 
   if(
-    /(\bfor\b|\bwhile\b|foreach|forEach)/.test(text)
-  ){
-
-    return {
-      kind:"loop",
-      label:"Loop"
-    };
-
-  }
-
-
-  if(
-    /(\bif\b|\belse\b|\belif\b|\bswitch\b|\bcase\b)/.test(text)
-  ){
-
-    return {
-      kind:"condition",
-      label:"Condition"
-    };
-
-  }
-
-
-  if(
-    /(scanf|cin\s*>>|getline|Scanner|nextInt|nextLine|fmt\.Scan|readLine|gets|fgets|STDIN|\bread\b)/.test(text)
+    /(\bscanf\s*\(|\bcin\s*>>|\bgetline\s*\(|\bScanner\b|\.nextInt\s*\(|\.nextLine\s*\(|fmt\.(Scan|Scanln|Scanf)|readLine\s*\(|\bgets\b|STDIN|\bread\s+)/.test(text)
   ){
 
     return {
       kind:"input",
-      label:"Read input"
+      label:"Get input"
     };
 
   }
@@ -2634,7 +2618,31 @@ function classifyLine(
 
     return {
       kind:"output",
-      label:"Output"
+      label:"Show result"
+    };
+
+  }
+
+
+  if(
+    /(\bfor\b|\bwhile\b|foreach|forEach)/.test(text)
+  ){
+
+    return {
+      kind:"loop",
+      label:"Repeat the step"
+    };
+
+  }
+
+
+  if(
+    /(\bif\b|\belse\b|\belif\b|\bswitch\b|\bcase\b|\bwhen\b)/.test(text)
+  ){
+
+    return {
+      kind:"condition",
+      label:"Make a decision"
     };
 
   }
@@ -2646,7 +2654,7 @@ function classifyLine(
 
     return {
       kind:"declaration",
-      label:"Declaration"
+      label:"Set things up"
     };
 
   }
@@ -2657,8 +2665,8 @@ function classifyLine(
   ){
 
     return {
-      kind:"assignment",
-      label:"Assignment"
+      kind:"process",
+      label:"Work with data"
     };
 
   }
@@ -2666,149 +2674,187 @@ function classifyLine(
 
   return {
     kind:"statement",
-    label:"Execute"
+    label:"Run this line"
   };
 
 }
 
 
 /* =========================================================
-   EXECUTABLE SOURCE LINES
+   FRIENDLY DESCRIPTION
 ========================================================= */
 
-function getExecutableSourceLines(
+function describeStep(
+  stepData,
   code,
   language
 ){
 
-  const lines =
-    getSourceLines(code);
+  const line =
+    stepData.source.trim();
 
 
-  return lines
-    .map(
-      (line,index) => {
-
-        const info =
-          classifyLine(
-            line,
-            language
-          );
+  const lineNumber =
+    stepData.lineNumber;
 
 
-        return {
-
-          lineNumber:index + 1,
-
-          source:line,
-
-          kind:info.kind,
-
-          label:info.label
-
-        };
-
-      }
-    )
-    .filter(
-      item =>
-        item.source.trim() &&
-        item.kind !== "comment" &&
-        item.kind !== "blank"
-    );
-
-}
-
-
-/* =========================================================
-   RUNTIME TRACE → PROGRAM STEPS
-========================================================= */
-
-function buildPythonExecutionSteps(
-  code,
-  runtimeTrace,
-  output
-){
-
-  const lines =
-    getSourceLines(code);
-
-
-  const steps = [];
-
-
-  for(
-    const lineNumber of runtimeTrace
+  if(
+    stepData.kind === "input"
   ){
 
-    const source =
-      lines[lineNumber - 1];
+    return {
+      note:
+        `<b>Getting input</b> — this line asks you for information.`,
 
+      insight:
+        `<strong>The program is getting information from you.</strong> ` +
+        `Look at the highlighted input box and enter the value the program needs. ` +
+        `This comes from line ${lineNumber}.`,
 
-    if(
-      source == null ||
-      !source.trim()
-    ){
+      variable:
+        `<span class="var"><b>input</b> = waiting</span>`
 
-      continue;
-
-    }
-
-
-    const info =
-      classifyLine(
-        source,
-        "python"
-      );
-
-
-    steps.push({
-
-      lineNumber,
-
-      source,
-
-      kind:info.kind,
-
-      label:info.label
-
-    });
+    };
 
   }
 
 
-  /*
-    Do not remove repeated runtime events here.
-    A Python loop can therefore produce:
+  if(
+    stepData.kind === "output"
+  ){
 
-    line 4
-    line 5
-    line 4
-    line 5
-    ...
+    return {
+      note:
+        `<b>Showing the result</b> — this line sends information to the output.`,
 
-    which is the actual execution.
-  */
+      insight:
+        `<strong>The program is producing a result.</strong> ` +
+        `TraceLab is showing the line responsible for the output.`,
 
-  return steps;
+      variable:
+        `<span class="var"><b>output</b> = produced</span>`
+
+    };
+
+  }
+
+
+  if(
+    stepData.kind === "loop"
+  ){
+
+    return {
+      note:
+        `<b>Repeating work</b> — the program is using a loop.`,
+
+      insight:
+        `<strong>The program is repeating an operation.</strong> ` +
+        `This line controls repeated work in your code.`,
+
+      variable:
+        `<span class="var"><b>flow</b> = repeating</span>`
+
+    };
+
+  }
+
+
+  if(
+    stepData.kind === "condition"
+  ){
+
+    return {
+      note:
+        `<b>Making a decision</b> — the program is checking a condition.`,
+
+      insight:
+        `<strong>The program is deciding what to do next.</strong> ` +
+        `This line controls which path the program follows.`,
+
+      variable:
+        `<span class="var"><b>flow</b> = decision</span>`
+
+    };
+
+  }
+
+
+  if(
+    stepData.kind === "declaration"
+  ){
+
+    return {
+      note:
+        `<b>Setting things up</b> — the program is preparing its functions or structure.`,
+
+      insight:
+        `<strong>The program is preparing its environment.</strong> ` +
+        `This line defines or initializes part of the program.`,
+
+      variable:
+        `<span class="var"><b>state</b> = prepared</span>`
+
+    };
+
+  }
+
+
+  if(
+    stepData.kind === "process"
+  ){
+
+    return {
+      note:
+        `<b>Working with data</b> — the program is calculating or updating a value.`,
+
+      insight:
+        `<strong>The program is doing work on its data.</strong> ` +
+        `This line changes, calculates, or stores information.`,
+
+      variable:
+        `<span class="var"><b>state</b> = processing</span>`
+
+    };
+
+  }
+
+
+  return {
+    note:
+      `<b>Running this line</b> — TraceLab is following your program step by step.`,
+
+    insight:
+      `<strong>Your program is executing this line.</strong> ` +
+      `This is line ${lineNumber} of your current code.`,
+
+    variable:
+      `<span class="var"><b>line</b> = ${lineNumber}</span>`
+
+  };
 
 }
 
 
 /* =========================================================
-   BUILD VISUAL FLOW FROM CURRENT PROGRAM
+   BUILD PROGRAM STEPS
 ========================================================= */
 
-function buildCurrentProgramFlow(
-  language,
+function getProgramSteps(
   code,
-  runtimeTrace,
-  output,
-  success
+  language,
+  runtimeTrace
 ){
 
-  let executionSteps = [];
+  const lines =
+    getSourceLines(code);
 
+
+  const result = [];
+
+
+  /*
+    Python runtime gives us actual executed lines.
+  */
 
   if(
     language === "python" &&
@@ -2816,80 +2862,297 @@ function buildCurrentProgramFlow(
     runtimeTrace.length
   ){
 
-    executionSteps =
-      buildPythonExecutionSteps(
-        code,
-        runtimeTrace,
-        output
-      );
+    for(
+      const lineNumber of runtimeTrace
+    ){
+
+      const source =
+        lines[lineNumber - 1];
+
+
+      if(
+        !source ||
+        !source.trim()
+      ){
+
+        continue;
+
+      }
+
+
+      const info =
+        classifyLine(
+          source,
+          language
+        );
+
+
+      if(
+        info.kind === "comment"
+      ){
+
+        continue;
+
+      }
+
+
+      result.push({
+
+        lineNumber,
+
+        source,
+
+        kind:info.kind,
+
+        label:info.label
+
+      });
+
+    }
 
   }
 
 
   /*
-    For languages where the backend does not currently
-    return line-by-line runtime information, use the
-    current source itself instead of the old fake flow.
+    Other runtimes currently provide output,
+    so build a trace directly from THIS source.
   */
 
   if(
-    !executionSteps.length
+    result.length === 0
   ){
 
-    executionSteps =
-      getExecutableSourceLines(
+    const sourceItems =
+      lines.map(
+        (source,index) => {
+
+          const info =
+            classifyLine(
+              source,
+              language
+            );
+
+
+          return {
+
+            lineNumber:index + 1,
+
+            source,
+
+            kind:info.kind,
+
+            label:info.label
+
+          };
+
+        }
+      );
+
+
+    result.push(
+      ...sourceItems.filter(
+        item =>
+          item.source.trim() &&
+          item.kind !== "comment"
+      )
+    );
+
+  }
+
+
+  return result;
+
+}
+
+
+/* =========================================================
+   BUILD FIVE VISUAL STEPS
+========================================================= */
+
+function buildCurrentProgramFlow(
+  code,
+  language,
+  runtimeTrace,
+  output,
+  success
+){
+
+  const programSteps =
+    getProgramSteps(
+      code,
+      language,
+      runtimeTrace
+    );
+
+
+  const finalSteps = [];
+
+
+  /*
+    Always begin with a clear Start step.
+  */
+
+  finalSteps.push({
+
+    label:"Start",
+    shortLabel:"Start",
+    icon:STEP_STYLES.start.icon,
+    ref:"program start",
+
+    note:
+      `<b>Starting your program</b> — TraceLab is beginning with the code you entered.`,
+
+    insight:
+      `<strong>Your program is starting now.</strong> ` +
+      `The animation below is based on the code currently in the editor, not a preset story.`,
+
+    variable:
+      `<span class="var"><b>status</b> = started</span>`,
+
+    source:
+      "Your current program begins here."
+
+  });
+
+
+  const selected = [];
+
+
+  /*
+    Add the most meaningful source steps.
+    Prefer input, loop, condition, output, then processing.
+  */
+
+  const priority =
+    [
+      "input",
+      "loop",
+      "condition",
+      "process",
+      "output",
+      "declaration",
+      "statement"
+    ];
+
+
+  for(
+    const type of priority
+  ){
+
+    const matches =
+      programSteps.filter(
+        item =>
+          item.kind === type
+      );
+
+
+    if(
+      matches.length
+    ){
+
+      selected.push(
+        ...matches
+      );
+
+    }
+
+
+    if(
+      selected.length >= 4
+    ){
+
+      break;
+
+    }
+
+  }
+
+
+  /*
+    Keep source order instead of priority order.
+  */
+
+  selected.sort(
+    (a,b) =>
+      a.lineNumber -
+      b.lineNumber
+  );
+
+
+  const unique = [];
+
+
+  for(
+    const item of selected
+  ){
+
+    const exists =
+      unique.some(
+        existing =>
+          existing.lineNumber ===
+            item.lineNumber
+      );
+
+
+    if(!exists){
+
+      unique.push(item);
+
+    }
+
+
+    if(
+      unique.length >= 4
+    ){
+
+      break;
+
+    }
+
+  }
+
+
+  for(
+    const item of unique
+  ){
+
+    const friendly =
+      describeStep(
+        item,
         code,
         language
       );
 
-  }
+
+    const style =
+      STEP_STYLES[
+        item.kind
+      ] ||
+      STEP_STYLES.statement;
 
 
-  const flow = [];
-
-
-  /*
-    Use up to the first five REAL program execution/source
-    steps. Nothing here says Start → Setup → Loop → Update.
-  */
-
-  const maxProgramSteps =
-    Math.min(
-      5,
-      executionSteps.length
-    );
-
-
-  for(
-    let i = 0;
-    i < maxProgramSteps;
-    i++
-  ){
-
-    const item =
-      executionSteps[i];
-
-
-    flow.push({
+    finalSteps.push({
 
       label:
-        `L${item.lineNumber} · ${item.label}`,
+        style.label,
 
       shortLabel:
-        `L${item.lineNumber}`,
+        style.label,
+
+      icon:
+        style.icon,
 
       ref:
         `line ${item.lineNumber}`,
 
       note:
-        `<b>Line ${item.lineNumber}</b> — ${escapeHtml(item.label)}.`,
+        friendly.note,
 
       insight:
-        `<strong>Current execution step.</strong> ` +
-        `TraceLab is showing the line from your program.`,
+        friendly.insight,
 
-      variables:
-        `<span class="var"><b>line</b> = ${item.lineNumber}</span>`,
+      variable:
+        friendly.variable,
 
       source:
         item.source
@@ -2900,160 +3163,98 @@ function buildCurrentProgramFlow(
 
 
   /*
-    If the program has more than five execution events,
-    make the fifth node summarize the remaining actual
-    execution instead of inventing a generic "Update".
+    Always use a meaningful final step.
   */
 
   if(
-    executionSteps.length > 5
+    finalSteps.length <
+    5
   ){
 
-    const remaining =
-      executionSteps.length - 5;
-
-
-    flow[4] = {
+    finalSteps.push({
 
       label:
-        `+${remaining} more`,
+        success
+          ? "Show result"
+          : "Fix the error",
 
       shortLabel:
-        `+${remaining}`,
+        success
+          ? "Show result"
+          : "Error",
+
+      icon:
+        success
+          ? STEP_STYLES.output.icon
+          : STEP_STYLES.error.icon,
 
       ref:
-        `lines ${executionSteps[4].lineNumber}+`,
+        success
+          ? "program result"
+          : "runtime error",
 
       note:
-        `<b>More execution</b> — the program continued through ` +
-        `${remaining} additional runtime step${remaining === 1 ? "" : "s"}.`,
+        success
+
+          ? `<b>Showing the result</b> — the program finished and TraceLab received its result.`
+
+          : `<b>Execution stopped</b> — the program returned an error.`,
 
       insight:
-        `<strong>Program continued.</strong> ` +
-        `The current code produced additional execution steps.`,
+        success
 
-      variables:
-        `<span class="var"><b>steps</b> = ${executionSteps.length}</span>`,
+          ? `<strong>Your program finished.</strong> ` +
+            `The output shown in the Output panel is the actual result from this run.`
+
+          : `<strong>The program could not finish.</strong> ` +
+            `Read the error in the Output panel, fix the code, and run it again.`,
+
+      variable:
+        success
+
+          ? `<span class="var"><b>status</b> = complete</span>`
+
+          : `<span class="var"><b>status</b> = error</span>`,
 
       source:
-        executionSteps
-          .slice(4,9)
-          .map(
-            item =>
-              `L${item.lineNumber}: ${item.source.trim()}`
-          )
-          .join("\n")
+        success
+          ? (output || "Program finished.")
+          : "Execution returned an error."
 
-    };
+    });
 
   }
 
 
   /*
-    With a short program, fill remaining visual positions
-    using the REAL result rather than the old artificial
-    loop/update stages.
+    Fill empty visual positions without changing
+    the overall five-node frame.
   */
 
-  if(
-    flow.length < 5 &&
-    output &&
-    output.trim()
-  ){
-
-    flow.push({
-
-      label:"Result",
-
-      shortLabel:"Result",
-
-      ref:"stdout",
-
-      note:
-        "<b>Result</b> — actual program output returned.",
-
-      insight:
-        "<strong>Actual output captured.</strong> " +
-        "The result below came from the current program.",
-
-      variables:
-        '<span class="var"><b>stdout</b> = captured</span>',
-
-      source:
-        output.trim()
-
-    });
-
-  }
-
-
-  if(
-    flow.length < 5
-  ){
-
-    flow.push({
-
-      label:
-        success
-          ? "Finished"
-          : "Error",
-
-      shortLabel:
-        success
-          ? "Done"
-          : "Error",
-
-      ref:
-        success
-          ? "complete"
-          : "runtime error",
-
-      note:
-        success
-          ? "<b>Finished</b> — the current program completed."
-          : "<b>Error</b> — the current program returned an error.",
-
-      insight:
-        success
-          ? "<strong>Execution complete.</strong> The animation belongs to this program run."
-          : "<strong>Execution stopped.</strong> Fix the error and run again.",
-
-      variables:
-        success
-          ? '<span class="var"><b>status</b> = complete</span>'
-          : '<span class="var"><b>status</b> = error</span>',
-
-      source:
-        success
-          ? "Program finished."
-          : "Program returned an error."
-
-    });
-
-  }
-
-
   while(
-    flow.length < 5
+    finalSteps.length <
+    5
   ){
 
-    flow.push({
+    finalSteps.push({
 
       label:"Complete",
 
       shortLabel:"Done",
 
+      icon:"✓",
+
       ref:"complete",
 
       note:
-        "<b>Complete</b> — TraceLab finished displaying this run.",
+        `<b>Complete</b> — the current program run has finished.`,
 
       insight:
-        "<strong>Trace finished.</strong> " +
-        "No additional program steps were available.",
+        `<strong>Trace complete.</strong> ` +
+        `There are no more program steps to display.`,
 
-      variables:
-        '<span class="var"><b>status</b> = complete</span>',
+      variable:
+        `<span class="var"><b>status</b> = complete</span>`,
 
       source:
         "Execution complete."
@@ -3063,13 +3264,131 @@ function buildCurrentProgramFlow(
   }
 
 
-  return flow.slice(0,5);
+  return finalSteps.slice(0,5);
 
 }
 
 
 /* =========================================================
-   RENDER CURRENT FLOW
+   INITIAL READY FLOW
+========================================================= */
+
+function buildReadyFlow(){
+
+  return [
+
+    {
+      label:"Start",
+      shortLabel:"Start",
+      icon:"▶",
+      ref:"waiting",
+
+      note:
+        `<b>Ready</b> — your program has not been run yet.`,
+
+      insight:
+        `<strong>Ready to execute.</strong> ` +
+        `TraceLab will build the animation from the code you currently have in the editor.`,
+
+      variable:
+        `<span class="var"><b>status</b> = ready</span>`,
+
+      source:
+        "Press Run & visualize."
+
+    },
+
+    {
+      label:"Get input",
+      shortLabel:"Get input",
+      icon:"⌨",
+      ref:"waiting",
+
+      note:
+        `<b>Waiting</b> — input will be shown here when your program needs it.`,
+
+      insight:
+        `<strong>Nothing is running yet.</strong> ` +
+        `When your code requests input, the input box will be highlighted.`,
+
+      variable:
+        `<span class="var"><b>input</b> = waiting</span>`,
+
+      source:
+        "No execution yet."
+
+    },
+
+    {
+      label:"Work with data",
+      shortLabel:"Process",
+      icon:"⚙",
+      ref:"waiting",
+
+      note:
+        `<b>Waiting</b> — this step will show program work after execution.`,
+
+      insight:
+        `<strong>Your program will be shown here.</strong> ` +
+        `The exact line from your code will replace this waiting state after Run.`,
+
+      variable:
+        `<span class="var"><b>state</b> = waiting</span>`,
+
+      source:
+        "No execution yet."
+
+    },
+
+    {
+      label:"Make a decision",
+      shortLabel:"Decide",
+      icon:"◆",
+      ref:"waiting",
+
+      note:
+        `<b>Waiting</b> — conditions are shown here when your code uses them.`,
+
+      insight:
+        `<strong>Decision steps come from your code.</strong> ` +
+        `TraceLab does not invent a loop or condition for your program.`,
+
+      variable:
+        `<span class="var"><b>flow</b> = waiting</span>`,
+
+      source:
+        "No execution yet."
+
+    },
+
+    {
+      label:"Show result",
+      shortLabel:"Result",
+      icon:"✓",
+      ref:"waiting",
+
+      note:
+        `<b>Waiting</b> — the result will appear after execution.`,
+
+      insight:
+        `<strong>Run your program.</strong> ` +
+        `The result shown here will come from the current execution.`,
+
+      variable:
+        `<span class="var"><b>status</b> = waiting</span>`,
+
+      source:
+        "No result yet."
+
+    }
+
+  ];
+
+}
+
+
+/* =========================================================
+   RENDER FLOW
 ========================================================= */
 
 function render(){
@@ -3083,16 +3402,12 @@ function render(){
   }
 
 
-  const total =
-    currentProgramFlow.length;
-
-
   step =
     Math.max(
       0,
       Math.min(
         step,
-        total - 1
+        currentProgramFlow.length - 1
       )
     );
 
@@ -3102,7 +3417,7 @@ function render(){
 
 
   $("#badge").textContent =
-    `Step ${step + 1} of ${total}`;
+    `Step ${step + 1} of ${currentProgramFlow.length}`;
 
 
   $("#stepname").textContent =
@@ -3122,24 +3437,35 @@ function render(){
 
 
   $("#vars").innerHTML =
-    data.variables;
+    data.variable;
 
-
-  /*
-    Keep the original five-node frame.
-    The labels now come from the current program.
-  */
 
   nodeLabels.forEach(
-    (nodeLabel,index) => {
+    (label,index) => {
 
-      const dataForNode =
+      const item =
         currentProgramFlow[index];
 
 
-      nodeLabel.textContent =
-        dataForNode
-          ? dataForNode.shortLabel
+      label.textContent =
+        item
+          ? item.shortLabel
+          : "";
+
+    }
+  );
+
+
+  nodeIcons.forEach(
+    (icon,index) => {
+
+      const item =
+        currentProgramFlow[index];
+
+
+      icon.textContent =
+        item
+          ? item.icon
           : "";
 
     }
@@ -3165,17 +3491,6 @@ function render(){
 
   nodes.forEach(
     (node,index) => {
-
-      const exists =
-        index <
-        currentProgramFlow.length;
-
-
-      node.style.opacity =
-        exists
-          ? "1"
-          : ".25";
-
 
       node.className =
         `node n${index + 1}` +
@@ -3217,7 +3532,7 @@ function render(){
 
 
 /* =========================================================
-   STOP VISUAL FLOW
+   STOP PLAY
 ========================================================= */
 
 function stopFlow(){
@@ -3247,7 +3562,7 @@ function stopFlow(){
 
 
 /* =========================================================
-   PLAY CURRENT PROGRAM FLOW
+   PLAY
 ========================================================= */
 
 function playFlow(){
@@ -3283,6 +3598,17 @@ function playFlow(){
     setInterval(
       () => {
 
+        if(
+          currentProgramFlow.length === 0
+        ){
+
+          stopFlow();
+
+          return;
+
+        }
+
+
         step =
           (step + 1) %
           currentProgramFlow.length;
@@ -3300,7 +3626,7 @@ function playFlow(){
 
 
 /* =========================================================
-   EDITOR
+   LINE NUMBERS
 ========================================================= */
 
 function numberLines(){
@@ -3321,6 +3647,10 @@ function numberLines(){
 
 }
 
+
+/* =========================================================
+   LOAD EXAMPLE
+========================================================= */
 
 function putCode(){
 
@@ -3367,6 +3697,7 @@ function detectInputRequest(){
   const language =
     $("#language").value;
 
+
   const code =
     $("#code").value;
 
@@ -3375,20 +3706,20 @@ function detectInputRequest(){
     language === "python"
   ){
 
-    const prompted =
+    const match =
       code.match(
         /\binput\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/
       );
 
 
-    if(prompted){
+    if(match){
 
       return {
 
         needsInput:true,
 
         prompt:
-          prompted[2] ||
+          match[2] ||
           "Python is asking for input."
 
       };
@@ -3418,20 +3749,20 @@ function detectInputRequest(){
     language === "javascript"
   ){
 
-    const prompted =
+    const match =
       code.match(
         /\bprompt\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/
       );
 
 
-    if(prompted){
+    if(match){
 
       return {
 
         needsInput:true,
 
         prompt:
-          prompted[2] ||
+          match[2] ||
           "JavaScript is asking for input."
 
       };
@@ -3511,12 +3842,12 @@ function detectInputRequest(){
   };
 
 
-  const languagePatterns =
+  const patternsForLanguage =
     patterns[language] || [];
 
 
   if(
-    languagePatterns.some(
+    patternsForLanguage.some(
       regex =>
         regex.test(code)
     )
@@ -3545,65 +3876,80 @@ function detectInputRequest(){
 }
 
 
+/* =========================================================
+   LANGUAGE LABELS
+========================================================= */
+
+const languageLabels = {
+
+  html:"HTML",
+  css:"CSS",
+  python:"Python",
+  javascript:"JavaScript",
+  typescript:"TypeScript",
+  c:"C",
+  cpp:"C++",
+  java:"Java",
+  go:"Go",
+  kotlin:"Kotlin",
+  swift:"Swift",
+  ruby:"Ruby",
+  php:"PHP",
+  perl:"Perl",
+  bash:"Bash",
+  sql:"SQL"
+
+};
+
+
+/* =========================================================
+   INPUT UI
+========================================================= */
+
 function updateInputUI(){
 
   const result =
     detectInputRequest();
 
 
-  const wrap =
-    $("#stdinWrap");
-
-
-  const label =
-    $("#stdinLabel");
-
-
-  const input =
-    $("#stdin");
-
-
-  const prompt =
-    $("#inputPrompt");
-
-
   if(
     result.needsInput
   ){
 
-    wrap.classList.add(
-      "needs-input"
-    );
+    $("#stdinWrap")
+      .classList
+      .add("needs-input");
 
 
-    label.textContent =
+    $("#stdinLabel").textContent =
       "User input here";
 
 
-    input.placeholder =
+    $("#stdin")
+      .placeholder =
       "Enter the requested value here...";
 
 
-    prompt.textContent =
+    $("#inputPrompt").textContent =
       result.prompt;
-
 
   }else{
 
-    wrap.classList.remove(
-      "needs-input"
-    );
+    $("#stdinWrap")
+      .classList
+      .remove("needs-input");
 
 
-    label.textContent =
+    $("#stdinLabel").textContent =
       "Enter the input here";
 
 
-    input.placeholder =
+    $("#stdin")
+      .placeholder =
       "Enter the input here...";
 
 
-    prompt.textContent =
+    $("#inputPrompt").textContent =
       "";
 
   }
@@ -3721,12 +4067,12 @@ function updateWebUI(){
     $("#language").value;
 
 
-  const preview =
+  const isPreview =
     language === "html" ||
     language === "css";
 
 
-  if(preview){
+  if(isPreview){
 
     renderPreview(
       language,
@@ -3743,7 +4089,7 @@ function updateWebUI(){
   $("#openBrowser")
     .style
     .display =
-      preview
+      isPreview
         ? "inline-flex"
         : "none";
 
@@ -3777,7 +4123,6 @@ function updateWebUI(){
 
 /* =========================================================
    PYODIDE
-   One consistent version.
 ========================================================= */
 
 let pyodidePromise =
@@ -3825,20 +4170,12 @@ function getPyodide(){
 
 /* =========================================================
    PYTHON EXECUTION
-   IMPORTANT:
-   - input(prompt) prompt is NOT sent to stdout.
-   - Python runtime line events are captured.
 ========================================================= */
 
 async function runPythonCode(
   code,
   stdinText
 ){
-
-  const logs = [];
-
-  let runtimeTrace = [];
-
 
   try{
 
@@ -3849,6 +4186,8 @@ async function runPythonCode(
     let stdout = "";
 
     let stderr = "";
+
+    let runtimeTrace = [];
 
 
     py.setStdout({
@@ -3920,29 +4259,30 @@ async function runPythonCode(
 
 
     /*
-      Critical fix:
+      Do not call normal input(prompt).
 
-      We replace Python's input() itself.
+      Normal Python input(prompt) writes its prompt
+      to stdout in the browser runtime.
 
-      Calling Python's normal input(prompt)
-      causes Python to write the prompt to stdout.
-
-      Instead we read directly from sys.stdin,
-      so "Enter the name:" never becomes part
-      of the program output.
+      TraceLab instead shows the prompt in the
+      dedicated input area and reads the actual
+      value directly from sys.stdin.
     */
 
     const wrapper = `
-import builtins as __tracelab_builtins
+import builtins
 import sys
 import traceback
 
-__tracelab_source =
-    ${sourceLiteral}
+__tracelab_source = ${sourceLiteral}
 
 __tracelab_events = []
 
-__tracelab_exception = ""
+__tracelab_error = ""
+
+
+__tracelab_original_input =
+    builtins.input
 
 
 def __tracelab_input(prompt=""):
@@ -3950,20 +4290,18 @@ def __tracelab_input(prompt=""):
     value =
         sys.stdin.readline()
 
+
     if value == "":
 
         raise EOFError(
             "No more input was provided."
         )
 
+
     return value.rstrip("\\\\r\\\\n")
 
 
-__tracelab_original_input =
-    __tracelab_builtins.input
-
-
-__tracelab_builtins.input =
+builtins.input =
     __tracelab_input
 
 
@@ -3973,7 +4311,7 @@ def __tracelab_trace(
     arg
 ):
 
-    if (
+    if(
         event == "line"
         and
         frame.f_code.co_filename ==
@@ -3984,6 +4322,7 @@ def __tracelab_trace(
             frame.f_lineno
         )
 
+
     return __tracelab_trace
 
 
@@ -3993,6 +4332,7 @@ try:
         __tracelab_trace
     )
 
+
     exec(
         compile(
             __tracelab_source,
@@ -4000,20 +4340,21 @@ try:
             "exec"
         ),
         {
-            "__name__":"__main__"
+            "__name__":
+                "__main__"
         }
     )
 
 except Exception:
 
-    __tracelab_exception =
+    __tracelab_error =
         traceback.format_exc()
 
 finally:
 
     sys.settrace(None)
 
-    __tracelab_builtins.input =
+    builtins.input =
         __tracelab_original_input
 `;
 
@@ -4031,7 +4372,7 @@ finally:
 
     const errorProxy =
       py.globals.get(
-        "__tracelab_exception"
+        "__tracelab_error"
       );
 
 
@@ -4045,66 +4386,34 @@ finally:
     }
 
 
-    let errorText = "";
+    let error = "";
 
 
     if(errorProxy){
 
-      errorText =
-        String(errorProxy);
+      error =
+        String(
+          errorProxy
+        );
 
       errorProxy.destroy();
 
     }
 
 
-    if(
-      errorText
-    ){
-
-      logs.push(
-        errorText
-      );
-
-    }
-
-
-    if(
-      stdout
-    ){
-
-      logs.push(
-        stdout
-      );
-
-    }
-
-
-    if(
-      stderr
-    ){
-
-      logs.push(
-        `stderr: ${stderr}`
-      );
-
-    }
-
+    /*
+      Only actual stdout goes into output.
+      The input() prompt is intentionally absent.
+    */
 
     return {
-
-      logs:
-        logs.length
-          ? logs
-          : [
-              "(No output — add print(...) to see output.)"
-            ],
 
       output:
         stdout,
 
-      error:
-        errorText,
+      stderr,
+
+      error,
 
       runtimeTrace
 
@@ -4112,22 +4421,17 @@ finally:
 
   }catch(error){
 
-    const message =
-      error?.message ||
-      String(error);
-
-
     return {
-
-      logs:[
-        `✕ Python execution failed: ${message}`
-      ],
 
       output:"",
 
-      error:message,
+      stderr:"",
 
-      runtimeTrace
+      error:
+        error?.message ||
+        String(error),
+
+      runtimeTrace:[]
 
     };
 
@@ -4138,8 +4442,6 @@ finally:
 
 /* =========================================================
    JAVASCRIPT EXECUTION
-   IMPORTANT:
-   prompt() itself is NOT written to output.
 ========================================================= */
 
 function runJavaScriptCode(
@@ -4186,8 +4488,7 @@ function runJavaScriptCode(
         }
 
 
-        finished =
-          true;
+        finished = true;
 
 
         window.removeEventListener(
@@ -4196,13 +4497,7 @@ function runJavaScriptCode(
         );
 
 
-        if(
-          iframe.parentNode
-        ){
-
-          iframe.remove();
-
-        }
+        iframe.remove();
 
 
         resolve(
@@ -4261,21 +4556,17 @@ function runJavaScriptCode(
               : "";
 
 
-        const args =
-          Array.isArray(
-            data.args
-          )
-            ? data.args
-            : [
-                String(
-                  data.args ?? ""
-                )
-              ];
-
-
         logs.push(
           prefix +
-          args.join(" ")
+          (
+            Array.isArray(
+              data.args
+            )
+              ? data.args.join(" ")
+              : String(
+                  data.args ?? ""
+                )
+          )
         );
 
       }
@@ -4287,7 +4578,14 @@ function runJavaScriptCode(
       );
 
 
-      const source =
+      const safeCode =
+        code.replace(
+          /<\/script/gi,
+          "<\\/script"
+        );
+
+
+      iframe.srcdoc =
 `
 <!doctype html>
 <html>
@@ -4309,38 +4607,8 @@ function send(
   parent.postMessage(
     {
       __tracelab:true,
-
-      type:type,
-
-      args:
-        args.map(
-          value => {
-
-            try{
-
-              if(
-                typeof value === "object" &&
-                value !== null
-              ){
-
-                return JSON.stringify(
-                  value
-                );
-
-              }
-
-              return String(value);
-
-            }catch{
-
-              return String(
-                value
-              );
-
-            }
-
-          }
-        )
+      type,
+      args
     },
     "*"
   );
@@ -4352,15 +4620,12 @@ console.log =
   (...args) =>
     send(
       "log",
-      args
-    );
-
-
-console.error =
-  (...args) =>
-    send(
-      "error",
-      args
+      args.map(
+        value =>
+          typeof value === "string"
+            ? value
+            : JSON.stringify(value)
+      )
     );
 
 
@@ -4368,12 +4633,26 @@ console.warn =
   (...args) =>
     send(
       "warn",
-      args
+      args.map(
+        value =>
+          String(value)
+      )
+    );
+
+
+console.error =
+  (...args) =>
+    send(
+      "error",
+      args.map(
+        value =>
+          String(value)
+      )
     );
 
 
 window.prompt =
-  message => {
+  () => {
 
     if(
       inputIndex >=
@@ -4381,17 +4660,11 @@ window.prompt =
     ){
 
       throw new Error(
-        "Input required. Enter the requested value in the TraceLab input box."
+        "Input required. Enter the value in the TraceLab input box."
       );
 
     }
 
-
-    /*
-      IMPORTANT:
-      Do not send the prompt message to console output.
-      TraceLab already displays it in the input UI.
-    */
 
     return String(
       inputLines[
@@ -4402,22 +4675,9 @@ window.prompt =
   };
 
 
-window.alert =
-  message => {
-
-    send(
-      "log",
-      [
-        String(message)
-      ]
-    );
-
-  };
-
-
 try{
 
-${code}
+${safeCode}
 
 send(
   "done",
@@ -4447,10 +4707,6 @@ send(
 </body>
 </html>
 `;
-
-
-      iframe.srcdoc =
-        source;
 
 
       document.body.appendChild(
@@ -4542,8 +4798,7 @@ async function runRemoteCode(
 
       data = {
 
-        error:
-          text
+        error:text
 
       };
 
@@ -4589,10 +4844,6 @@ async function runRemoteCode(
 
       executionTime:
         data.executionTime ??
-        null,
-
-      memoryUsed:
-        data.memoryUsed ??
         null
 
     };
@@ -4657,7 +4908,6 @@ async function checkBackend(){
       await fetch(
         `${TRACELAB_BACKEND}/api/health?t=${Date.now()}`,
         {
-
           method:"GET",
 
           headers:{
@@ -4666,7 +4916,6 @@ async function checkBackend(){
           },
 
           cache:"no-store"
-
         }
       );
 
@@ -4681,7 +4930,6 @@ async function checkBackend(){
     ){
 
       throw new Error(
-        data.error ||
         "Backend health check failed."
       );
 
@@ -4695,7 +4943,6 @@ async function checkBackend(){
       element.textContent =
         "● Backend online · compiler ready";
 
-
       element.className =
         "server-pill online";
 
@@ -4704,18 +4951,15 @@ async function checkBackend(){
       element.textContent =
         "● Backend online · API key missing";
 
-
       element.className =
         "server-pill warning";
 
     }
 
-
   }catch(error){
 
     element.textContent =
       "● Backend offline";
-
 
     element.className =
       "server-pill offline";
@@ -4726,275 +4970,7 @@ async function checkBackend(){
 
 
 /* =========================================================
-   PREVIEW / CURRENT FLOW INITIAL STATE
-========================================================= */
-
-function initializeFlow(){
-
-  currentProgramFlow = [
-
-    {
-      label:"Ready",
-      shortLabel:"Ready",
-      ref:"waiting",
-      note:
-        "<b>Ready</b> — run your current program.",
-      insight:
-        "<strong>Ready.</strong> Choose a language and run your program.",
-      variables:
-        '<span class="var"><b>status</b> = ready</span>',
-      source:
-        "No execution has started."
-    },
-
-    {
-      label:"Waiting",
-      shortLabel:"Wait",
-      ref:"waiting",
-      note:
-        "<b>Waiting</b> — TraceLab is ready.",
-      insight:
-        "<strong>Waiting.</strong> Your current program has not run yet.",
-      variables:
-        '<span class="var"><b>status</b> = waiting</span>',
-      source:
-        "Press Run & visualize."
-    },
-
-    {
-      label:"Waiting",
-      shortLabel:"Wait",
-      ref:"waiting",
-      note:
-        "<b>Waiting</b> — no execution steps yet.",
-      insight:
-        "<strong>No execution.</strong> Run the current program to generate its flow.",
-      variables:
-        '<span class="var"><b>steps</b> = 0</span>',
-      source:
-        "No execution steps."
-    },
-
-    {
-      label:"Waiting",
-      shortLabel:"Wait",
-      ref:"waiting",
-      note:
-        "<b>Waiting</b> — no execution steps yet.",
-      insight:
-        "<strong>No execution.</strong> The flow is generated after Run.",
-      variables:
-        '<span class="var"><b>trace</b> = empty</span>',
-      source:
-        "No trace."
-    },
-
-    {
-      label:"Waiting",
-      shortLabel:"Wait",
-      ref:"waiting",
-      note:
-        "<b>Waiting</b> — run your program.",
-      insight:
-        "<strong>Ready.</strong> The visual flow will use your actual program.",
-      variables:
-        '<span class="var"><b>status</b> = ready</span>',
-      source:
-        "No result yet."
-    }
-
-  ];
-
-}
-
-
-/* =========================================================
-   RESET
-========================================================= */
-
-$("#reset").onclick =
-  () => {
-
-    executionId++;
-
-    stopFlow();
-
-    step =
-      0;
-
-
-    putCode();
-
-
-    initializeFlow();
-
-    render();
-
-    updateWebUI();
-
-    explainLogic();
-
-
-    $("#output").textContent =
-      "Ready.";
-
-
-    setStatus(
-      "● Ready"
-    );
-
-  };
-
-
-/* =========================================================
-   LANGUAGE CHANGE
-========================================================= */
-
-$("#language").onchange =
-  () => {
-
-    executionId++;
-
-    stopFlow();
-
-    step =
-      0;
-
-
-    putCode();
-
-
-    initializeFlow();
-
-    render();
-
-    updateWebUI();
-
-    explainLogic();
-
-
-    const language =
-      $("#language").value;
-
-
-    setStatus(
-      "● Ready"
-    );
-
-
-    if(
-      language === "html" ||
-      language === "css"
-    ){
-
-      $("#output").textContent =
-        "Browser preview updated.";
-
-    }else if(
-      language === "python"
-    ){
-
-      $("#output").textContent =
-        "Python selected. Run to execute locally.";
-
-    }else if(
-      language === "javascript"
-    ){
-
-      $("#output").textContent =
-        "JavaScript selected. Run to execute locally.";
-
-    }else{
-
-      $("#output").textContent =
-        "Hosted language selected. Run to execute through TraceLab.";
-
-    }
-
-  };
-
-
-/* =========================================================
-   CODE INPUT
-========================================================= */
-
-$("#code").oninput =
-  () => {
-
-    numberLines();
-
-
-    $("#detect").textContent =
-      "✦ Auto-detect";
-
-
-    explainLogic();
-
-
-    updateInputUI();
-
-
-    const language =
-      $("#language").value;
-
-
-    /*
-      Do not destroy an existing execution flow while
-      typing. But once code changes, the old flow no
-      longer belongs to the current source.
-    */
-
-    currentProgramFlow = [];
-
-
-    initializeFlow();
-
-    step = 0;
-
-    render();
-
-
-    if(
-      language === "html" ||
-      language === "css"
-    ){
-
-      renderPreview(
-        language,
-        $("#code").value
-      );
-
-    }
-
-  };
-
-
-/* =========================================================
-   USER INPUT
-========================================================= */
-
-$("#stdin").oninput =
-  () => {
-
-    if(
-      $("#stdin").value.trim()
-    ){
-
-      $("#stdinWrap")
-        .classList
-        .add("needs-input");
-
-    }else{
-
-      updateInputUI();
-
-    }
-
-  };
-
-
-/* =========================================================
-   OPEN IN BROWSER
+   OPEN BROWSER
 ========================================================= */
 
 $("#openBrowser").onclick =
@@ -5008,14 +4984,14 @@ $("#openBrowser").onclick =
       $("#code").value;
 
 
-    const documentText =
+    const html =
       buildFullDocument(
         language,
         code
       );
 
 
-    if(!documentText){
+    if(!html){
 
       return;
 
@@ -5024,7 +5000,7 @@ $("#openBrowser").onclick =
 
     const blob =
       new Blob(
-        [documentText],
+        [html],
         {
           type:"text/html"
         }
@@ -5054,6 +5030,794 @@ $("#openBrowser").onclick =
       },
       60000
     );
+
+  };
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+$("#reset").onclick =
+  () => {
+
+    executionId++;
+
+
+    stopFlow();
+
+
+    step = 0;
+
+
+    putCode();
+
+
+    currentProgramFlow =
+      buildReadyFlow();
+
+
+    render();
+
+
+    updateWebUI();
+
+
+    explainLogic();
+
+
+    $("#output").textContent =
+      "Ready.";
+
+
+    setStatus(
+      "● Ready"
+    );
+
+  };
+
+
+/* =========================================================
+   LANGUAGE CHANGE
+========================================================= */
+
+$("#language").onchange =
+  () => {
+
+    executionId++;
+
+
+    stopFlow();
+
+
+    step = 0;
+
+
+    putCode();
+
+
+    currentProgramFlow =
+      buildReadyFlow();
+
+
+    render();
+
+
+    updateWebUI();
+
+
+    explainLogic();
+
+
+    $("#output").textContent =
+      "Language selected. Press Run & visualize to execute.";
+
+    setStatus(
+      "● Ready"
+    );
+
+  };
+
+
+/* =========================================================
+   CODE INPUT
+========================================================= */
+
+$("#code").oninput =
+  () => {
+
+    numberLines();
+
+
+    updateInputUI();
+
+
+    explainLogic();
+
+
+    /*
+      The old execution must not remain attached
+      to changed source code.
+    */
+
+    stopFlow();
+
+
+    currentProgramFlow =
+      buildReadyFlow();
+
+
+    step = 0;
+
+
+    render();
+
+
+    const language =
+      $("#language").value;
+
+
+    if(
+      language === "html" ||
+      language === "css"
+    ){
+
+      renderPreview(
+        language,
+        $("#code").value
+      );
+
+    }
+
+  };
+
+
+/* =========================================================
+   INPUT CHANGE
+========================================================= */
+
+$("#stdin").oninput =
+  () => {
+
+    if(
+      $("#stdin").value.trim()
+    ){
+
+      $("#stdinWrap")
+        .classList
+        .add("needs-input");
+
+    }else{
+
+      updateInputUI();
+
+    }
+
+  };
+
+
+/* =========================================================
+   EXPLAIN MAIN LOGIC
+========================================================= */
+
+function explainLogic(){
+
+  const lines =
+    $("#code")
+      .value
+      .split("\n");
+
+
+  const matches = [];
+
+
+  const patterns = [
+
+    /^(def )/,
+
+    /^(function )/,
+
+    /^(class )/,
+
+    /^(for )/,
+
+    /^(while )/,
+
+    /^(if )/,
+
+    /^(else )/,
+
+    /^(elif )/,
+
+    /^(switch )/,
+
+    /^(public static)/,
+
+    /^(int main)/,
+
+    /^(func main)/,
+
+    /^(fun main)/
+
+  ];
+
+
+  lines.forEach(
+    (line,index) => {
+
+      const trimmed =
+        line.trim();
+
+
+      if(
+        patterns.some(
+          regex =>
+            regex.test(
+              trimmed
+            )
+        )
+      ){
+
+        matches.push(
+          [
+            index,
+            trimmed
+          ]
+        );
+
+      }
+
+    }
+  );
+
+
+  const first =
+    matches[0] ||
+    [
+      0,
+      lines.find(
+        line =>
+          line.trim()
+      ) ||
+      "Program entry"
+    ];
+
+
+  let kind =
+    "starting point";
+
+
+  if(
+    /^(for|while)\b/.test(
+      first[1]
+    )
+  ){
+
+    kind =
+      "loop";
+
+  }else if(
+    /^(if|else|elif|switch)\b/.test(
+      first[1]
+    )
+  ){
+
+    kind =
+      "decision";
+
+  }else if(
+    /^(def|function|class|func|fun)\b/.test(
+      first[1]
+    )
+  ){
+
+    kind =
+      "function";
+
+  }
+
+
+  $("#logicSummary").innerHTML =
+    `<strong>Main logic found.</strong> ` +
+    `The first important ${kind} in your current program ` +
+    `appears on line ${first[0] + 1}. ` +
+    `The explanation is based on the code currently in the editor.`;
+
+
+  $("#logicCode").textContent =
+    lines
+      .slice(
+        Math.max(
+          0,
+          first[0] - 1
+        ),
+        Math.min(
+          lines.length,
+          first[0] + 7
+        )
+      )
+      .map(
+        (line,index) =>
+          String(
+            Math.max(
+              0,
+              first[0] - 1
+            ) +
+            index +
+            1
+          ).padStart(3," ") +
+          "  " +
+          line
+      )
+      .join("\n");
+
+
+  $("#focus").textContent =
+    "✓ Main logic explained";
+
+}
+
+
+/* =========================================================
+   RUN
+========================================================= */
+
+$("#run").onclick =
+  async () => {
+
+    stopFlow();
+
+
+    const currentExecution =
+      ++executionId;
+
+
+    const language =
+      $("#language").value;
+
+
+    const code =
+      $("#code").value;
+
+
+    const stdin =
+      $("#stdin").value;
+
+
+    if(
+      !code.trim()
+    ){
+
+      $("#output").textContent =
+        "✕ Your code is empty.";
+
+
+      setStatus(
+        "● Nothing to run",
+        "error"
+      );
+
+
+      return;
+
+    }
+
+
+    const inputRequest =
+      detectInputRequest();
+
+
+    /*
+      Input must be supplied before execution.
+    */
+
+    if(
+      inputRequest.needsInput &&
+      !stdin.trim()
+    ){
+
+      updateInputUI();
+
+
+      $("#stdinWrap")
+        .classList
+        .add("needs-input");
+
+
+      $("#output").textContent =
+        inputRequest.prompt +
+        "\n\n" +
+        "Enter the requested value in the highlighted input box, then press Run again.";
+
+
+      setStatus(
+        "● Input required",
+        "error"
+      );
+
+
+      $("#stdin").focus();
+
+
+      return;
+
+    }
+
+
+    $("#run").disabled =
+      true;
+
+
+    try{
+
+      setStatus(
+        "● Running your program…",
+        "running"
+      );
+
+
+      /*
+        Clear any old trace.
+
+        This prevents the previous program's animation
+        from continuing.
+      */
+
+      currentProgramFlow =
+        [];
+
+
+      step = 0;
+
+
+      /*
+        HTML/CSS
+      */
+
+      if(
+        language === "html" ||
+        language === "css"
+      ){
+
+        renderPreview(
+          language,
+          code
+        );
+
+
+        currentProgramFlow =
+          buildCurrentProgramFlow(
+            code,
+            language,
+            [],
+            "Preview rendered.",
+            true
+          );
+
+
+        step = 0;
+
+        render();
+
+
+        $("#output").textContent =
+          "Rendered below in the live preview.";
+
+
+        setStatus(
+          "● Preview ready"
+        );
+
+
+        playFlow();
+
+        return;
+
+      }
+
+
+      /*
+        JavaScript
+      */
+
+      if(
+        language === "javascript"
+      ){
+
+        hidePreview();
+
+
+        const logs =
+          await runJavaScriptCode(
+            code,
+            stdin
+          );
+
+
+        if(
+          currentExecution !==
+          executionId
+        ){
+
+          return;
+
+        }
+
+
+        const output =
+          logs.join("\n");
+
+
+        const failed =
+          logs.some(
+            line =>
+              line.startsWith("✕")
+          );
+
+
+        $("#output").textContent =
+          output;
+
+
+        currentProgramFlow =
+          buildCurrentProgramFlow(
+            code,
+            language,
+            [],
+            output,
+            !failed
+          );
+
+
+        step = 0;
+
+
+        render();
+
+
+        setStatus(
+          failed
+            ? "● Execution failed"
+            : "● Executed live",
+          failed
+            ? "error"
+            : "ready"
+        );
+
+
+        /*
+          Play the newly generated current-program
+          animation AFTER execution.
+        */
+
+        playFlow();
+
+
+        return;
+
+      }
+
+
+      /*
+        Python
+      */
+
+      if(
+        language === "python"
+      ){
+
+        hidePreview();
+
+
+        const result =
+          await runPythonCode(
+            code,
+            stdin
+          );
+
+
+        if(
+          currentExecution !==
+          executionId
+        ){
+
+          return;
+
+        }
+
+
+        let displayOutput =
+          result.output;
+
+
+        if(
+          result.error
+        ){
+
+          displayOutput =
+            result.error;
+
+        }else if(
+          result.stderr
+        ){
+
+          displayOutput +=
+            (
+              displayOutput
+                ? "\n"
+                : ""
+            ) +
+            result.stderr;
+
+        }
+
+
+        $("#output").textContent =
+          displayOutput ||
+          "(No output — add print(...) to see output.)";
+
+
+        currentProgramFlow =
+          buildCurrentProgramFlow(
+            code,
+            language,
+            result.runtimeTrace,
+            result.output,
+            !result.error
+          );
+
+
+        step = 0;
+
+
+        render();
+
+
+        setStatus(
+          result.error
+            ? "● Python execution failed"
+            : "● Executed live",
+          result.error
+            ? "error"
+            : "ready"
+        );
+
+
+        playFlow();
+
+
+        return;
+
+      }
+
+
+      /*
+        Hosted languages
+      */
+
+      hidePreview();
+
+
+      const result =
+        await runRemoteCode(
+          language,
+          code,
+          stdin
+        );
+
+
+      if(
+        currentExecution !==
+        executionId
+      ){
+
+        return;
+
+      }
+
+
+      $("#output").textContent =
+        result.output;
+
+
+      currentProgramFlow =
+        buildCurrentProgramFlow(
+          code,
+          language,
+          [],
+          result.output,
+          result.ok
+        );
+
+
+      step = 0;
+
+
+      render();
+
+
+      setStatus(
+        result.ok
+          ? "● Executed live"
+          : "● Execution failed",
+        result.ok
+          ? "ready"
+          : "error"
+      );
+
+
+      if(
+        result.runtime
+      ){
+
+        const timing =
+          result.executionTime != null
+            ? ` · ${result.executionTime} ms`
+            : "";
+
+
+        $("#modeStatus").textContent =
+          `${result.runtime} executed on backend${timing}`;
+
+      }
+
+
+      playFlow();
+
+    }
+
+    catch(error){
+
+      $("#output").textContent =
+        "✕ Unexpected error\n" +
+        (
+          error?.stack ||
+          error?.message ||
+          String(error)
+        );
+
+
+      currentProgramFlow =
+        buildCurrentProgramFlow(
+          code,
+          language,
+          [],
+          "",
+          false
+        );
+
+
+      step = 0;
+
+
+      render();
+
+
+      setStatus(
+        "● Error",
+        "error"
+      );
+
+
+      console.error(
+        error
+      );
+
+    }
+
+    finally{
+
+      if(
+        currentExecution ===
+        executionId
+      ){
+
+        $("#run").disabled =
+          false;
+
+      }
+
+    }
 
   };
 
@@ -5120,159 +5884,168 @@ $("#prev").onclick =
   };
 
 
-$("#focus").onclick =
-  explainLogic;
-
-
 /* =========================================================
    AUTO DETECT
    IMPORTANT:
-   Never replace the user's current code.
+   Does NOT replace current user code.
 ========================================================= */
 
 $("#detect").onclick =
-  detectLanguage;
+  () => {
+
+    const source =
+      $("#code")
+        .value
+        .toLowerCase();
 
 
-function detectLanguage(){
+    const markers = {
 
-  const source =
-    $("#code")
-      .value
-      .toLowerCase();
+      html:[
+        "<!doctype html",
+        "<html",
+        "<body",
+        "<div"
+      ],
 
+      css:[
+        "font-family:",
+        "background:",
+        "border-radius:"
+      ],
 
-  const markers = {
+      python:[
+        "def ",
+        "print(",
+        "input(",
+        "import "
+      ],
 
-    html:[
-      "<!doctype html",
-      "<html",
-      "<body",
-      "<div"
-    ],
+      javascript:[
+        "console.log",
+        "prompt(",
+        "const ",
+        "let "
+      ],
 
-    css:[
-      "font-family:",
-      "background:",
-      "border-radius:"
-    ],
+      typescript:[
+        "interface ",
+        ": number",
+        ": string",
+        "number[]"
+      ],
 
-    python:[
-      "def ",
-      "print(",
-      "input(",
-      "import "
-    ],
+      c:[
+        "#include <stdio",
+        "printf(",
+        "scanf("
+      ],
 
-    javascript:[
-      "console.log",
-      "prompt(",
-      "const ",
-      "let "
-    ],
+      cpp:[
+        "#include <iostream>",
+        "std::",
+        "cout",
+        "cin"
+      ],
 
-    typescript:[
-      "interface ",
-      ": number",
-      ": string",
-      "number[]"
-    ],
+      java:[
+        "public static void main",
+        "system.out",
+        "scanner"
+      ],
 
-    c:[
-      "#include <stdio",
-      "printf(",
-      "scanf("
-    ],
+      go:[
+        "package main",
+        "fmt."
+      ],
 
-    cpp:[
-      "#include <iostream>",
-      "std::",
-      "cout",
-      "cin"
-    ],
+      kotlin:[
+        "fun main",
+        "readline",
+        "println"
+      ],
 
-    java:[
-      "public static void main",
-      "system.out",
-      "scanner"
-    ],
+      swift:[
+        "func ",
+        "readline()",
+        "print("
+      ],
 
-    go:[
-      "package main",
-      "fmt."
-    ],
+      ruby:[
+        "puts ",
+        "gets"
+      ],
 
-    kotlin:[
-      "fun main",
-      "readline",
-      "println"
-    ],
+      php:[
+        "<?php",
+        "echo ",
+        "stdin"
+      ],
 
-    swift:[
-      "func ",
-      "readline()",
-      "print("
-    ],
+      perl:[
+        "<stdin>",
+        "my $",
+        "print "
+      ],
 
-    ruby:[
-      "puts ",
-      "gets"
-    ],
+      bash:[
+        "#!/bin",
+        "echo ",
+        "read "
+      ],
 
-    php:[
-      "<?php",
-      "echo ",
-      "stdin"
-    ],
+      sql:[
+        "select ",
+        "create table"
+      ]
 
-    perl:[
-      "<stdin>",
-      "my $",
-      "print "
-    ],
-
-    bash:[
-      "#!/bin",
-      "echo ",
-      "read "
-    ],
-
-    sql:[
-      "select ",
-      "create table"
-    ]
-
-  };
+    };
 
 
-  let best =
-    "python";
+    let best =
+      "python";
 
 
-  let bestScore =
-    0;
-
-
-  for(
-    const [
-      language,
-      words
-    ] of Object.entries(markers)
-  ){
-
-    let score =
+    let bestScore =
       0;
 
 
     for(
-      const word of words
+      const [
+        language,
+        words
+      ] of Object.entries(markers)
     ){
 
-      if(
-        source.includes(word)
+      let score =
+        0;
+
+
+      for(
+        const word of words
       ){
 
-        score++;
+        if(
+          source.includes(word)
+        ){
+
+          score++;
+
+        }
+
+      }
+
+
+      if(
+        score >
+        bestScore
+      ){
+
+        bestScore =
+          score;
+
+        best =
+          language;
 
       }
 
@@ -5280,266 +6053,17 @@ function detectLanguage(){
 
 
     if(
-      score >
-      bestScore
+      bestScore === 0
     ){
-
-      bestScore =
-        score;
-
-      best =
-        language;
-
-    }
-
-  }
-
-
-  if(
-    bestScore === 0
-  ){
-
-    setStatus(
-      "● Could not detect",
-      "error"
-    );
-
-
-    $("#output").textContent =
-      "Auto-detect could not identify the language.";
-
-    return;
-
-  }
-
-
-  /*
-    FIX:
-    Select the detected language,
-    but DO NOT overwrite the user's code.
-  */
-
-  $("#language").value =
-    best;
-
-
-  const filename =
-    codes[best]
-      ? codes[best][0]
-      : `main.${best}`;
-
-
-  $("#file").textContent =
-    filename;
-
-
-  numberLines();
-
-  updateInputUI();
-
-  updateWebUI();
-
-  initializeFlow();
-
-  step = 0;
-
-  render();
-
-  explainLogic();
-
-
-  const label =
-    languageLabels[best] ||
-    best;
-
-
-  setStatus(
-    `✦ Detected ${label}`
-  );
-
-
-  $("#output").textContent =
-    `${label} detected.\n` +
-    `Your current code was kept unchanged.\n` +
-    `Press Run & visualize to execute it.`;
-
-}
-
-
-/* =========================================================
-   LOGIC EXPLAINER
-========================================================= */
-
-function explainLogic(){
-
-  const lines =
-    $("#code")
-      .value
-      .split("\n");
-
-
-  const matches = [];
-
-
-  const pattern =
-    /^(def |function |class |for |while |if |else if|elif |switch |try |public static|int main|func main|fun main)/;
-
-
-  lines.forEach(
-    (line,index) => {
-
-      if(
-        pattern.test(
-          line.trim()
-        )
-      ){
-
-        matches.push([
-          index,
-          line.trim()
-        ]);
-
-      }
-
-    }
-  );
-
-
-  const first =
-    matches[0] ||
-    [
-      0,
-      lines.find(
-        line =>
-          line.trim()
-      ) ||
-      "Program entry"
-    ];
-
-
-  let kind =
-    "entry point";
-
-
-  if(
-    /^(for |while )/.test(
-      first[1]
-    )
-  ){
-
-    kind =
-      "loop";
-
-  }else if(
-    /^(if |else if|elif |switch )/.test(
-      first[1]
-    )
-  ){
-
-    kind =
-      "decision";
-
-  }else if(
-    /^(def |function |class |func |fun )/.test(
-      first[1]
-    )
-  ){
-
-    kind =
-      "function";
-
-  }
-
-
-  $("#logicSummary").innerHTML =
-    `<strong>Main path found.</strong> ` +
-    `This ${lines.length}-line program has ` +
-    `${matches.length} detected control-flow block` +
-    `${matches.length === 1 ? "" : "s"}. ` +
-    `The first important ${kind} appears on line ` +
-    `${first[0] + 1}.`;
-
-
-  $("#logicCode").textContent =
-    lines
-      .slice(
-        Math.max(
-          0,
-          first[0] - 1
-        ),
-        Math.min(
-          lines.length,
-          first[0] + 7
-        )
-      )
-      .map(
-        (line,index) =>
-          String(
-            Math.max(
-              0,
-              first[0] - 1
-            ) +
-            index +
-            1
-          ).padStart(3," ") +
-          "  " +
-          line
-      )
-      .join("\n");
-
-
-  $("#focus").textContent =
-    "✓ Main logic explained";
-
-}
-
-
-/* =========================================================
-   RUN
-========================================================= */
-
-$("#run").onclick =
-  async () => {
-
-    stopFlow();
-
-
-    const currentExecution =
-      ++executionId;
-
-
-    step =
-      0;
-
-
-    const language =
-      $("#language").value;
-
-
-    const code =
-      $("#code").value;
-
-
-    const stdin =
-      $("#stdin").value;
-
-
-    const inputRequest =
-      detectInputRequest();
-
-
-    if(
-      !code.trim()
-    ){
-
-      $("#output").textContent =
-        "✕ Your code is empty.";
-
 
       setStatus(
-        "● Nothing to run",
+        "● Could not detect",
         "error"
       );
+
+
+      $("#output").textContent =
+        "Auto-detect could not identify the language.";
 
 
       return;
@@ -5548,497 +6072,61 @@ $("#run").onclick =
 
 
     /*
-      Input check.
+      Keep the user's current code.
     */
 
+    $("#language").value =
+      best;
+
+
     if(
-      inputRequest.needsInput &&
-      !stdin.trim()
+      codes[best]
     ){
 
-      updateInputUI();
-
-
-      $("#stdinWrap")
-        .classList
-        .add("needs-input");
-
-
-      $("#output").textContent =
-        inputRequest.prompt +
-        "\n\n" +
-        "Enter the requested value in the highlighted input box, then press Run again.";
-
-
-      setStatus(
-        "● Input required",
-        "error"
-      );
-
-
-      $("#stdin").focus();
-
-
-      return;
+      $("#file").textContent =
+        codes[best][0];
 
     }
 
 
-    $("#run").disabled =
-      true;
+    updateInputUI();
 
+    updateWebUI();
 
-    try{
+    initializeReadyState();
 
-      setStatus(
-        "● Running current program…",
-        "running"
-      );
+    explainLogic();
 
 
-      /*
-        Clear the old animation.
+    setStatus(
+      `✦ Detected ${languageLabels[best]}`
+    );
 
-        Nothing from a previous program is allowed
-        to continue playing.
-      */
 
-      currentProgramFlow = [];
-
-      initializeFlow();
-
-      step = 0;
-
-      render();
-
-
-      /* =========================================
-         HTML / CSS
-      ========================================== */
-
-      if(
-        language === "html" ||
-        language === "css"
-      ){
-
-        renderPreview(
-          language,
-          code
-        );
-
-
-        const flow =
-          buildCurrentProgramFlow(
-            language,
-            code,
-            [],
-            "Browser preview rendered.",
-            true
-          );
-
-
-        currentProgramFlow =
-          flow;
-
-
-        step = 0;
-
-        render();
-
-
-        $("#output").textContent =
-          "Rendered below in the live preview.";
-
-
-        setStatus(
-          "● Preview ready"
-        );
-
-
-        playFlow();
-
-        return;
-
-      }
-
-
-      /* =========================================
-         JAVASCRIPT
-      ========================================== */
-
-      if(
-        language === "javascript"
-      ){
-
-        hidePreview();
-
-
-        setStatus(
-          "● Running JavaScript…",
-          "running"
-        );
-
-
-        const logs =
-          await runJavaScriptCode(
-            code,
-            stdin
-          );
-
-
-        if(
-          currentExecution !==
-          executionId
-        ){
-
-          return;
-
-        }
-
-
-        const output =
-          logs.join("\n");
-
-
-        const failed =
-          logs.some(
-            line =>
-              line.startsWith("✕")
-          );
-
-
-        $("#output").textContent =
-          output;
-
-
-        currentProgramFlow =
-          buildCurrentProgramFlow(
-            language,
-            code,
-            [],
-            output,
-            !failed
-          );
-
-
-        lastExecution = {
-
-          ok:!failed,
-
-          output,
-
-          language,
-
-          source:code,
-
-          runtimeTrace:[]
-
-        };
-
-
-        step = 0;
-
-        render();
-
-
-        setStatus(
-          failed
-            ? "● Execution failed"
-            : "● Executed live",
-          failed
-            ? "error"
-            : "ready"
-        );
-
-
-        /*
-          ONLY now, after the program has run,
-          play the generated current-program flow.
-        */
-
-        playFlow();
-
-        return;
-
-      }
-
-
-      /* =========================================
-         PYTHON
-      ========================================== */
-
-      if(
-        language === "python"
-      ){
-
-        hidePreview();
-
-
-        setStatus(
-          "● Running Python…",
-          "running"
-        );
-
-
-        const result =
-          await runPythonCode(
-            code,
-            stdin
-          );
-
-
-        if(
-          currentExecution !==
-          executionId
-        ){
-
-          return;
-
-        }
-
-
-        $("#output").textContent =
-          result.logs.join("\n");
-
-
-        const failed =
-          !!result.error;
-
-
-        currentProgramFlow =
-          buildCurrentProgramFlow(
-            language,
-            code,
-            result.runtimeTrace,
-            result.output,
-            !failed
-          );
-
-
-        lastExecution = {
-
-          ok:!failed,
-
-          output:
-            result.output,
-
-          language,
-
-          source:code,
-
-          runtimeTrace:
-            result.runtimeTrace
-
-        };
-
-
-        step = 0;
-
-        render();
-
-
-        setStatus(
-          failed
-            ? "● Python execution failed"
-            : "● Executed live",
-          failed
-            ? "error"
-            : "ready"
-        );
-
-
-        playFlow();
-
-        return;
-
-      }
-
-
-      /* =========================================
-         HOSTED LANGUAGES
-      ========================================== */
-
-      hidePreview();
-
-
-      const label =
-        languageLabels[language] ||
-        language;
-
-
-      setStatus(
-        `● Compiling and running ${label}…`,
-        "running"
-      );
-
-
-      const result =
-        await runRemoteCode(
-          language,
-          code,
-          stdin
-        );
-
-
-      if(
-        currentExecution !==
-        executionId
-      ){
-
-        return;
-
-      }
-
-
-      $("#output").textContent =
-        result.output;
-
-
-      currentProgramFlow =
-        buildCurrentProgramFlow(
-          language,
-          code,
-          [],
-          result.output,
-          result.ok
-        );
-
-
-      lastExecution = {
-
-        ok:
-          result.ok,
-
-        output:
-          result.output,
-
-        language,
-
-        source:
-          code,
-
-        runtimeTrace:[]
-
-      };
-
-
-      step = 0;
-
-      render();
-
-
-      if(
-        result.ok
-      ){
-
-        setStatus(
-          "● Executed live"
-        );
-
-      }else{
-
-        setStatus(
-          "● Execution failed",
-          "error"
-        );
-
-      }
-
-
-      if(
-        result.runtime
-      ){
-
-        const timing =
-          result.executionTime != null
-
-            ? ` · ${result.executionTime} ms`
-
-            : "";
-
-
-        $("#modeStatus").textContent =
-          `${result.runtime} executed on backend${timing}`;
-
-      }
-
-
-      /*
-        Animate only the flow generated from
-        THIS exact source after execution.
-      */
-
-      playFlow();
-
-    }
-
-    catch(error){
-
-      $("#output").textContent =
-        "✕ Unexpected frontend error\n" +
-        (
-          error?.stack ||
-          error?.message ||
-          String(error)
-        );
-
-
-      currentProgramFlow =
-        buildCurrentProgramFlow(
-          language,
-          code,
-          [],
-          "",
-          false
-        );
-
-
-      step = 0;
-
-      render();
-
-
-      setStatus(
-        "● Error",
-        "error"
-      );
-
-
-      console.error(
-        error
-      );
-
-    }
-
-    finally{
-
-      if(
-        currentExecution ===
-        executionId
-      ){
-
-        $("#run").disabled =
-          false;
-
-      }
-
-    }
+    $("#output").textContent =
+      `${languageLabels[best]} detected.\n` +
+      `Your current code was kept unchanged.\n` +
+      `Press Run & visualize to execute it.`;
 
   };
 
 
 /* =========================================================
-   PLAY / STOP SAFETY
+   READY STATE
 ========================================================= */
 
-window.addEventListener(
-  "beforeunload",
-  () => {
+function initializeReadyState(){
 
-    stopFlow();
+  stopFlow();
 
-  }
-);
+  currentProgramFlow =
+    buildReadyFlow();
+
+  step = 0;
+
+  render();
+
+}
 
 
 /* =========================================================
@@ -6091,7 +6179,7 @@ $("#siteNav")
 
 
 /* =========================================================
-   CTRL + ENTER
+   KEYBOARD
 ========================================================= */
 
 document.addEventListener(
@@ -6124,9 +6212,7 @@ $("#year").textContent =
 
 putCode();
 
-initializeFlow();
-
-render();
+initializeReadyState();
 
 explainLogic();
 
