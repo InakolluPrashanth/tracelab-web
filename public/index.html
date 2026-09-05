@@ -1,3841 +1,2520 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>TraceLab | Learn code by watching it run</title>
-
-<meta
-  name="description"
-  content="TraceLab is an interactive code playground with real execution across 16 programming languages."
->
-
-<meta name="theme-color" content="#5277f5">
-
-<style>
-:root{
-  --ink:#18223b;
-  --muted:#6e7890;
-  --line:#e6eaf1;
-  --blue:#5277f5;
-  --mint:#35cba4;
-  --bg:#f8f9fc;
-  --pale:#eff2ff;
-  --danger:#df5f67;
-  --warning:#b07a12;
-  --input-bg:#fffaf0;
-  --input-border:#e2ad31;
-  --white:#ffffff;
-}
-
-*{
-  box-sizing:border-box;
-}
-
-html{
-  scroll-behavior:smooth;
-}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Arial,Helvetica,sans-serif;
-}
-
-button,
-select,
-textarea{
-  font:inherit;
-}
-
-button{
-  border:0;
-  cursor:pointer;
-}
-
-button:disabled{
-  opacity:.6;
-  cursor:progress;
-}
-
-.top{
-  height:72px;
-  background:#fff;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 clamp(22px,6vw,88px);
-  position:sticky;
-  top:0;
-  z-index:50;
-}
-
-.brand{
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:-1px;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.mark{
-  width:32px;
-  height:32px;
-  border-radius:10px;
-  background:var(--blue);
-  color:#fff;
-  font:500 13px monospace;
-  display:grid;
-  place-items:center;
-  box-shadow:0 7px 16px #5277f54d;
-}
-
-.nav{
-  display:flex;
-  gap:24px;
-  align-items:center;
-  font-size:12px;
-  font-weight:700;
-  color:#737d90;
-}
-
-.nav a{
-  color:inherit;
-  text-decoration:none;
-}
-
-.nav a:hover{
-  color:var(--ink);
-}
-
-.top-actions{
-  display:flex;
-  align-items:center;
-  gap:14px;
-}
-
-.cta{
-  background:var(--ink);
-  color:#fff;
-  text-decoration:none;
-  font-size:12px;
-  font-weight:800;
-  padding:10px 16px;
-  border-radius:8px;
-}
-
-.menu-btn{
-  display:none;
-  background:transparent;
-  font-size:20px;
-  color:var(--ink);
-}
-
-main{
-  max-width:1440px;
-  margin:auto;
-  padding:39px clamp(20px,6vw,88px) 60px;
-}
-
-.hero{
-  padding-top:6px;
-}
-
-.eyebrow{
-  color:#657ed8;
-  text-transform:uppercase;
-  letter-spacing:1.2px;
-  font-weight:800;
-  font-size:10px;
-}
-
-h1{
-  font-size:clamp(28px,3vw,40px);
-  letter-spacing:-2px;
-  margin:7px 0 8px;
-  line-height:1.15;
-}
-
-h1 span{
-  color:var(--blue);
-}
-
-.sub{
-  margin:0;
-  color:var(--muted);
-  font-size:14px;
-}
-
-.workspace{
-  margin-top:29px;
-  display:grid;
-  grid-template-columns:minmax(330px,.94fr) minmax(430px,1.35fr);
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:0 18px 50px #1a29420d;
-}
-
-.editor{
-  min-height:720px;
-  border-right:1px solid var(--line);
-  display:flex;
-  flex-direction:column;
-}
-
-.bar{
-  min-height:58px;
-  padding:0 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid var(--line);
-  gap:10px;
-}
-
-.bar-actions{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  min-width:0;
-}
-
-.file{
-  font:12px monospace;
-  color:#4d5870;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.file i{
-  display:inline-block;
-  width:10px;
-  height:10px;
-  background:#f3c158;
-  border-radius:3px;
-  margin-right:8px;
-}
-
-.lang,
-.speed{
-  border:0;
-  background:transparent;
-  color:#6d7790;
-  font-size:12px;
-  font-weight:700;
-  outline:0;
-}
-
-.detect{
-  border:1px solid #dce3ff;
-  background:#f6f7ff;
-  color:#526de5;
-  border-radius:7px;
-  padding:6px 8px;
-  font-size:10px;
-  font-weight:800;
-  white-space:nowrap;
-}
-
-.detect:hover{
-  background:#e9edff;
-}
-
-.codearea{
-  position:relative;
-  flex:1;
-  background:#fcfcfe;
-  min-height:380px;
-}
-
-.nums{
-  position:absolute;
-  left:0;
-  top:16px;
-  width:40px;
-  text-align:right;
-  color:#adb5c6;
-  font:12px/27px monospace;
-  user-select:none;
-  pointer-events:none;
-}
-
-#code{
-  width:100%;
-  height:100%;
-  min-height:380px;
-  padding:16px 18px 16px 58px;
-  border:0;
-  outline:0;
-  resize:none;
-  background:transparent;
-  color:#2b3852;
-  font:13px/27px monospace;
-}
-
-.stdin-wrap{
-  padding:14px 16px 15px;
-  border-top:1px solid var(--line);
-  background:#fbfcff;
-  transition:
-    background .2s ease,
-    box-shadow .2s ease,
-    border-color .2s ease;
-}
-
-.stdin-wrap.needs-input{
-  background:var(--input-bg);
-  box-shadow:inset 5px 0 0 var(--input-border);
-}
-
-.stdin-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:8px;
-}
-
-.stdin-label{
-  color:#707b91;
-  font-size:11px;
-  font-weight:800;
-}
-
-.stdin-wrap.needs-input .stdin-label{
-  color:#8b6205;
-}
-
-.input-alert{
-  display:none;
-  color:#9a6a00;
-  font-size:10px;
-  font-weight:800;
-  text-align:right;
-}
-
-.stdin-wrap.needs-input .input-alert{
-  display:block;
-  animation:inputBlink 1s ease-in-out infinite;
-}
-
-.input-prompt{
-  display:none;
-  margin:0 0 8px;
-  padding:8px 10px;
-  border-radius:8px;
-  border:1px solid #efd38a;
-  background:#fff6d9;
-  color:#805a00;
-  font:12px/1.45 monospace;
-  font-weight:700;
-}
-
-.stdin-wrap.needs-input .input-prompt{
-  display:block;
-  animation:inputBlink 1.15s ease-in-out infinite;
-}
-
-#stdin{
-  display:block;
-  width:100%;
-  min-height:78px;
-  resize:vertical;
-  padding:11px 12px;
-  border:1px solid var(--line);
-  border-radius:9px;
-  outline:0;
-  background:#fff;
-  color:#2b3852;
-  font:12px/1.5 monospace;
-  transition:
-    border-color .2s ease,
-    box-shadow .2s ease,
-    background .2s ease;
-}
-
-#stdin::placeholder{
-  color:#a4adbd;
-}
-
-.stdin-wrap.needs-input #stdin{
-  border-color:var(--input-border);
-  background:#fffdf6;
-  box-shadow:
-    0 0 0 3px #f4e3b2,
-    0 0 16px #e2ad3140;
-  animation:inputGlow 1.35s ease-in-out infinite;
-}
-
-#stdin:focus{
-  border-color:#8ca3f7;
-}
-
-.stdin-wrap.needs-input #stdin:focus{
-  border-color:#d09518;
-  box-shadow:
-    0 0 0 3px #f2dfad,
-    0 0 16px #e2ad3140;
-  animation:none;
-}
-
-@keyframes inputBlink{
-  0%,100%{
-    opacity:1;
-  }
-  50%{
-    opacity:.35;
-  }
-}
-
-@keyframes inputGlow{
-  0%,100%{
-    box-shadow:
-      0 0 0 3px #f4e3b2,
-      0 0 10px #e2ad3125;
-  }
-  50%{
-    box-shadow:
-      0 0 0 4px #e8ca72,
-      0 0 20px #e2ad3150;
-  }
-}
-
-.runbar{
-  padding:13px 16px;
-  display:flex;
-  gap:10px;
-  border-top:1px solid var(--line);
-  align-items:center;
-  flex-wrap:wrap;
-}
-
-.run{
-  background:var(--blue);
-  color:#fff;
-  padding:10px 16px;
-  border-radius:8px;
-  font-size:12px;
-  font-weight:800;
-  box-shadow:0 5px 13px #5277f542;
-}
-
-.reset{
-  background:#f1f3f8;
-  color:#536079;
-  padding:10px 13px;
-  border-radius:8px;
-  font-size:12px;
-  font-weight:800;
-}
-
-.saved{
-  margin-left:auto;
-  font-size:11px;
-  color:#9aa3b3;
-  max-width:300px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.server-pill{
-  font-size:11px;
-  font-weight:800;
-  white-space:nowrap;
-}
-
-.server-pill.online{
-  color:#15956f;
-}
-
-.server-pill.warning{
-  color:var(--warning);
-}
-
-.server-pill.offline{
-  color:var(--danger);
-}
-
-.console{
-  min-height:160px;
-  padding:14px 18px;
-  background:#fbfcff;
-  border-top:1px solid var(--line);
-}
-
-.chead{
-  display:flex;
-  justify-content:space-between;
-  color:#929baa;
-  text-transform:uppercase;
-  letter-spacing:1px;
-  font-size:10px;
-  font-weight:800;
-  margin-bottom:10px;
-}
-
-.status-ready{
-  color:#28a87f;
-}
-
-.status-error{
-  color:var(--danger);
-}
-
-.status-running{
-  color:#5570e9;
-}
-
-.console pre{
-  margin:0;
-  color:#5b6881;
-  font:12px/21px monospace;
-  white-space:pre-wrap;
-  overflow:auto;
-  max-height:240px;
-}
-
-.preview{
-  padding:14px 18px;
-  border-top:1px solid var(--line);
-  background:#fbfcff;
-}
-
-.preview iframe{
-  width:100%;
-  height:240px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#fff;
-}
-
-.visual{
-  min-width:0;
-}
-
-.title{
-  font-size:13px;
-  font-weight:800;
-}
-
-.badge{
-  padding:5px 9px;
-  border-radius:6px;
-  background:var(--pale);
-  color:#5570e9;
-  font-size:10px;
-  font-weight:800;
-}
-
-.stage{
-  height:317px;
-  position:relative;
-  overflow:hidden;
-  border-bottom:1px solid var(--line);
-  background-image:
-    radial-gradient(#d8deea 1px,transparent 1px);
-  background-size:19px 19px;
-}
-
-.line{
-  position:absolute;
-  left:9%;
-  right:9%;
-  top:156px;
-  height:2px;
-  background:#cdd6eb;
-}
-
-.pulse{
-  position:absolute;
-  left:11%;
-  top:151px;
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:var(--blue);
-  box-shadow:0 0 0 7px #5277f523;
-  z-index:2;
-  transition:left .45s ease;
-}
-
-.node{
-  position:absolute;
-  top:125px;
-  transform:translateX(-50%);
-  z-index:1;
-  width:64px;
-  height:64px;
-  border:2px solid #dce1ec;
-  border-radius:18px;
-  display:grid;
-  place-items:center;
-  background:#fff;
-  transition:.35s;
-}
-
-.node small{
-  position:absolute;
-  top:74px;
-  width:105px;
-  text-align:center;
-  white-space:normal;
-  color:#6e7890;
-  font-size:10px;
-  font-weight:800;
-}
-
-.node span{
-  font-size:20px;
-}
-
-.n1{left:11%}
-.n2{left:30%}
-.n3{left:50%}
-.n4{left:70%}
-.n5{left:89%}
-
-.node.active{
-  border-color:var(--blue);
-  background:#edf1ff;
-  transform:
-    translateX(-50%)
-    translateY(-8px)
-    scale(1.08);
-  box-shadow:0 10px 25px #5277f538;
-}
-
-.node.done{
-  background:#edfff9;
-  border-color:#8adeca;
-}
-
-.node.done:after{
-  content:'✓';
-  position:absolute;
-  right:-7px;
-  bottom:-7px;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  background:var(--mint);
-  color:#fff;
-  font-size:11px;
-}
-
-.note{
-  position:absolute;
-  bottom:17px;
-  left:25px;
-  right:25px;
-  text-align:center;
-  color:#68738a;
-  font-size:12px;
-}
-
-.note b{
-  color:var(--ink);
-}
-
-.timeline{
-  padding:20px 25px;
-}
-
-.toptime{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:18px;
-}
-
-.toptime strong{
-  font-size:13px;
-}
-
-.toptime span{
-  color:#8792a8;
-  font:11px monospace;
-}
-
-.tracks{
-  display:flex;
-  gap:9px;
-}
-
-.track{
-  height:6px;
-  flex:1;
-  border-radius:8px;
-  background:#edf0f5;
-  transition:.2s;
-}
-
-.track.done{
-  background:#78dfc5;
-}
-
-.track.now{
-  background:var(--blue);
-  box-shadow:0 0 0 4px #5277f51c;
-}
-
-.labels{
-  display:flex;
-  justify-content:space-between;
-  margin-top:7px;
-  gap:5px;
-}
-
-.labels span{
-  flex:1;
-  text-align:center;
-  color:#9ba4b4;
-  font-size:9px;
-  font-weight:700;
-}
-
-.controls{
-  margin-top:18px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.circle{
-  width:34px;
-  height:34px;
-  margin-right:6px;
-  background:#f1f3f8;
-  color:#536079;
-  font-weight:800;
-  border-radius:8px;
-  font-size:14px;
-}
-
-.play{
-  padding:9px 13px;
-  border-radius:8px;
-  background:var(--ink);
-  color:#fff;
-  font-size:11px;
-  font-weight:800;
-}
-
-.playing{
-  background:var(--blue)!important;
-}
-
-.lower{
-  display:grid;
-  grid-template-columns:1fr 1fr 1.25fr;
-  gap:18px;
-  margin-top:18px;
-}
-
-.card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:20px 22px;
-}
-
-.tiny{
-  font-size:10px;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  color:#9099aa;
-  font-weight:800;
-  margin-bottom:12px;
-}
-
-.card p{
-  color:#68738a;
-  font-size:13px;
-  line-height:1.65;
-  margin:0;
-}
-
-.card p strong{
-  color:#4b60d3;
-}
-
-.variables{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.var{
-  padding:8px 11px;
-  border-radius:7px;
-  background:#f4f6fb;
-  color:#53617b;
-  font:12px monospace;
-}
-
-.var b{
-  color:#293650;
-}
-
-.focus{
-  background:var(--pale);
-  color:#4e69de;
-  padding:8px 10px;
-  border-radius:7px;
-  font-size:11px;
-  font-weight:800;
-}
-
-.logic-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:10px;
-  gap:12px;
-}
-
-.logic-code{
-  margin:10px 0 0;
-  background:#fbfcff;
-  border-left:3px solid var(--blue);
-  padding:8px 10px;
-  color:#48556d;
-  font:11px/1.55 monospace;
-  white-space:pre-wrap;
-  max-height:100px;
-  overflow:auto;
-}
-
-.languages{
-  margin-top:16px;
-  display:flex;
-  align-items:center;
-  gap:7px;
-  flex-wrap:wrap;
-}
-
-.chip{
-  padding:5px 8px;
-  border-radius:7px;
-  background:#f4f6fb;
-  color:#53617b;
-  font-size:10px;
-}
-
-.hint{
-  text-align:center;
-  color:#929bac;
-  font-size:12px;
-  margin-top:20px;
-}
-
-.hint b{
-  color:#5570e9;
-}
-
-.sections{
-  max-width:1440px;
-  margin:auto;
-  padding:64px clamp(20px,6vw,88px);
-}
-
-.section-head{
-  max-width:520px;
-  margin:0 auto 30px;
-  text-align:center;
-}
-
-.section-head h2{
-  font-size:clamp(22px,2.4vw,28px);
-  letter-spacing:-1px;
-  margin:0 0 8px;
-}
-
-.section-head p{
-  color:var(--muted);
-  font-size:14px;
-  margin:0;
-}
-
-.step-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-}
-
-.step-card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:24px;
-}
-
-.step-card .num{
-  display:inline-grid;
-  place-items:center;
-  width:28px;
-  height:28px;
-  border-radius:9px;
-  background:var(--pale);
-  color:#4e69de;
-  font:700 13px monospace;
-  margin-bottom:14px;
-}
-
-.step-card h3{
-  margin:0 0 8px;
-  font-size:15px;
-}
-
-.step-card p{
-  margin:0;
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.6;
-}
-
-.cap-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:20px;
-}
-
-.cap-card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:24px;
-}
-
-.cap-card h3{
-  margin:12px 0 8px;
-  font-size:15px;
-}
-
-.cap-card p{
-  margin:0;
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.6;
-}
-
-.faq-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:24px 40px;
-}
-
-.faq-item h3{
-  margin:0 0 6px;
-  font-size:14px;
-}
-
-.faq-item p{
-  margin:0;
-  color:var(--muted);
-  font-size:13px;
-  line-height:1.65;
-}
-
-.site-footer{
-  border-top:1px solid var(--line);
-  padding:32px clamp(20px,6vw,88px) 40px;
-  max-width:1440px;
-  margin:auto;
-}
-
-.foot-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:16px;
-}
-
-.foot-links{
-  display:flex;
-  gap:22px;
-  font-size:12px;
-  font-weight:700;
-  color:#737d90;
-}
-
-.foot-links a{
-  color:inherit;
-  text-decoration:none;
-}
-
-.foot-note{
-  margin:18px 0 0;
-  color:#9099aa;
-  font-size:12px;
-}
-
-@media(max-width:1050px){
-
-  .lower{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .logic{
-    grid-column:span 2;
-  }
-
-  .cap-grid{
-    grid-template-columns:1fr 1fr;
-  }
-
-}
-
-@media(max-width:860px){
-
-  .nav{
-    position:absolute;
-    top:72px;
-    left:0;
-    right:0;
-    background:#fff;
-    flex-direction:column;
-    align-items:flex-start;
-    gap:0;
-    border-bottom:1px solid var(--line);
-    max-height:0;
-    overflow:hidden;
-    transition:max-height .25s ease;
-  }
-
-  .nav.open{
-    max-height:260px;
-  }
-
-  .nav a{
-    padding:14px clamp(22px,6vw,88px);
-    width:100%;
-  }
-
-  .menu-btn{
-    display:block;
-  }
-
-  .cta{
-    display:none;
-  }
-
-  .workspace{
-    grid-template-columns:1fr;
-  }
-
-  .editor{
-    border-right:0;
-    border-bottom:1px solid var(--line);
-  }
-
-  .lower{
-    grid-template-columns:1fr;
-  }
-
-  .logic{
-    grid-column:auto;
-  }
-
-  .step-grid,
-  .cap-grid{
-    grid-template-columns:1fr;
-  }
-
-  .faq-grid{
-    grid-template-columns:1fr;
-  }
-
-}
-
-@media(max-width:480px){
-
-  .node{
-    width:48px;
-    height:48px;
-    border-radius:15px;
-    top:115px;
-  }
-
-  .node small{
-    top:57px;
-    font-size:9px;
-    width:70px;
-  }
-
-  .node span{
-    font-size:16px;
-  }
-
-  .line{
-    top:139px;
-  }
-
-  .pulse{
-    top:134px;
-  }
-
-  .stage{
-    height:275px;
-  }
-
-  .saved{
-    display:none;
-  }
-
-  .bar{
-    padding:0 12px;
-  }
-
-  .bar-actions{
-    flex-wrap:wrap;
-    justify-content:flex-end;
-  }
-
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>TraceLab — Interactive Code Playground</title>
+
+  <!-- Pyodide for real Python execution in the browser -->
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.27.7/full/pyodide.js"></script>
+
+  <style>
+    :root {
+      --bg: #0a0f18;
+      --panel: #101827;
+      --panel2: #0d1421;
+      --border: #223047;
+      --text: #e9eef7;
+      --muted: #91a0b7;
+      --accent: #67e8f9;
+      --accent2: #8b5cf6;
+      --good: #4ade80;
+      --warn: #facc15;
+      --bad: #fb7185;
+      --shadow: 0 14px 45px rgba(0, 0, 0, 0.28);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(
+          circle at 15% 10%,
+          rgba(103, 232, 249, 0.08),
+          transparent 28%
+        ),
+        radial-gradient(
+          circle at 85% 0%,
+          rgba(139, 92, 246, 0.1),
+          transparent 30%
+        ),
+        var(--bg);
+      color: var(--text);
+      font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+    }
+
+    button,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      max-width: 1480px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      font-size: 24px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      color: #071018;
+      font-weight: 900;
+      box-shadow: 0 8px 30px rgba(103, 232, 249, 0.16);
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--warn);
+    }
+
+    .dot.ok {
+      background: var(--good);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(340px, 0.9fr);
+      gap: 16px;
+    }
+
+    .panel {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(16, 24, 39, 0.97),
+          rgba(13, 20, 33, 0.97)
+        );
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-title {
+      font-weight: 750;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    select,
+    button {
+      border: 1px solid var(--border);
+      background: #111c2d;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 9px 12px;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--accent2), #4f46e5);
+      border-color: transparent;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    button:hover,
+    select:hover {
+      border-color: #385071;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .editor-wrap {
+      padding: 14px;
+    }
+
+    textarea.code {
+      width: 100%;
+      min-height: 490px;
+      resize: vertical;
+
+      background: #09101b;
+      color: #e7eef9;
+      border: 1px solid #1d2a3f;
+      border-radius: 14px;
+      padding: 16px;
+
+      outline: none;
+
+      font:
+        14px/1.6 "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+
+      tab-size: 2;
+    }
+
+    textarea.code:focus {
+      border-color: #365f8c;
+      box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.07);
+    }
+
+    .subgrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .block {
+      padding: 14px;
+    }
+
+    .block h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin: 0 0 10px;
+    }
+
+    textarea.stdin {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+
+      background: #09101b;
+      color: #fff;
+      border: 1px solid #1d2a3f;
+      border-radius: 12px;
+      padding: 12px;
+
+      outline: none;
+
+      font:
+        14px/1.5 "SFMono-Regular",
+        Consolas,
+        "Liberation Mono",
+        monospace;
+    }
+
+    .stdin-wrap.needs-input {
+      border-radius: 14px;
+      animation: inputGlow 1.15s infinite;
+    }
+
+    .stdin-wrap.needs-input textarea.stdin {
+      border-color: var(--accent);
+      box-shadow:
+        0 0 0 2px rgba(103, 232, 249, 0.1),
+        0 0 24px rgba(103, 232, 249, 0.12);
+    }
+
+    @keyframes inputGlow {
+      0%,
+      100% {
+        filter: none;
+      }
+
+      50% {
+        filter: brightness(1.14);
+      }
+    }
+
+    .stdin-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stdin-label {
+      font-weight: 750;
+    }
+
+    .input-alert {
+      display: none;
+      color: var(--warn);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .stdin-wrap.needs-input .input-alert {
+      display: inline-block;
+      animation: blink 1s infinite;
+    }
+
+    .stdin-wrap.needs-input .stdin-label {
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.28;
+      }
+    }
+
+    .input-prompt {
+      min-height: 20px;
+      margin: 8px 0 6px;
+      color: var(--accent);
+
+      font:
+        13px "SFMono-Regular",
+        Consolas,
+        monospace;
+    }
+
+    .input-prompt:empty {
+      display: none;
+    }
+
+    .output {
+      min-height: 120px;
+      max-height: 300px;
+      overflow: auto;
+
+      background: #08101a;
+      border: 1px solid #1d2a3f;
+      border-radius: 12px;
+      padding: 12px;
+
+      white-space: pre-wrap;
+      word-break: break-word;
+
+      font:
+        14px/1.55 "SFMono-Regular",
+        Consolas,
+        monospace;
+    }
+
+    .output.error {
+      color: #fecdd3;
+    }
+
+    .trace {
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .trace-top {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .trace-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+
+      border: 1px solid var(--border);
+      background: #0d1625;
+      color: var(--muted);
+
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+
+    .trace-current {
+      padding: 16px;
+      border-bottom: 1px solid var(--border);
+      background:
+        linear-gradient(
+          90deg,
+          rgba(103, 232, 249, 0.045),
+          transparent
+        );
+    }
+
+    .trace-kicker {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .trace-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin-top: 5px;
+    }
+
+    .trace-code {
+      margin-top: 10px;
+
+      background: #08101a;
+      border: 1px solid #20304a;
+
+      padding: 12px;
+      border-radius: 12px;
+
+      font:
+        13px/1.55 "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .trace-list {
+      padding: 12px;
+      overflow: auto;
+      max-height: 510px;
+    }
+
+    .trace-step {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 10px;
+
+      padding: 10px;
+
+      border: 1px solid transparent;
+      border-radius: 12px;
+
+      margin-bottom: 7px;
+    }
+
+    .trace-step.active {
+      border-color: #2f6480;
+      background: rgba(103, 232, 249, 0.075);
+    }
+
+    .trace-num {
+      color: var(--muted);
+      font-size: 12px;
+      padding-top: 2px;
+      text-align: right;
+    }
+
+    .trace-main {
+      min-width: 0;
+    }
+
+    .trace-label {
+      font-size: 12px;
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .trace-source {
+      font:
+        13px/1.45 "SFMono-Regular",
+        Consolas,
+        monospace;
+
+      margin-top: 3px;
+
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .trace-help {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .preview {
+      padding: 14px;
+    }
+
+    iframe.preview-frame {
+      width: 100%;
+      height: 300px;
+
+      border: 1px solid #223047;
+      border-radius: 12px;
+
+      background: #fff;
+    }
+
+    .logic {
+      margin-top: 16px;
+    }
+
+    .logic-body {
+      padding: 14px;
+    }
+
+    .logic-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .logic-chip {
+      border: 1px solid var(--border);
+      background: #0c1624;
+      border-radius: 10px;
+      padding: 7px 9px;
+      font-size: 12px;
+    }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 12px;
+      padding: 14px 2px;
+      text-align: center;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .subgrid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header class="top">
+  <div class="app">
 
-  <div class="brand">
-    <div class="mark">&gt;_</div>
-    TraceLab
-  </div>
+    <!-- HEADER -->
+    <div class="topbar">
 
-  <nav class="nav" id="siteNav">
-    <a href="#playground">Playground</a>
-    <a href="#how-it-works">How it works</a>
-    <a href="#capabilities">What runs live</a>
-    <a href="#faq">FAQ</a>
-  </nav>
+      <div>
+        <div class="brand">
+          <div class="brand-mark">T</div>
+          TraceLab
+        </div>
 
-  <div class="top-actions">
-
-    <a
-      class="cta"
-      href="#playground"
-    >
-      Start coding
-    </a>
-
-    <button
-      class="menu-btn"
-      id="menuBtn"
-      type="button"
-      aria-label="Open menu"
-      aria-expanded="false"
-    >
-      ☰
-    </button>
-
-  </div>
-
-</header>
-
-
-<main>
-
-<section class="hero">
-
-  <div class="eyebrow">
-    Interactive code playground
-  </div>
-
-  <h1>
-    Don’t just run code.
-    <span>Watch it think.</span>
-  </h1>
-
-  <p class="sub">
-    Write, run, and understand code in 16 supported languages
-    with real execution and a visual execution flow.
-  </p>
-
-</section>
-
-
-<section
-  class="workspace"
-  id="playground"
->
-
-  <div class="editor">
-
-    <div class="bar">
-
-      <div class="file">
-
-        <i></i>
-
-        <span id="file">
-          main.py
-        </span>
-
+        <div class="sub">
+          Run real code, then trace the program you actually entered.
+        </div>
       </div>
 
-
-      <div class="bar-actions">
-
-        <button
-          class="detect"
-          id="detect"
-          type="button"
-        >
-          ✦ Auto-detect
-        </button>
-
-
-        <button
-          class="detect"
-          id="openBrowser"
-          type="button"
-          style="display:none"
-        >
-          ↗ Open in browser
-        </button>
-
-
-        <select
-          class="lang"
-          id="language"
-          aria-label="Select programming language"
-        >
-
-          <optgroup label="Web">
-
-            <option value="html">
-              HTML
-            </option>
-
-            <option value="css">
-              CSS
-            </option>
-
-          </optgroup>
-
-
-          <optgroup label="Popular">
-
-            <option
-              value="python"
-              selected
-            >
-              Python 3
-            </option>
-
-            <option value="javascript">
-              JavaScript
-            </option>
-
-            <option value="typescript">
-              TypeScript
-            </option>
-
-            <option value="c">
-              C
-            </option>
-
-            <option value="cpp">
-              C++
-            </option>
-
-            <option value="java">
-              Java
-            </option>
-
-            <option value="go">
-              Go
-            </option>
-
-          </optgroup>
-
-
-          <optgroup label="Modern & mobile">
-
-            <option value="kotlin">
-              Kotlin
-            </option>
-
-            <option value="swift">
-              Swift
-            </option>
-
-          </optgroup>
-
-
-          <optgroup label="Scripting & data">
-
-            <option value="ruby">
-              Ruby
-            </option>
-
-            <option value="php">
-              PHP
-            </option>
-
-            <option value="perl">
-              Perl
-            </option>
-
-            <option value="bash">
-              Bash
-            </option>
-
-            <option value="sql">
-              SQL
-            </option>
-
-          </optgroup>
-
-        </select>
-
+      <div class="status">
+        <span id="statusDot" class="dot"></span>
+        <span id="statusText">Checking backend…</span>
       </div>
 
     </div>
 
+    <!-- MAIN LAYOUT -->
+    <div class="layout">
 
-    <div class="codearea">
+      <!-- LEFT -->
+      <section>
 
-      <div
-        class="nums"
-        id="nums"
-      ></div>
+        <!-- EDITOR -->
+        <div class="panel">
 
-      <textarea
-        id="code"
-        spellcheck="false"
-        aria-label="Code editor"
-      ></textarea>
+          <div class="panel-head">
 
-    </div>
+            <div class="toolbar">
 
+              <select id="language"></select>
 
-    <div
-      class="stdin-wrap"
-      id="stdinWrap"
-    >
+              <button id="runBtn" class="primary">
+                ▶ Run
+              </button>
 
-      <div class="stdin-head">
+              <button id="resetBtn" class="ghost">
+                Reset
+              </button>
 
-        <label
-          class="stdin-label"
-          id="stdinLabel"
-          for="stdin"
-        >
-          Enter the input here
-        </label>
+            </div>
 
-        <span
-          class="input-alert"
-          id="inputAlert"
-        >
-          USER INPUT HERE
-        </span>
+            <div class="toolbar">
 
-      </div>
+              <button id="prevBtn" class="ghost">
+                ←
+              </button>
 
+              <button id="playBtn" class="ghost">
+                Play trace
+              </button>
 
-      <div
-        class="input-prompt"
-        id="inputPrompt"
-      ></div>
+              <button id="nextBtn" class="ghost">
+                →
+              </button>
 
+            </div>
 
-      <textarea
-        id="stdin"
-        placeholder="Enter the input here..."
-        spellcheck="false"
-        aria-label="User program input"
-      ></textarea>
+          </div>
 
-    </div>
+          <div class="editor-wrap">
 
+            <textarea
+              id="code"
+              class="code"
+              spellcheck="false"
+              placeholder="Write your code here..."
+            ></textarea>
 
-    <div class="runbar">
-
-      <button
-        class="run"
-        id="run"
-        type="button"
-      >
-        ▶ Run &amp; visualize
-      </button>
-
-
-      <button
-        class="reset"
-        id="reset"
-        type="button"
-      >
-        ↻ Reset
-      </button>
-
-
-      <span
-        class="saved"
-        id="modeStatus"
-      >
-        Python runs locally in your browser
-      </span>
-
-
-      <span
-        class="server-pill"
-        id="serverStatus"
-      >
-        ● Checking backend…
-      </span>
-
-    </div>
-
-
-    <div class="console">
-
-      <div class="chead">
-
-        <span>
-          Output
-        </span>
-
-        <span
-          id="status"
-          class="status-ready"
-        >
-          ● Ready
-        </span>
-
-      </div>
-
-
-      <pre id="output">Ready.</pre>
-
-    </div>
-
-
-    <div
-      class="preview"
-      id="previewWrap"
-      style="display:none"
-    >
-
-      <div class="chead">
-
-        <span>
-          Live preview
-        </span>
-
-        <span>
-          Sandboxed browser preview
-        </span>
-
-      </div>
-
-
-      <iframe
-        id="previewFrame"
-        title="Live preview"
-        sandbox="allow-scripts"
-      ></iframe>
-
-    </div>
-
-  </div>
-
-
-  <div class="visual">
-
-    <div class="bar">
-
-      <span class="title">
-        Program flow
-      </span>
-
-      <span
-        class="badge"
-        id="badge"
-      >
-        Step 1 of 5
-      </span>
-
-    </div>
-
-
-    <div class="stage">
-
-      <div class="line"></div>
-
-
-      <div
-        class="pulse"
-        id="pulse"
-      ></div>
-
-
-      <div class="node n1 active">
-
-        <small id="nodeLabel1">
-          Start
-        </small>
-
-        <span>
-          ⚡
-        </span>
-
-      </div>
-
-
-      <div class="node n2">
-
-        <small id="nodeLabel2">
-          Setup
-        </small>
-
-        <span>
-          📦
-        </span>
-
-      </div>
-
-
-      <div class="node n3">
-
-        <small id="nodeLabel3">
-          Loop
-        </small>
-
-        <span>
-          ↻
-        </span>
-
-      </div>
-
-
-      <div class="node n4">
-
-        <small id="nodeLabel4">
-          Update
-        </small>
-
-        <span>
-          ＋
-        </span>
-
-      </div>
-
-
-      <div class="node n5">
-
-        <small id="nodeLabel5">
-          Output
-        </small>
-
-        <span>
-          ⌁
-        </span>
-
-      </div>
-
-
-      <p
-        class="note"
-        id="note"
-      >
-        <b>Start</b> — ready to execute.
-      </p>
-
-    </div>
-
-
-    <div class="timeline">
-
-      <div class="toptime">
-
-        <strong id="stepname">
-          Start program
-        </strong>
-
-        <span id="lineref">
-          line 1
-        </span>
-
-      </div>
-
-
-      <div
-        class="tracks"
-        id="tracks"
-      >
-
-        <i class="track now"></i>
-        <i class="track"></i>
-        <i class="track"></i>
-        <i class="track"></i>
-        <i class="track"></i>
-
-      </div>
-
-
-      <div
-        class="labels"
-        id="labels"
-      >
-
-        <span>Start</span>
-        <span>Setup</span>
-        <span>Loop</span>
-        <span>Update</span>
-        <span>Output</span>
-
-      </div>
-
-
-      <div class="controls">
-
-        <div>
-
-          <button
-            class="circle"
-            id="prev"
-            type="button"
-            aria-label="Previous step"
-          >
-            ←
-          </button>
-
-
-          <button
-            class="circle"
-            id="next"
-            type="button"
-            aria-label="Next step"
-          >
-            →
-          </button>
-
-
-          <button
-            class="play"
-            id="play"
-            type="button"
-          >
-            ▶ Play flow
-          </button>
+          </div>
 
         </div>
 
+        <!-- INPUT + OUTPUT -->
+        <div class="subgrid">
 
-        <select
-          class="speed"
-          id="speed"
-          aria-label="Flow speed"
+          <!-- INPUT -->
+          <div class="panel stdin-wrap" id="stdinWrap">
+
+            <div class="block">
+
+              <div class="stdin-head">
+
+                <label
+                  for="stdin"
+                  class="stdin-label"
+                  id="stdinLabel"
+                >
+                  Enter the input here
+                </label>
+
+                <span
+                  class="input-alert"
+                  id="inputAlert"
+                >
+                  USER INPUT HERE
+                </span>
+
+              </div>
+
+              <div
+                class="input-prompt"
+                id="inputPrompt"
+              ></div>
+
+              <textarea
+                id="stdin"
+                class="stdin"
+                placeholder="Enter the input here..."
+              ></textarea>
+
+            </div>
+
+          </div>
+
+          <!-- OUTPUT -->
+          <div class="panel">
+
+            <div class="block">
+
+              <h3>Output</h3>
+
+              <div
+                id="output"
+                class="output"
+              >
+                Run your program to see real output here.
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- PROGRAM STRUCTURE -->
+        <div class="panel logic">
+
+          <div class="panel-head">
+
+            <div class="panel-title">
+              Program structure
+            </div>
+
+            <div class="sub">
+              Generated from the current editor content
+            </div>
+
+          </div>
+
+          <div class="logic-body">
+
+            <div
+              id="logicList"
+              class="logic-list"
+            ></div>
+
+          </div>
+
+        </div>
+
+        <!-- PREVIEW -->
+        <div
+          id="previewPanel"
+          class="panel"
+          style="display:none; margin-top:16px;"
         >
 
-          <option value="1400">
-            1× speed
-          </option>
+          <div class="panel-head">
 
-          <option value="800">
-            1.5× speed
-          </option>
+            <div class="panel-title">
+              Browser preview
+            </div>
 
-          <option value="500">
-            2× speed
-          </option>
+          </div>
 
-        </select>
+          <div class="preview">
 
-      </div>
+            <iframe
+              id="previewFrame"
+              class="preview-frame"
+              sandbox="allow-scripts"
+            ></iframe>
+
+          </div>
+
+        </div>
+
+        <div class="footer-note">
+          TraceLab runs Python in the browser and sends hosted languages
+          to the Render execution backend.
+        </div>
+
+      </section>
+
+      <!-- RIGHT -->
+      <aside class="panel trace">
+
+        <div class="trace-top">
+
+          <div class="panel-title">
+            Execution trace
+          </div>
+
+          <div class="trace-help">
+            This trace is built from the current program.
+            It is not a fixed Start → Setup → Loop → Update → Output animation.
+          </div>
+
+        </div>
+
+        <div class="trace-current">
+
+          <div
+            class="trace-kicker"
+            id="traceKicker"
+          >
+            Ready
+          </div>
+
+          <div
+            class="trace-title"
+            id="traceTitle"
+          >
+            Run your current program
+          </div>
+
+          <div
+            class="trace-code"
+            id="traceCode"
+          >
+            No line is executing yet.
+          </div>
+
+        </div>
+
+        <div
+          id="traceList"
+          class="trace-list"
+        ></div>
+
+      </aside>
 
     </div>
-
   </div>
 
-</section>
+  <script>
 
+    /* =========================================================
+       TRACELAB CONFIG
+    ========================================================= */
 
-<section class="lower">
+    const API_BASE =
+      location.hostname === "tracelab-free.onrender.com"
+        ? location.origin
+        : "https://tracelab-free.onrender.com";
 
-  <div class="card">
 
-    <div class="tiny">
-      What’s happening now
-    </div>
+    /* =========================================================
+       SUPPORTED LANGUAGES
+    ========================================================= */
 
-    <p id="insight">
-      <strong>Ready.</strong>
-      Choose a language and run your program.
-    </p>
+    const LANGUAGES = [
 
-  </div>
-
-
-  <div class="card">
-
-    <div class="tiny">
-      Live variables
-    </div>
-
-    <div
-      class="variables"
-      id="vars"
-    ></div>
-
-  </div>
-
-
-  <div class="card logic">
-
-    <div class="logic-top">
-
-      <div
-        class="tiny"
-        style="margin:0"
-      >
-        Main logic finder
-      </div>
-
-      <button
-        class="focus"
-        id="focus"
-        type="button"
-      >
-        ⌘ Explain main logic
-      </button>
-
-    </div>
-
-
-    <p id="logicSummary">
-      TraceLab identifies loops, decisions,
-      functions, and program entry points.
-    </p>
-
-
-    <pre
-      class="logic-code"
-      id="logicCode"
-    >Run the program or explain the main logic.</pre>
-
-  </div>
-
-</section>
-
-
-<div class="languages">
-
-  <span
-    class="tiny"
-    style="margin:0 4px 0 0"
-  >
-    16 supported
-  </span>
-
-  <span class="chip">
-    HTML / CSS
-  </span>
-
-  <span class="chip">
-    Python
-  </span>
-
-  <span class="chip">
-    JavaScript
-  </span>
-
-  <span class="chip">
-    TypeScript
-  </span>
-
-  <span class="chip">
-    C / C++
-  </span>
-
-  <span class="chip">
-    Java / Go
-  </span>
-
-  <span class="chip">
-    Kotlin / Swift
-  </span>
-
-  <span class="chip">
-    Ruby / PHP
-  </span>
-
-  <span class="chip">
-    Perl / Bash
-  </span>
-
-  <span class="chip">
-    SQL
-  </span>
-
-</div>
-
-
-<p class="hint">
-  Use <b>← →</b> to move through the visual flow,
-  or use <b>Play flow</b>.
-</p>
-
-</main>
-
-
-<section
-  class="sections"
-  id="how-it-works"
->
-
-  <div class="section-head">
-
-    <h2>
-      How it works
-    </h2>
-
-    <p>
-      Write code, enter input when requested,
-      run it for real, and inspect the execution flow.
-    </p>
-
-  </div>
-
-
-  <div class="step-grid">
-
-    <div class="step-card">
-
-      <span class="num">
-        1
-      </span>
-
-      <h3>
-        Write or paste code
-      </h3>
-
-      <p>
-        Start with the built-in example or paste your own program.
-      </p>
-
-    </div>
-
-
-    <div class="step-card">
-
-      <span class="num">
-        2
-      </span>
-
-      <h3>
-        Pick a language
-      </h3>
-
-      <p>
-        Choose from 16 supported languages or use Auto-detect.
-      </p>
-
-    </div>
-
-
-    <div class="step-card">
-
-      <span class="num">
-        3
-      </span>
-
-      <h3>
-        Run it
-      </h3>
-
-      <p>
-        Browser languages execute locally.
-        Hosted languages execute through the TraceLab backend.
-      </p>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<section
-  class="sections"
-  id="capabilities"
->
-
-  <div class="section-head">
-
-    <h2>
-      What actually runs
-    </h2>
-
-    <p>
-      TraceLab distinguishes local browser execution
-      from hosted execution.
-    </p>
-
-  </div>
-
-
-  <div class="cap-grid">
-
-    <div class="cap-card">
-
-      <span class="badge">
-        Live
-      </span>
-
-      <h3>
-        Python
-      </h3>
-
-      <p>
-        Executes locally in the browser using Pyodide,
-        including program input.
-      </p>
-
-    </div>
-
-
-    <div class="cap-card">
-
-      <span class="badge">
-        Live
-      </span>
-
-      <h3>
-        JavaScript
-      </h3>
-
-      <p>
-        Executes inside a sandboxed iframe.
-      </p>
-
-    </div>
-
-
-    <div class="cap-card">
-
-      <span class="badge">
-        Live
-      </span>
-
-      <h3>
-        HTML &amp; CSS
-      </h3>
-
-      <p>
-        Render directly in the browser preview.
-      </p>
-
-    </div>
-
-
-    <div class="cap-card">
-
-      <span class="badge">
-        Hosted
-      </span>
-
-      <h3>
-        12 additional runtimes
-      </h3>
-
-      <p>
-        TypeScript, C, C++, Java, Go, Kotlin, Swift,
-        Ruby, PHP, Perl, Bash, and SQL use the backend.
-      </p>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<section
-  class="sections"
-  id="faq"
->
-
-  <div class="section-head">
-
-    <h2>
-      Frequently asked
-    </h2>
-
-  </div>
-
-
-  <div class="faq-grid">
-
-    <div class="faq-item">
-
-      <h3>
-        Is the output real?
-      </h3>
-
-      <p>
-        Yes. Browser languages execute locally and hosted
-        languages are sent to the TraceLab backend.
-      </p>
-
-    </div>
-
-
-    <div class="faq-item">
-
-      <h3>
-        Can programs receive input?
-      </h3>
-
-      <p>
-        Yes. TraceLab highlights the input area when the
-        program contains a recognized input operation.
-      </p>
-
-    </div>
-
-
-    <div class="faq-item">
-
-      <h3>
-        Does Python input work?
-      </h3>
-
-      <p>
-        Python input() is connected to the input field
-        through the Pyodide standard-input handler.
-      </p>
-
-    </div>
-
-
-    <div class="faq-item">
-
-      <h3>
-        Where does hosted code run?
-      </h3>
-
-      <p>
-        Hosted source is sent to the TraceLab backend,
-        which forwards it to the configured execution provider.
-      </p>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<footer class="site-footer">
-
-  <div class="foot-top">
-
-    <div class="brand">
-
-      <div class="mark">
-        &gt;_
-      </div>
-
-      TraceLab
-
-    </div>
-
-
-    <nav class="foot-links">
-
-      <a href="#playground">
-        Playground
-      </a>
-
-      <a href="#how-it-works">
-        How it works
-      </a>
-
-      <a href="#capabilities">
-        What runs live
-      </a>
-
-      <a href="#faq">
-        FAQ
-      </a>
-
-    </nav>
-
-  </div>
-
-
-  <p class="foot-note">
-    TraceLab supports 16 languages with local and hosted execution.
-    © <span id="year"></span>
-  </p>
-
-</footer>
-
-
-<script>
-"use strict";
-
-
-/* =========================================================
-   BACKEND
-========================================================= */
-
-const TRACELAB_BACKEND =
-  "https://tracelab-free.onrender.com";
-
-const TRACELAB_EXECUTOR_URL =
-  `${TRACELAB_BACKEND}/api/execute`;
-
-
-/* =========================================================
-   DOM HELPERS
-========================================================= */
-
-const $ =
-  selector =>
-    document.querySelector(selector);
-
-const nodes =
-  [...document.querySelectorAll(".node")];
-
-const tracks =
-  [...document.querySelectorAll(".track")];
-
-
-/* =========================================================
-   EXAMPLES
-========================================================= */
-
-const codes = {
-
-  html:[
-    "index.html",
-    [
-      "<!doctype html>",
-      "<html>",
-      "  <head>",
-      "    <title>TraceLab</title>",
-      "  </head>",
-      "  <body>",
-      "    <h1>Hello, TraceLab!</h1>",
-      "    <p>Edit this HTML and click Run.</p>",
-      "  </body>",
-      "</html>"
-    ]
-  ],
-
-  css:[
-    "style.css",
-    [
-      "body {",
-      "  font-family: sans-serif;",
-      "  background: #f4f6fb;",
-      "}",
-      "",
-      "h1 {",
-      "  color: #5277f5;",
-      "}",
-      "",
-      "button {",
-      "  background: #5277f5;",
-      "  color: white;",
-      "  border: 0;",
-      "  padding: 8px 14px;",
-      "  border-radius: 8px;",
-      "}"
-    ]
-  ],
-
-  python:[
-    "main.py",
-    [
-      "numbers = [3, 7, 2, 9]",
-      "total = 0",
-      "",
-      "for number in numbers:",
-      "    total += number",
-      "",
-      "print(total)"
-    ]
-  ],
-
-  javascript:[
-    "main.js",
-    [
-      "const numbers = [3, 7, 2, 9];",
-      "let total = 0;",
-      "",
-      "for (const number of numbers) {",
-      "  total += number;",
-      "}",
-      "",
-      "console.log(total);"
-    ]
-  ],
-
-  typescript:[
-    "main.ts",
-    [
-      "const numbers: number[] = [3, 7, 2, 9];",
-      "const total = numbers.reduce((sum, n) => sum + n, 0);",
-      "console.log(total);"
-    ]
-  ],
-
-  c:[
-    "main.c",
-    [
-      "#include <stdio.h>",
-      "",
-      "int main(void) {",
-      "    int numbers[] = {3, 7, 2, 9};",
-      "    int total = 0;",
-      "    for (int i = 0; i < 4; i++) {",
-      "        total += numbers[i];",
-      "    }",
-      "    printf(\"%d\\n\", total);",
-      "    return 0;",
-      "}"
-    ]
-  ],
-
-  cpp:[
-    "main.cpp",
-    [
-      "#include <iostream>",
-      "",
-      "int main() {",
-      "    int numbers[] = {3, 7, 2, 9};",
-      "    int total = 0;",
-      "    for (int number : numbers) {",
-      "        total += number;",
-      "    }",
-      "    std::cout << total << \"\\n\";",
-      "    return 0;",
-      "}"
-    ]
-  ],
-
-  java:[
-    "Main.java",
-    [
-      "import java.util.Scanner;",
-      "",
-      "class Main {",
-      "  public static void main(String[] args) {",
-      "    Scanner sc = new Scanner(System.in);",
-      "    System.out.print(\"Enter a number: \");",
-      "    int n = sc.nextInt();",
-      "    System.out.println(n * 2);",
-      "  }",
-      "}"
-    ]
-  ],
-
-  go:[
-    "main.go",
-    [
-      "package main",
-      "",
-      "import \"fmt\"",
-      "",
-      "func main() {",
-      "  var n int",
-      "  fmt.Print(\"Enter a number: \")",
-      "  fmt.Scan(&n)",
-      "  fmt.Println(n * 2)",
-      "}"
-    ]
-  ],
-
-  kotlin:[
-    "Main.kt",
-    [
-      "fun main() {",
-      "  print(\"Enter a number: \")",
-      "  val n = readLine()!!.toInt()",
-      "  println(n * 2)",
-      "}"
-    ]
-  ],
-
-  swift:[
-    "main.swift",
-    [
-      "print(\"Enter a number: \", terminator: \"\")",
-      "let n = Int(readLine()!)!",
-      "print(n * 2)"
-    ]
-  ],
-
-  ruby:[
-    "main.rb",
-    [
-      "print \"Enter a number: \"",
-      "n = gets.to_i",
-      "puts n * 2"
-    ]
-  ],
-
-  php:[
-    "main.php",
-    [
-      "<?php",
-      "echo \"Enter a number: \";",
-      "$n = trim(fgets(STDIN));",
-      "echo ($n * 2) . PHP_EOL;"
-    ]
-  ],
-
-  perl:[
-    "main.pl",
-    [
-      "print \"Enter a number: \";",
-      "my $n = <STDIN>;",
-      "chomp $n;",
-      "print ($n * 2), \"\\n\";"
-    ]
-  ],
-
-  bash:[
-    "main.sh",
-    [
-      "read -p \"Enter a number: \" n",
-      "echo $((n * 2))"
-    ]
-  ],
-
-  sql:[
-    "main.sql",
-    [
-      "SELECT 3 + 7 + 2 + 9 AS total;"
-    ]
-  ]
-
-};
-
-
-/* =========================================================
-   FLOW DEFINITIONS
-========================================================= */
-
-const flowDefinitions = {
-
-  python:[
-    [
-      "Start",
-      "program start",
-      "<b>Start</b> — Python begins executing the program.",
-      "<strong>Execution begins.</strong> Python starts reading the source.",
-      '<span class="var"><b>status</b> = started</span>'
-    ],
-
-    [
-      "Setup",
-      "variables",
-      "<b>Setup</b> — variables and data are initialized.",
-      "<strong>Variables ready.</strong> The program prepares its values.",
-      '<span class="var"><b>total</b> = 0</span>'
-    ],
-
-    [
-      "Input / loop",
-      "program flow",
-      "<b>Input / loop</b> — Python processes input or iteration.",
-      "<strong>Program work.</strong> The runtime evaluates the next operation.",
-      '<span class="var"><b>state</b> = processing</span>'
-    ],
-
-    [
-      "Update",
-      "calculation",
-      "<b>Update</b> — the program changes its working values.",
-      "<strong>Calculation.</strong> New values are stored.",
-      '<span class="var"><b>state</b> = updated</span>'
-    ],
-
-    [
-      "Output",
-      "stdout",
-      "<b>Output</b> — the result is written to stdout.",
-      "<strong>Complete.</strong> TraceLab shows the resulting output.",
-      '<span class="var"><b>status</b> = complete</span>'
-    ]
-  ],
-
-  javascript:[
-    [
-      "Start",
-      "script",
-      "<b>Start</b> — JavaScript enters the sandbox.",
-      "<strong>Execution begins.</strong> The script is loaded.",
-      '<span class="var"><b>engine</b> = ready</span>'
-    ],
-
-    [
-      "Setup",
-      "variables",
-      "<b>Setup</b> — variables are initialized.",
-      "<strong>Scope ready.</strong> Program values are available.",
-      '<span class="var"><b>state</b> = ready</span>'
-    ],
-
-    [
-      "Input / loop",
-      "program flow",
-      "<b>Input / loop</b> — the program processes its next operation.",
-      "<strong>Processing.</strong> The sandbox continues execution.",
-      '<span class="var"><b>state</b> = processing</span>'
-    ],
-
-    [
-      "Update",
-      "calculation",
-      "<b>Update</b> — program values change.",
-      "<strong>Assignment.</strong> New values are stored.",
-      '<span class="var"><b>state</b> = updated</span>'
-    ],
-
-    [
-      "Output",
-      "console",
-      "<b>Output</b> — console output is captured.",
-      "<strong>Complete.</strong> The sandbox sends the result back.",
-      '<span class="var"><b>status</b> = complete</span>'
-    ]
-  ],
-
-  html:[
-    [
-      "Parse",
-      "HTML",
-      "<b>Parse</b> — the browser reads the HTML source.",
-      "<strong>Markup processing.</strong> The document is interpreted.",
-      '<span class="var"><b>DOM</b> = building</span>'
-    ],
-
-    [
-      "Build DOM",
-      "elements",
-      "<b>Build DOM</b> — elements become document nodes.",
-      "<strong>Structure ready.</strong> Parent-child relationships are created.",
-      '<span class="var"><b>nodes</b> = created</span>'
-    ],
-
-    [
-      "Layout",
-      "render tree",
-      "<b>Layout</b> — geometry is calculated.",
-      "<strong>Geometry ready.</strong> Elements receive positions and sizes.",
-      '<span class="var"><b>layout</b> = calculated</span>'
-    ],
-
-    [
-      "Paint",
-      "browser",
-      "<b>Paint</b> — the browser draws the page.",
-      "<strong>Rendering.</strong> Pixels are prepared.",
-      '<span class="var"><b>status</b> = painted</span>'
-    ],
-
-    [
-      "Preview",
-      "iframe",
-      "<b>Preview</b> — the rendered page appears.",
-      "<strong>Complete.</strong> The browser preview displays the result.",
-      '<span class="var"><b>status</b> = rendered</span>'
-    ]
-  ],
-
-  css:[
-    [
-      "Parse",
-      "stylesheet",
-      "<b>Parse</b> — CSS rules are read.",
-      "<strong>Stylesheet processing.</strong> Declarations are parsed.",
-      '<span class="var"><b>rules</b> = parsed</span>'
-    ],
-
-    [
-      "Match",
-      "selectors",
-      "<b>Match</b> — selectors are matched.",
-      "<strong>Matching.</strong> Applicable rules are found.",
-      '<span class="var"><b>matches</b> = found</span>'
-    ],
-
-    [
-      "Cascade",
-      "computed style",
-      "<b>Cascade</b> — competing declarations are resolved.",
-      "<strong>Styles ready.</strong> Final values are selected.",
-      '<span class="var"><b>styles</b> = resolved</span>'
-    ],
-
-    [
-      "Layout",
-      "render tree",
-      "<b>Layout</b> — styled elements receive geometry.",
-      "<strong>Geometry.</strong> Positions and sizes are calculated.",
-      '<span class="var"><b>layout</b> = calculated</span>'
-    ],
-
-    [
-      "Paint",
-      "pixels",
-      "<b>Paint</b> — the browser draws the result.",
-      "<strong>Complete.</strong> The preview is visible.",
-      '<span class="var"><b>status</b> = painted</span>'
-    ]
-  ],
-
-  typescript:[
-    [
-      "Submit",
-      "source",
-      "<b>Submit</b> — TypeScript is sent to the backend.",
-      "<strong>Backend execution.</strong> TraceLab submits the source.",
-      '<span class="var"><b>runtime</b> = TypeScript</span>'
-    ],
-
-    [
-      "Prepare",
-      "main.ts",
-      "<b>Prepare</b> — the provider receives the source.",
-      "<strong>Source ready.</strong> The program is prepared.",
-      '<span class="var"><b>source</b> = ready</span>'
-    ],
-
-    [
-      "Compile",
-      "provider",
-      "<b>Compile</b> — the hosted runtime processes the source.",
-      "<strong>Compiler stage.</strong> The source is compiled.",
-      '<span class="var"><b>status</b> = compiling</span>'
-    ],
-
-    [
-      "Execute",
-      "program",
-      "<b>Execute</b> — the compiled program runs.",
-      "<strong>Runtime.</strong> Output is collected.",
-      '<span class="var"><b>process</b> = running</span>'
-    ],
-
-    [
-      "Output",
-      "result",
-      "<b>Output</b> — the result returns to TraceLab.",
-      "<strong>Complete.</strong> Actual provider output is displayed.",
-      '<span class="var"><b>status</b> = complete</span>'
-    ]
-  ]
-
-};
-
-
-const genericFlow = [
-
-  [
-    "Start",
-    "entry point",
-    "<b>Start</b> — execution enters the selected runtime.",
-    "<strong>Runtime selected.</strong> TraceLab prepares the source.",
-    '<span class="var"><b>runtime</b> = selected</span>'
-  ],
-
-  [
-    "Submit",
-    "source file",
-    "<b>Submit</b> — the source is sent to the backend.",
-    "<strong>Submission.</strong> The backend forwards the program.",
-    '<span class="var"><b>source</b> = submitted</span>'
-  ],
-
-  [
-    "Compile",
-    "provider",
-    "<b>Compile / interpret</b> — the runtime processes the program.",
-    "<strong>Provider stage.</strong> Compilation or interpretation occurs remotely.",
-    '<span class="var"><b>status</b> = running</span>'
-  ],
-
-  [
-    "Execute",
-    "program",
-    "<b>Execute</b> — the program runs.",
-    "<strong>Execution.</strong> Output and errors are collected.",
-    '<span class="var"><b>process</b> = executed</span>'
-  ],
-
-  [
-    "Output",
-    "result",
-    "<b>Output</b> — the result is displayed.",
-    "<strong>Complete.</strong> The execution result appears in the console.",
-    '<span class="var"><b>status</b> = complete</span>'
-  ]
-
-];
-
-
-/* =========================================================
-   STATE
-========================================================= */
-
-let step = 0;
-let flowTimer = null;
-let executionId = 0;
-
-
-/* =========================================================
-   FLOW
-========================================================= */
-
-function getFlow(){
-
-  return (
-    flowDefinitions[
-      $("#language").value
-    ] ||
-    genericFlow
-  );
-
-}
-
-
-function render(){
-
-  const flow =
-    getFlow();
-
-  const total =
-    flow.length;
-
-
-  if(
-    step < 0 ||
-    step >= total
-  ){
-
-    step = 0;
-
-  }
-
-
-  const data =
-    flow[step];
-
-
-  $("#badge").textContent =
-    `Step ${step + 1} of ${total}`;
-
-  $("#stepname").textContent =
-    data[0];
-
-  $("#lineref").textContent =
-    data[1];
-
-  $("#note").innerHTML =
-    data[2];
-
-  $("#insight").innerHTML =
-    data[3];
-
-  $("#vars").innerHTML =
-    data[4];
-
-
-  const positions =
-    [11,30,50,70,89];
-
-
-  $("#pulse").style.left =
-    `${positions[Math.min(step,4)]}%`;
-
-
-  nodes.forEach(
-    (node,index) => {
-
-      node.className =
-        `node n${index + 1}` +
-        (
-          index < step
-            ? " done"
-            : ""
-        ) +
-        (
-          index === step
-            ? " active"
-            : ""
-        );
-
-    }
-  );
-
-
-  tracks.forEach(
-    (track,index) => {
-
-      track.className =
-        "track" +
-        (
-          index < step
-            ? " done"
-            : ""
-        ) +
-        (
-          index === step
-            ? " now"
-            : ""
-        );
-
-    }
-  );
-
-
-  $("#labels").innerHTML =
-    flow
-      .map(
-        item =>
-          `<span>${escapeHtml(item[0])}</span>`
-      )
-      .join("");
-
-
-  for(
-    let i = 0;
-    i < 5;
-    i++
-  ){
-
-    const label =
-      document.querySelector(
-        `#nodeLabel${i + 1}`
-      );
-
-
-    if(label){
-
-      label.textContent =
-        flow[i]
-          ? flow[i][0]
-          : "";
-
-    }
-
-  }
-
-}
-
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHtml(value){
-
-  return String(value)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-
-}
-
-
-/* =========================================================
-   STATUS
-========================================================= */
-
-function setStatus(
-  text,
-  type = "ready"
-){
-
-  $("#status").textContent =
-    text;
-
-
-  $("#status").className =
-    type === "error"
-      ? "status-error"
-      : type === "running"
-        ? "status-running"
-        : "status-ready";
-
-}
-
-
-/* =========================================================
-   EDITOR
-========================================================= */
-
-function numberLines(){
-
-  const lines =
-    $("#code")
-      .value
-      .split("\n");
-
-
-  $("#nums").innerHTML =
-    lines
-      .map(
-        (_,index) =>
-          index + 1
-      )
-      .join("<br>");
-
-}
-
-
-function putCode(){
-
-  const language =
-    $("#language").value;
-
-
-  const data =
-    codes[language];
-
-
-  if(!data){
-    return;
-  }
-
-
-  $("#file").textContent =
-    data[0];
-
-
-  $("#code").value =
-    data[1].join("\n");
-
-
-  $("#stdin").value =
-    "";
-
-
-  numberLines();
-
-  updateInputUI();
-
-}
-
-
-/* =========================================================
-   INPUT DETECTION
-========================================================= */
-
-function detectInputRequest(){
-
-  const language =
-    $("#language").value;
-
-  const code =
-    $("#code").value;
-
-
-  /* Python */
-
-  if(language === "python"){
-
-    const prompted =
-      code.match(
-        /\binput\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/
-      );
-
-
-    if(prompted){
-
-      return {
-        needsInput:true,
-        prompt:prompted[2] ||
-          "Python is asking for input."
-      };
-
-    }
-
-
-    if(
-      /\binput\s*\(/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"Python is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* JavaScript */
-
-  if(language === "javascript"){
-
-    const prompted =
-      code.match(
-        /\bprompt\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/
-      );
-
-
-    if(prompted){
-
-      return {
-        needsInput:true,
-        prompt:prompted[2] ||
-          "JavaScript is asking for input."
-      };
-
-    }
-
-
-    if(
-      /\bprompt\s*\(/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"JavaScript is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* C */
-
-  if(language === "c"){
-
-    if(
-      /\bscanf\s*\(|\bfgets\s*\(|\bgetchar\s*\(/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"C is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* C++ */
-
-  if(language === "cpp"){
-
-    if(
-      /\bcin\s*>>|\bgetline\s*\(/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"C++ is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* Java */
-
-  if(language === "java"){
-
-    if(
-      /Scanner|BufferedReader|System\.in|nextInt\s*\(|nextLine\s*\(/.test(code)
-    ){
-
-      const prompt =
-        code.match(
-          /System\.out\.print(?:ln)?\s*\(\s*(["'])(.*?)\1\s*\)/
-        );
-
-
-      return {
-        needsInput:true,
-        prompt:
-          prompt
-            ? prompt[2]
-            : "Java is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* Go */
-
-  if(language === "go"){
-
-    if(
-      /fmt\.(Scan|Scanln|Scanf)/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"Go is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* Kotlin */
-
-  if(language === "kotlin"){
-
-    if(
-      /readLine\s*\(|Scanner/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"Kotlin is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* Swift */
-
-  if(language === "swift"){
-
-    if(
-      /readLine\s*\(/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"Swift is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* Ruby */
-
-  if(language === "ruby"){
-
-    if(
-      /\bgets\b/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"Ruby is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* PHP */
-
-  if(language === "php"){
-
-    if(
-      /STDIN|fgets\s*\(\s*STDIN/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"PHP is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* Perl */
-
-  if(language === "perl"){
-
-    if(
-      /<STDIN>|STDIN/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"Perl is asking for input."
-      };
-
-    }
-
-  }
-
-
-  /* Bash */
-
-  if(language === "bash"){
-
-    if(
-      /\bread\b/.test(code)
-    ){
-
-      return {
-        needsInput:true,
-        prompt:"Bash is asking for input."
-      };
-
-    }
-
-  }
-
-
-  return {
-    needsInput:false,
-    prompt:""
-  };
-
-}
-
-
-function updateInputUI(){
-
-  const result =
-    detectInputRequest();
-
-
-  const wrap =
-    $("#stdinWrap");
-
-  const label =
-    $("#stdinLabel");
-
-  const input =
-    $("#stdin");
-
-  const prompt =
-    $("#inputPrompt");
-
-
-  if(
-    result.needsInput
-  ){
-
-    wrap.classList.add(
-      "needs-input"
-    );
-
-
-    label.textContent =
-      "User input here";
-
-
-    input.placeholder =
-      result.prompt ||
-      "Enter the requested value here...";
-
-
-    prompt.textContent =
-      result.prompt ||
-      "This program is asking for input.";
-
-
-  }else{
-
-    wrap.classList.remove(
-      "needs-input"
-    );
-
-
-    label.textContent =
-      "Enter the input here";
-
-
-    input.placeholder =
-      "Enter the input here...";
-
-
-    prompt.textContent =
-      "";
-
-  }
-
-}
-
-
-/* =========================================================
-   WEB PREVIEW
-========================================================= */
-
-function buildFullDocument(
-  language,
-  code
-){
-
-  if(
-    language === "html"
-  ){
-
-    if(
-      /<\s*html[\s>]/i.test(code)
-    ){
-
-      return code;
-
-    }
-
-
-    return `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>TraceLab Preview</title>
-</head>
-<body>
-${code}
-</body>
-</html>
-`;
-
-  }
-
-
-  if(
-    language === "css"
-  ){
-
-    return `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>TraceLab CSS Preview</title>
-<style>
-${code}
-</style>
-</head>
-<body>
-<h1>TraceLab</h1>
-<p>This paragraph shows your CSS.</p>
-<button>Sample button</button>
-</body>
-</html>
-`;
-
-  }
-
-
-  return "";
-
-}
-
-
-function renderPreview(
-  language,
-  code
-){
-
-  $("#previewWrap")
-    .style
-    .display =
-    "block";
-
-
-  $("#previewFrame")
-    .srcdoc =
-    buildFullDocument(
-      language,
-      code
-    );
-
-}
-
-
-function hidePreview(){
-
-  $("#previewWrap")
-    .style
-    .display =
-    "none";
-
-
-  $("#previewFrame")
-    .srcdoc =
-    "about:blank";
-
-}
-
-
-function updateWebUI(){
-
-  const language =
-    $("#language").value;
-
-
-  const preview =
-    language === "html" ||
-    language === "css";
-
-
-  if(preview){
-
-    renderPreview(
-      language,
-      $("#code").value
-    );
-
-  }else{
-
-    hidePreview();
-
-  }
-
-
-  $("#openBrowser")
-    .style
-    .display =
-      preview
-        ? "inline-flex"
-        : "none";
-
-
-  const labels = {
-
-    html:
-      "HTML renders in the browser",
-
-    css:
-      "CSS renders in the browser",
-
-    python:
-      "Python runs locally in your browser",
-
-    javascript:
-      "JavaScript runs locally in your browser"
-
-  };
-
-
-  $("#modeStatus").textContent =
-    labels[language] ||
-    "Live server execution via TraceLab backend";
-
-
-  updateInputUI();
-
-}
-
-
-/* =========================================================
-   PYODIDE
-========================================================= */
-
-let pyodidePromise =
-  null;
-
-
-function getPyodide(){
-
-  if(pyodidePromise){
-
-    return pyodidePromise;
-
-  }
-
-
-  pyodidePromise =
-    new Promise(
-      (resolve,reject) => {
-
-        const load =
-          () => {
-
-            if(
-              typeof window.loadPyodide !==
-              "function"
-            ){
-
-              reject(
-                new Error(
-                  "Pyodide loader is unavailable."
-                )
-              );
-
-              return;
-
-            }
-
-
-            window
-              .loadPyodide({
-                indexURL:
-                  "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/"
-              })
-              .then(resolve)
-              .catch(reject);
-
-          };
-
-
-        if(
-          typeof window.loadPyodide ===
-          "function"
-        ){
-
-          load();
-
-          return;
-
-        }
-
-
-        const script =
-          document.createElement(
-            "script"
-          );
-
-
-        script.src =
-          "https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js";
-
-
-        script.onload =
-          load;
-
-
-        script.onerror =
-          () => {
-
-            reject(
-              new Error(
-                "Could not load Pyodide."
-              )
-            );
-
-          };
-
-
-        document.head.appendChild(
-          script
-        );
-
-      }
-    );
-
-
-  return pyodidePromise;
-
-}
-
-
-/* =========================================================
-   PYTHON EXECUTION
-========================================================= */
-
-async function runPythonCode(
-  code,
-  stdinText
-){
-
-  const logs = [];
-
-
-  try{
-
-    const py =
-      await getPyodide();
-
-
-    py.setStdout({
-
-      batched:
-        text => {
-
-          logs.push(
-            String(text)
-          );
-
-        }
-
-    });
-
-
-    py.setStderr({
-
-      batched:
-        text => {
-
-          logs.push(
-            `stderr: ${String(text)}`
-          );
-
-        }
-
-    });
-
-
-    const inputLines =
-      String(
-        stdinText || ""
-      )
-      .split(/\r?\n/);
-
-
-    let inputIndex =
-      0;
-
-
-    py.setStdin({
-
-      stdin: () => {
-
-        if(
-          inputIndex >=
-          inputLines.length
-        ){
-
-          return undefined;
-
-        }
-
-
-        return String(
-          inputLines[
-            inputIndex++
-          ]
-        );
-
+      {
+        id: "html",
+        label: "HTML",
+        mode: "local"
       },
 
-      isatty:false
+      {
+        id: "css",
+        label: "CSS",
+        mode: "local"
+      },
 
-    });
+      {
+        id: "python",
+        label: "Python 3",
+        mode: "python"
+      },
+
+      {
+        id: "javascript",
+        label: "JavaScript",
+        mode: "js"
+      },
+
+      {
+        id: "typescript",
+        label: "TypeScript",
+        mode: "remote"
+      },
+
+      {
+        id: "c",
+        label: "C",
+        mode: "remote"
+      },
+
+      {
+        id: "cpp",
+        label: "C++",
+        mode: "remote"
+      },
+
+      {
+        id: "java",
+        label: "Java",
+        mode: "remote"
+      },
+
+      {
+        id: "go",
+        label: "Go",
+        mode: "remote"
+      },
+
+      {
+        id: "kotlin",
+        label: "Kotlin",
+        mode: "remote"
+      },
+
+      {
+        id: "swift",
+        label: "Swift",
+        mode: "remote"
+      },
+
+      {
+        id: "ruby",
+        label: "Ruby",
+        mode: "remote"
+      },
+
+      {
+        id: "php",
+        label: "PHP",
+        mode: "remote"
+      },
+
+      {
+        id: "perl",
+        label: "Perl",
+        mode: "remote"
+      },
+
+      {
+        id: "bash",
+        label: "Bash",
+        mode: "remote"
+      },
+
+      {
+        id: "sql",
+        label: "SQL / SQLite",
+        mode: "remote"
+      }
+
+    ];
 
 
-    await py.runPythonAsync(
-      code
-    );
+    /* =========================================================
+       EXAMPLES
+    ========================================================= */
 
+    const EXAMPLES = {
 
-  }catch(error){
+      html:
+`<!doctype html>
+<html>
+  <body>
+    <h2>Hello TraceLab</h2>
+    <p>This is a real browser preview.</p>
+  </body>
+</html>`,
 
-    const message =
-      error?.message ||
-      String(error);
-
-
-    logs.push(
-      `✕ Python execution failed: ${message}`
-    );
-
-  }
-
-
-  return logs.length
-    ? logs
-    : [
-        "(No output — add print(...) to see output.)"
-      ];
-
+      css:
+`body {
+  font-family: Arial, sans-serif;
+  padding: 30px;
 }
 
+h1 {
+  letter-spacing: 2px;
+}`,
 
-/* =========================================================
-   JAVASCRIPT EXECUTION
-========================================================= */
+      python:
+`name = input("Enter the name:")
+print("hello", name)`,
 
-function runJavaScriptCode(
-  code,
-  stdinText
-){
+      javascript:
+`const name = prompt("Enter the name:");
+console.log("hello", name);`,
 
-  return new Promise(
-    resolve => {
+      typescript:
+`const name: string = "Prashanth";
+console.log("hello", name);`,
 
-      const logs = [];
+      c:
+`#include <stdio.h>
 
-      let finished =
-        false;
+int main() {
+    int n;
+    scanf("%d", &n);
+    printf("hello %d\\n", n);
+    return 0;
+}`,
 
+      cpp:
+`#include <iostream>
+using namespace std;
 
-      const inputLines =
-        String(
-          stdinText || ""
-        )
-        .split(/\r?\n/);
+int main() {
+    int n;
+    cin >> n;
+    cout << "hello " << n << "\\n";
+    return 0;
+}`,
 
+      java:
+`import java.util.*;
 
-      const iframe =
-        document.createElement(
-          "iframe"
-        );
+class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String name = sc.nextLine();
+        System.out.println("hello " + name);
+    }
+}`,
 
+      go:
+`package main
 
-      iframe.style.display =
-        "none";
+import "fmt"
 
-      iframe.sandbox =
-        "allow-scripts";
+func main() {
+    var name string
+    fmt.Scanln(&name)
+    fmt.Println("hello", name)
+}`,
 
+      kotlin:
+`fun main() {
+    val name = readLine() ?: ""
+    println("hello $name")
+}`,
 
-      function finish(){
+      swift:
+`let name = readLine() ?? ""
+print("hello", name)`,
 
-        if(finished){
+      ruby:
+`name = gets&.chomp
+puts "hello #{name}"`,
 
-          return;
+      php:
+`<?php
+$name = trim(fgets(STDIN));
+echo "hello " . $name;
+?>`,
 
-        }
+      perl:
+`my $name = <STDIN>;
+chomp $name;
+print "hello $name\\n";`,
 
+      bash:
+`read name
+echo "hello $name"`,
 
-        finished =
-          true;
+      sql:
+`CREATE TABLE people(name TEXT);
 
+INSERT INTO people
+VALUES ('Prashanth');
 
-        window.removeEventListener(
-          "message",
-          onMessage
-        );
+SELECT 'hello ' || name
+FROM people;`
 
-
-        if(
-          iframe.parentNode
-        ){
-
-          iframe.remove();
-
-        }
-
-
-        resolve(
-          logs.length
-            ? logs
-            : [
-                "(No output — add console.log(...) to see output.)"
-              ]
-        );
-
-      }
-
-
-      function onMessage(event){
-
-        if(
-          event.source !==
-          iframe.contentWindow
-        ){
-
-          return;
-
-        }
-
-
-        const data =
-          event.data;
-
-
-        if(
-          !data ||
-          data.__tracelab !== true
-        ){
-
-          return;
-
-        }
+    };
 
 
-        if(
-          data.type === "done"
-        ){
+    /* =========================================================
+       DOM
+    ========================================================= */
 
-          finish();
+    const els = {
 
-          return;
+      language: document.getElementById("language"),
 
-        }
+      code: document.getElementById("code"),
+
+      stdin: document.getElementById("stdin"),
+
+      stdinWrap: document.getElementById("stdinWrap"),
+
+      stdinLabel: document.getElementById("stdinLabel"),
+
+      inputAlert: document.getElementById("inputAlert"),
+
+      inputPrompt: document.getElementById("inputPrompt"),
+
+      output: document.getElementById("output"),
+
+      runBtn: document.getElementById("runBtn"),
+
+      resetBtn: document.getElementById("resetBtn"),
+
+      statusDot: document.getElementById("statusDot"),
+
+      statusText: document.getElementById("statusText"),
+
+      traceList: document.getElementById("traceList"),
+
+      traceKicker: document.getElementById("traceKicker"),
+
+      traceTitle: document.getElementById("traceTitle"),
+
+      traceCode: document.getElementById("traceCode"),
+
+      playBtn: document.getElementById("playBtn"),
+
+      prevBtn: document.getElementById("prevBtn"),
+
+      nextBtn: document.getElementById("nextBtn"),
+
+      logicList: document.getElementById("logicList"),
+
+      previewPanel: document.getElementById("previewPanel"),
+
+      previewFrame: document.getElementById("previewFrame")
+
+    };
 
 
-        const prefix =
-          data.type === "error"
-            ? "✕ "
-            : data.type === "warn"
-              ? "⚠ "
-              : "";
+    /* =========================================================
+       STATE
+    ========================================================= */
+
+    let pyodide = null;
+
+    let traceSteps = [];
+
+    let traceIndex = -1;
+
+    let traceTimer = null;
+
+    let inputRequest = {
+      needsInput: false,
+      prompt: ""
+    };
 
 
-        const args =
-          Array.isArray(
-            data.args
-          )
-            ? data.args
-            : [
-                String(
-                  data.args ?? ""
-                )
-              ];
+    /* =========================================================
+       HELPERS
+    ========================================================= */
 
+    function selectedLanguage() {
 
-        logs.push(
-          prefix +
-          args.join(" ")
-        );
-
-      }
-
-
-      window.addEventListener(
-        "message",
-        onMessage
+      return (
+        LANGUAGES.find(
+          x => x.id === els.language.value
+        ) || LANGUAGES[0]
       );
 
-
-      const source =
-`
-<!doctype html>
-<html>
-<body>
-
-<script>
-
-const inputLines =
-${JSON.stringify(inputLines)};
-
-let inputIndex = 0;
+    }
 
 
-function send(type,args){
+    function escapeHtml(text) {
 
-  parent.postMessage(
-    {
-      __tracelab:true,
-      type:type,
-      args:args.map(
-        value => {
+      return String(text ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
 
-          try{
+    }
 
-            if(
-              typeof value === "object" &&
-              value !== null
-            ){
 
-              return JSON.stringify(value);
+    function setOutput(text, isError = false) {
 
-            }
+      els.output.textContent =
+        text || "(no output)";
 
-            return String(value);
+      els.output.classList.toggle(
+        "error",
+        !!isError
+      );
 
-          }catch{
+    }
 
-            return String(value);
+
+    /* =========================================================
+       LINE CLASSIFICATION
+    ========================================================= */
+
+    function classifyLine(line, language) {
+
+      const s = line.trim();
+
+      if (!s) {
+
+        return {
+          kind: "blank",
+          label: "Blank line"
+        };
+
+      }
+
+
+      if (
+        /^(#|\/\/|\/\*|\*|<!--)/.test(s)
+      ) {
+
+        return {
+          kind: "comment",
+          label: "Comment"
+        };
+
+      }
+
+
+      if (
+        language === "python" &&
+        /\b(input|print)\s*\(/.test(s)
+      ) {
+
+        return {
+
+          kind:
+            /\binput\s*\(/.test(s)
+              ? "input"
+              : "output",
+
+          label:
+            /\binput\s*\(/.test(s)
+              ? "Read input"
+              : "Print output"
+
+        };
+
+      }
+
+
+      if (
+        language === "javascript" &&
+        /\b(prompt|console\.)/.test(s)
+      ) {
+
+        return {
+
+          kind:
+            /\bprompt\s*\(/.test(s)
+              ? "input"
+              : "output",
+
+          label:
+            /\bprompt\s*\(/.test(s)
+              ? "Read input"
+              : "Console output"
+
+        };
+
+      }
+
+
+      if (
+        /(\bfor\b|\bwhile\b|\bforeach\b|forEach\s*\()/.test(s)
+      ) {
+
+        return {
+          kind: "loop",
+          label: "Loop / iteration"
+        };
+
+      }
+
+
+      if (
+        /(\bif\b|\belse\b|\belif\b|\bswitch\b|\bcase\b|\bwhen\b)/.test(s)
+      ) {
+
+        return {
+          kind: "condition",
+          label: "Condition"
+        };
+
+      }
+
+
+      if (
+        /(printf|cout\b|System\.out|fmt\.Print|println|puts\b|echo\b|print\b|SELECT\b|RETURNING\b)/.test(s)
+      ) {
+
+        return {
+          kind: "output",
+          label: "Output"
+        };
+
+      }
+
+
+      if (
+        /(scanf|cin\b|Scanner\b|readLine\b|gets\b|fgets|STDIN|read\b)/.test(s)
+      ) {
+
+        return {
+          kind: "input",
+          label: "Read input"
+        };
+
+      }
+
+
+      if (
+        /^\s*(class|def|func|function|fn|public static|int main|void main|package|import)\b/.test(s)
+      ) {
+
+        return {
+          kind: "declaration",
+          label: "Declaration / setup"
+        };
+
+      }
+
+
+      if (/[=]/.test(s)) {
+
+        return {
+          kind: "assignment",
+          label: "Assign / update value"
+        };
+
+      }
+
+
+      return {
+
+        kind: "statement",
+
+        label: "Execute statement"
+
+      };
+
+    }
+
+
+    /* =========================================================
+       STATIC TRACE
+       ========================================================= */
+
+    function buildStaticTrace(
+      code,
+      language,
+      output
+    ) {
+
+      const lines =
+        code
+          .replace(/\r\n/g, "\n")
+          .split("\n");
+
+      const steps = [];
+
+      lines.forEach(
+        (line, idx) => {
+
+          if (!line.trim()) {
+            return;
+          }
+
+
+          const info =
+            classifyLine(
+              line,
+              language
+            );
+
+
+          if (
+            info.kind === "comment" ||
+            info.kind === "blank"
+          ) {
+
+            return;
 
           }
 
+
+          steps.push({
+
+            line: idx + 1,
+
+            source: line,
+
+            label: info.label,
+
+            kind: info.kind
+
+          });
+
         }
-      )
-    },
-    "*"
-  );
-
-}
+      );
 
 
-console.log =
-  (...args) =>
-    send("log",args);
+      if (
+        output &&
+        output.trim()
+      ) {
 
-console.error =
-  (...args) =>
-    send("error",args);
+        const outputStep =
+          [...steps]
+            .reverse()
+            .find(
+              step =>
+                step.kind === "output"
+            );
 
-console.warn =
-  (...args) =>
-    send("warn",args);
+
+        if (outputStep) {
+
+          outputStep.result =
+            output
+              .trim()
+              .split("\n")
+              .slice(-4)
+              .join("\n");
+
+        }
+
+      }
 
 
-window.prompt =
-  message => {
+      return steps;
 
-    if(
-      inputIndex >=
-      inputLines.length
-    ){
+    }
 
-      throw new Error(
-        "Input required. Enter the requested value in the TraceLab input box."
+
+    /* =========================================================
+       PYTHON RUNTIME TRACE
+    ========================================================= */
+
+    function buildPythonTrace(
+      code,
+      executedLines,
+      output
+    ) {
+
+      const lines =
+        code
+          .replace(/\r\n/g, "\n")
+          .split("\n");
+
+      const steps = [];
+
+
+      for (const lineNumber of executedLines) {
+
+        const line =
+          lines[lineNumber - 1];
+
+
+        if (
+          line == null ||
+          !line.trim()
+        ) {
+
+          continue;
+
+        }
+
+
+        const info =
+          classifyLine(
+            line,
+            "python"
+          );
+
+
+        steps.push({
+
+          line: lineNumber,
+
+          source: line,
+
+          label: info.label,
+
+          kind: info.kind
+
+        });
+
+      }
+
+
+      if (!steps.length) {
+
+        return buildStaticTrace(
+          code,
+          "python",
+          output
+        );
+
+      }
+
+
+      if (
+        output &&
+        output.trim()
+      ) {
+
+        const outputStep =
+          [...steps]
+            .reverse()
+            .find(
+              step =>
+                step.kind === "output"
+            );
+
+
+        if (outputStep) {
+
+          outputStep.result =
+            output
+              .trim()
+              .split("\n")
+              .slice(-4)
+              .join("\n");
+
+        }
+
+      }
+
+
+      return steps;
+
+    }
+
+
+    /* =========================================================
+       TRACE RENDERING
+    ========================================================= */
+
+    function renderTrace() {
+
+      els.traceList.innerHTML = "";
+
+
+      traceSteps.forEach(
+        (step, index) => {
+
+          const row =
+            document.createElement("div");
+
+
+          row.className =
+            "trace-step" +
+            (
+              index === traceIndex
+                ? " active"
+                : ""
+            );
+
+
+          row.innerHTML = `
+
+            <div class="trace-num">
+              #${index + 1}
+            </div>
+
+            <div class="trace-main">
+
+              <div class="trace-label">
+                Line ${step.line}
+                ·
+                ${escapeHtml(step.label)}
+              </div>
+
+              <div class="trace-source">
+                ${escapeHtml(step.source)}
+              </div>
+
+            </div>
+
+          `;
+
+
+          row.addEventListener(
+            "click",
+            () => setTraceIndex(index)
+          );
+
+
+          els.traceList.appendChild(row);
+
+        }
       );
 
     }
 
 
-    const messageText =
-      message ||
-      "Enter input:";
+    function setTraceIndex(index) {
+
+      if (!traceSteps.length) {
+
+        traceIndex = -1;
+
+        els.traceKicker.textContent =
+          "Ready";
+
+        els.traceTitle.textContent =
+          "Run your current program";
+
+        els.traceCode.textContent =
+          "No executable line has been traced yet.";
+
+        renderTrace();
+
+        return;
+
+      }
+
+
+      traceIndex =
+        Math.max(
+          0,
+          Math.min(
+            index,
+            traceSteps.length - 1
+          )
+        );
+
+
+      const step =
+        traceSteps[traceIndex];
+
+
+      els.traceKicker.textContent =
+        `Step ${traceIndex + 1} of ${traceSteps.length} · Line ${step.line}`;
+
+
+      els.traceTitle.textContent =
+        step.label;
+
+
+      els.traceCode.textContent =
+        step.source;
+
+
+      renderTrace();
+
+
+      const active =
+        els.traceList.querySelector(
+          ".trace-step.active"
+        );
+
+
+      if (active) {
+
+        active.scrollIntoView({
+          block: "nearest"
+        });
+
+      }
+
+    }
+
+
+    function stopTrace() {
+
+      if (traceTimer) {
+
+        clearTimeout(traceTimer);
+
+      }
+
+      traceTimer = null;
+
+    }
+
+
+    function playTrace() {
+
+      stopTrace();
+
+
+      if (!traceSteps.length) {
+
+        return;
+
+      }
+
+
+      if (
+        traceIndex >=
+        traceSteps.length - 1
+      ) {
+
+        traceIndex = -1;
+
+      }
+
+
+      const tick = () => {
+
+        setTraceIndex(
+          traceIndex + 1
+        );
+
+
+        if (
+          traceIndex <
+          traceSteps.length - 1
+        ) {
+
+          traceTimer =
+            setTimeout(
+              tick,
+              650
+            );
+
+        } else {
+
+          traceTimer = null;
+
+        }
+
+      };
+
+
+      tick();
+
+    }
+
+
+    /* =========================================================
+       INPUT DETECTION
+    ========================================================= */
+
+    function detectInputRequest(
+      code,
+      language
+    ) {
+
+      const text =
+        code.replace(
+          /\r\n/g,
+          "\n"
+        );
+
+
+      if (
+        ["html", "css", "sql"]
+          .includes(language)
+      ) {
+
+        return {
+          needsInput: false,
+          prompt: ""
+        };
+
+      }
+
+
+      /* PYTHON */
+
+      if (language === "python") {
+
+        const match =
+          text.match(
+            /\binput\s*\(\s*(['"`])([\s\S]*?)\1\s*\)/
+          );
+
+
+        if (match) {
+
+          return {
+            needsInput: true,
+            prompt: match[2]
+          };
+
+        }
+
+
+        if (
+          /\binput\s*\(/.test(text)
+        ) {
+
+          return {
+            needsInput: true,
+            prompt: ""
+          };
+
+        }
+
+      }
+
+
+      /* JAVASCRIPT */
+
+      if (
+        language === "javascript"
+      ) {
+
+        const match =
+          text.match(
+            /\bprompt\s*\(\s*(['"`])([\s\S]*?)\1\s*\)/
+          );
+
+
+        if (match) {
+
+          return {
+            needsInput: true,
+            prompt: match[2]
+          };
+
+        }
+
+
+        if (
+          /\bprompt\s*\(/.test(text)
+        ) {
+
+          return {
+            needsInput: true,
+            prompt: ""
+          };
+
+        }
+
+      }
+
+
+      /* HOSTED LANGUAGES */
+
+      const patterns = {
+
+        c: [
+          /\bscanf\s*\(/,
+          /\bgets\s*\(/,
+          /\bfgets\s*\(\s*stdin/
+        ],
+
+        cpp: [
+          /\bcin\s*>>/,
+          /\bgetline\s*\(/
+        ],
+
+        java: [
+          /\bScanner\b/,
+          /\.next(Line|Int|Double|Float|Boolean)?\s*\(/
+        ],
+
+        go: [
+          /\bfmt\.(Scan|Fscan|Scanln)\s*\(/
+        ],
+
+        kotlin: [
+          /\breadLine\s*\(/,
+          /\bScanner\b/
+        ],
+
+        swift: [
+          /\breadLine\s*\(/
+        ],
+
+        ruby: [
+          /\bgets\b/
+        ],
+
+        php: [
+          /\bfgets\s*\(\s*STDIN\s*\)/
+        ],
+
+        perl: [
+          /<STDIN>/,
+          /\bSTDIN\b/
+        ],
+
+        bash: [
+          /(^|\s)read\s+[-a-zA-Z]*/
+        ]
+
+      };
+
+
+      const languagePatterns =
+        patterns[language] || [];
+
+
+      if (
+        languagePatterns.some(
+          regex => regex.test(text)
+        )
+      ) {
+
+        return {
+          needsInput: true,
+          prompt: ""
+        };
+
+      }
+
+
+      return {
+        needsInput: false,
+        prompt: ""
+      };
+
+    }
+
+
+    /* =========================================================
+       INPUT UI
+    ========================================================= */
+
+    function updateInputUI() {
+
+      inputRequest =
+        detectInputRequest(
+          els.code.value,
+          els.language.value
+        );
+
+
+      if (
+        inputRequest.needsInput
+      ) {
+
+        els.stdinWrap.classList.add(
+          "needs-input"
+        );
+
+
+        els.stdinLabel.textContent =
+          "User input here";
+
+
+        els.inputPrompt.textContent =
+          inputRequest.prompt ||
+          "Program is waiting for your input";
+
+
+        els.stdin.placeholder =
+          "Enter the input here...";
+
+      } else {
+
+        els.stdinWrap.classList.remove(
+          "needs-input"
+        );
+
+
+        els.stdinLabel.textContent =
+          "Enter the input here";
+
+
+        els.inputPrompt.textContent =
+          "";
+
+
+        els.stdin.placeholder =
+          "Enter the input here...";
+
+      }
+
+    }
+
+
+    /* =========================================================
+       PROGRAM STRUCTURE
+    ========================================================= */
+
+    function buildLogic() {
+
+      const lines =
+        els.code.value
+          .replace(/\r\n/g, "\n")
+          .split("\n");
+
+
+      const seen = [];
+
+
+      lines.forEach(
+        (line, index) => {
+
+          if (!line.trim()) {
+            return;
+          }
+
+
+          const info =
+            classifyLine(
+              line,
+              els.language.value
+            );
+
+
+          if (
+            info.kind === "comment" ||
+            info.kind === "blank"
+          ) {
+
+            return;
+
+          }
+
+
+          seen.push(
+            `Line ${index + 1}: ${info.label}`
+          );
+
+        }
+      );
+
+
+      els.logicList.innerHTML =
+        seen.length
+
+          ? seen
+              .map(
+                item =>
+                  `<span class="logic-chip">${escapeHtml(item)}</span>`
+              )
+              .join("")
+
+          : `<span class="sub">
+              No executable statements yet.
+            </span>`;
+
+    }
+
+
+    /* =========================================================
+       PREVIEW
+    ========================================================= */
+
+    function updatePreview() {
+
+      const language =
+        els.language.value;
+
+
+      els.previewPanel.style.display =
+        (
+          language === "html" ||
+          language === "css"
+        )
+          ? "block"
+          : "none";
+
+    }
+
+
+    function resetTrace() {
+
+      stopTrace();
+
+      traceSteps = [];
+
+      traceIndex = -1;
+
+      renderTrace();
+
+    }
+
+
+    function setExample() {
+
+      const language =
+        els.language.value;
+
+
+      els.code.value =
+        EXAMPLES[language] || "";
+
+
+      els.stdin.value = "";
+
+
+      updateInputUI();
+
+      buildLogic();
+
+      resetTrace();
+
+      updatePreview();
+
+
+      if (
+        language === "html" ||
+        language === "css"
+      ) {
+
+        runPreview(false);
+
+      }
+
+    }
+
+
+    /* =========================================================
+       PYODIDE
+    ========================================================= */
+
+    async function ensurePyodide() {
+
+      if (pyodide) {
+
+        return pyodide;
+
+      }
+
+
+      els.statusText.textContent =
+        "Loading Python runtime…";
+
+
+      pyodide =
+        await loadPyodide();
+
+
+      return pyodide;
+
+    }
+
+
+    /* =========================================================
+       PYTHON EXECUTION
+       
+       IMPORTANT:
+       Python input(prompt) prompt is intentionally ignored
+       when captured. The prompt appears in the TraceLab
+       input UI instead.
+    ========================================================= */
+
+    async function runPython(
+      code,
+      stdinText
+    ) {
+
+      const py =
+        await ensurePyodide();
+
+
+      let stdout = "";
+
+      let stderr = "";
+
+
+      const lines =
+        String(stdinText || "")
+          .split(/\r?\n/);
+
+
+      let inputIndex = 0;
+
+
+      py.setStdout({
+
+        batched: text => {
+
+          stdout += text;
+
+        }
+
+      });
+
+
+      py.setStderr({
+
+        batched: text => {
+
+          stderr += text;
+
+        }
+
+      });
+
+
+      py.setStdin({
+
+        stdin: () => {
+
+          if (
+            inputIndex >=
+            lines.length
+          ) {
+
+            return undefined;
+
+          }
+
+
+          return lines[inputIndex++];
+
+        },
+
+        isatty: false
+
+      });
+
+
+      const sourceLiteral =
+        JSON.stringify(code);
+
+
+      const wrapper = `
+import builtins as __tracelab_builtins
+import sys
+import traceback
+
+__tracelab_source = ${sourceLiteral}
+
+__tracelab_events = []
+
+__tracelab_exception = ""
+
+__tracelab_real_input =
+    __tracelab_builtins.input
+
+
+def __tracelab_input(prompt=""):
+
+    # Do NOT print Python's input prompt.
+    # TraceLab displays that prompt in the
+    # dedicated input area.
+
+    return __tracelab_real_input()
+
+
+__tracelab_builtins.input =
+    __tracelab_input
+
+
+def __tracelab_trace(
+    frame,
+    event,
+    arg
+):
+
+    if (
+        event == "line"
+        and
+        frame.f_code.co_filename ==
+            "<tracelab-user>"
+    ):
+
+        __tracelab_events.append(
+            frame.f_lineno
+        )
+
+    return __tracelab_trace
+
+
+try:
+
+    sys.settrace(
+        __tracelab_trace
+    )
+
+    exec(
+        compile(
+            __tracelab_source,
+            "<tracelab-user>",
+            "exec"
+        ),
+        {}
+    )
+
+except Exception:
+
+    __tracelab_exception =
+        traceback.format_exc()
+
+finally:
+
+    sys.settrace(None)
+
+    __tracelab_builtins.input =
+        __tracelab_real_input
+`;
+
+
+      await py.runPythonAsync(
+        wrapper
+      );
+
+
+      const eventsProxy =
+        py.globals.get(
+          "__tracelab_events"
+        );
+
+
+      const exceptionProxy =
+        py.globals.get(
+          "__tracelab_exception"
+        );
+
+
+      const events =
+        eventsProxy
+          ? eventsProxy.toJs()
+          : [];
+
+
+      const exception =
+        exceptionProxy
+          ? String(exceptionProxy)
+          : "";
+
+
+      if (eventsProxy) {
+
+        eventsProxy.destroy();
+
+      }
+
+
+      if (exceptionProxy) {
+
+        exceptionProxy.destroy();
+
+      }
+
+
+      return {
+
+        stdout,
+
+        stderr,
+
+        error: exception,
+
+        trace: events
+
+      };
+
+    }
+
+
+    /* =========================================================
+       JAVASCRIPT EXECUTION
+    ========================================================= */
+
+    function runJavaScript(
+      code,
+      stdinText
+    ) {
+
+      return new Promise(
+        resolve => {
+
+          const values =
+            String(stdinText || "")
+              .split(/\r?\n/);
+
+
+          let index = 0;
+
+
+          const id =
+            "tracelab_" +
+            Math.random()
+              .toString(36)
+              .slice(2);
+
+
+          const listener =
+            event => {
+
+              if (
+                !event.data ||
+                event.data.id !== id
+              ) {
+
+                return;
+
+              }
+
+
+              window.removeEventListener(
+                "message",
+                listener
+              );
+
+
+              resolve(
+                event.data
+              );
+
+            };
+
+
+          window.addEventListener(
+            "message",
+            listener
+          );
+
+
+          const safeCode =
+            code.replace(
+              /<\/script/gi,
+              "<\\/script"
+            );
+
+
+          const srcdoc = `
+<!doctype html>
+<html>
+<body>
+
+<script>
+
+(function() {
+
+  const id =
+    ${JSON.stringify(id)};
+
+  const inputs =
+    ${JSON.stringify(values)};
+
+  let idx = 0;
+
+  let out = [];
+
+
+  function send(
+    kind,
+    value
+  ) {
+
+    parent.postMessage(
+      {
+        id,
+        kind,
+        value: String(
+          value ?? ""
+        )
+      },
+      "*"
+    );
+
+  }
+
+
+  [
+    "log",
+    "info",
+    "warn",
+    "error"
+  ].forEach(
+    function(key) {
+
+      const original =
+        console[key];
+
+
+      console[key] =
+        function(...args) {
+
+          const text =
+            args
+              .map(
+                function(value) {
+
+                  try {
+
+                    return typeof value ===
+                      "string"
+
+                      ? value
+
+                      : JSON.stringify(
+                          value
+                        );
+
+                  } catch {
+
+                    return String(
+                      value
+                    );
+
+                  }
+
+                }
+              )
+              .join(" ");
+
+
+          out.push(text);
+
+
+          original.apply(
+            console,
+            args
+          );
+
+        };
+
+    }
+  );
+
+
+  window.prompt =
+    function(_message) {
+
+      if (
+        idx >= inputs.length
+      ) {
+
+        return "";
+
+      }
+
+
+      return inputs[idx++];
+
+    };
+
+
+  window.alert =
+    function(message) {
+
+      out.push(
+        String(message)
+      );
+
+    };
+
+
+  try {
+
+    ${safeCode}
 
 
     send(
-      "log",
-      [String(messageText)]
+      "result",
+      out.join("\\n")
     );
 
+  } catch (error) {
 
-    return String(
-      inputLines[
-        inputIndex++
-      ]
+    send(
+      "error",
+      error &&
+      error.stack
+        ? error.stack
+        : error
     );
 
-  };
+  }
 
-
-try{
-
-${code}
-
-send(
-  "done",
-  []
-);
-
-}catch(error){
-
-send(
-  "error",
-  [
-    error?.message ||
-    String(error)
-  ]
-);
-
-send(
-  "done",
-  []
-);
-
-}
+})();
 
 <\/script>
 
@@ -3844,814 +2523,242 @@ send(
 `;
 
 
-      iframe.srcdoc =
-        source;
+          els.previewFrame.srcdoc =
+            srcdoc;
 
-
-      document.body.appendChild(
-        iframe
-      );
-
-
-      setTimeout(
-        finish,
-        5000
-      );
-
-    }
-  );
-
-}
-
-
-/* =========================================================
-   REMOTE EXECUTION
-========================================================= */
-
-async function runRemoteCode(
-  language,
-  code,
-  stdin
-){
-
-  const controller =
-    new AbortController();
-
-
-  const timer =
-    setTimeout(
-      () =>
-        controller.abort(),
-      20000
-    );
-
-
-  try{
-
-    const response =
-      await fetch(
-        TRACELAB_EXECUTOR_URL,
-        {
-          method:"POST",
-
-          headers:{
-            "Content-Type":
-              "application/json",
-
-            "Accept":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-              language,
-              code,
-              stdin
-            }),
-
-          signal:
-            controller.signal
         }
       );
 
-
-    const text =
-      await response.text();
-
-
-    let data;
-
-
-    try{
-
-      data =
-        JSON.parse(text);
-
-    }catch{
-
-      data = {
-        error:text
-      };
-
     }
 
 
-    if(
-      !response.ok
-    ){
-
-      return {
-
-        ok:false,
-
-        output:
-          `✕ Backend execution failed\n` +
-          (
-            data.error ||
-            data.message ||
-            `HTTP ${response.status}`
-          )
-
-      };
-
-    }
-
-
-    return {
-
-      ok:
-        data.ok === true,
-
-      output:
-        String(
-          data.output ??
-          "(No output)"
-        ),
-
-      runtime:
-        data.runtime ||
-        language,
-
-      executionTime:
-        data.executionTime ??
-        null,
-
-      memoryUsed:
-        data.memoryUsed ??
-        null
-
-    };
-
-
-  }catch(error){
-
-    if(
-      error?.name ===
-      "AbortError"
-    ){
-
-      return {
-
-        ok:false,
-
-        output:
-          "✕ Execution timed out. Try a shorter program."
-
-      };
-
-    }
-
-
-    return {
-
-      ok:false,
-
-      output:
-        "✕ Could not reach TraceLab backend.\n" +
-        (
-          error?.message ||
-          String(error)
-        )
-
-    };
-
-  }finally{
-
-    clearTimeout(
-      timer
-    );
-
-  }
-
-}
-
-
-/* =========================================================
-   BACKEND HEALTH
-========================================================= */
-
-async function checkBackend(){
-
-  const element =
-    $("#serverStatus");
-
-
-  try{
-
-    const response =
-      await fetch(
-        `${TRACELAB_BACKEND}/api/health?t=${Date.now()}`,
-        {
-          method:"GET",
-
-          headers:{
-            "Accept":
-              "application/json"
-          },
-
-          cache:"no-store"
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if(
-      !response.ok ||
-      !data.ok
-    ){
-
-      throw new Error(
-        data.error ||
-        "Backend health check failed."
-      );
-
-    }
-
-
-    if(
-      data.executorConfigured
-    ){
-
-      element.textContent =
-        "● Backend online · compiler ready";
-
-      element.className =
-        "server-pill online";
-
-    }else{
-
-      element.textContent =
-        "● Backend online · API key missing";
-
-      element.className =
-        "server-pill warning";
-
-    }
-
-
-  }catch(error){
-
-    element.textContent =
-      "● Backend offline";
-
-    element.className =
-      "server-pill offline";
-
-  }
-
-}
-
-
-/* =========================================================
-   FLOW CONTROLS
-========================================================= */
-
-function stopFlow(){
-
-  if(flowTimer){
-
-    clearInterval(
-      flowTimer
-    );
-
-  }
-
-
-  flowTimer =
-    null;
-
-
-  $("#play").textContent =
-    "▶ Play flow";
-
-
-  $("#play")
-    .classList
-    .remove("playing");
-
-}
-
-
-function playFlow(){
-
-  if(flowTimer){
-
-    stopFlow();
-
-    return;
-
-  }
-
-
-  const language =
-    $("#language").value;
-
-  const flow =
-    getFlow();
-
-
-  $("#play").textContent =
-    "❚❚ Pause";
-
-
-  $("#play")
-    .classList
-    .add("playing");
-
-
-  flowTimer =
-    setInterval(
-      () => {
-
-        if(
-          language !==
-          $("#language").value
-        ){
-
-          stopFlow();
-
-          return;
-
-        }
-
-
-        step =
-          (step + 1) %
-          flow.length;
-
-
-        render();
-
-      },
-      Number(
-        $("#speed").value
-      )
-    );
-
-}
-
-
-/* =========================================================
-   AUTO DETECT
-========================================================= */
-
-function detectLanguage(){
-
-  const source =
-    $("#code")
-      .value
-      .toLowerCase();
-
-
-  const markers = {
-
-    html:[
-      "<!doctype html",
-      "<html",
-      "<body",
-      "<div"
-    ],
-
-    css:[
-      "font-family:",
-      "background:",
-      "border-radius:"
-    ],
-
-    python:[
-      "def ",
-      "print(",
-      "input(",
-      "import "
-    ],
-
-    javascript:[
-      "console.log",
-      "prompt(",
-      "const ",
-      "let "
-    ],
-
-    typescript:[
-      "interface ",
-      ": number",
-      ": string",
-      "number[]"
-    ],
-
-    c:[
-      "#include <stdio",
-      "printf(",
-      "scanf("
-    ],
-
-    cpp:[
-      "#include <iostream>",
-      "std::",
-      "cout",
-      "cin"
-    ],
-
-    java:[
-      "public static void main",
-      "system.out",
-      "scanner"
-    ],
-
-    go:[
-      "package main",
-      "fmt."
-    ],
-
-    kotlin:[
-      "fun main",
-      "readline",
-      "println"
-    ],
-
-    swift:[
-      "func ",
-      "readline()",
-      "print("
-    ],
-
-    ruby:[
-      "puts ",
-      "gets"
-    ],
-
-    php:[
-      "<?php",
-      "echo ",
-      "stdin"
-    ],
-
-    perl:[
-      "<stdin>",
-      "my $",
-      "print "
-    ],
-
-    bash:[
-      "#!/bin",
-      "echo ",
-      "read "
-    ],
-
-    sql:[
-      "select ",
-      "create table"
-    ]
-
-  };
-
-
-  let best =
-    "python";
-
-
-  let bestScore =
-    0;
-
-
-  for(
-    const [
+    /* =========================================================
+       REMOTE EXECUTION
+    ========================================================= */
+
+    async function runRemote(
       language,
-      words
-    ] of Object.entries(markers)
-  ){
+      code,
+      stdin
+    ) {
 
-    let score =
-      0;
+      const response =
+        await fetch(
+          `${API_BASE}/api/execute`,
+          {
 
+            method: "POST",
 
-    for(
-      const word of words
-    ){
+            headers: {
+              "Content-Type":
+                "application/json",
 
-      if(
-        source.includes(word)
-      ){
+              "Accept":
+                "application/json"
 
-        score++;
+            },
 
-      }
+            body: JSON.stringify({
 
-    }
+              language,
 
+              code,
 
-    if(
-      score >
-      bestScore
-    ){
+              stdin
 
-      bestScore =
-        score;
+            })
 
-      best =
-        language;
-
-    }
-
-  }
+          }
+        );
 
 
-  if(
-    bestScore === 0
-  ){
-
-    setStatus(
-      "● Could not detect",
-      "error"
-    );
+      const data =
+        await response
+          .json()
+          .catch(
+            () => ({})
+          );
 
 
-    $("#output").textContent =
-      "Auto-detect could not identify the language.";
+      if (!response.ok) {
 
-    return;
-
-  }
-
-
-  $("#language").value =
-    best;
-
-
-  putCode();
-
-  render();
-
-  updateWebUI();
-
-
-  const label =
-    $("#language")
-      .options[
-        $("#language").selectedIndex
-      ]
-      .text;
-
-
-  setStatus(
-    `✦ Detected ${label}`
-  );
-
-
-  $("#output").textContent =
-    `${label} detected.\nRun the program to execute it.`;
-
-}
-
-
-/* =========================================================
-   LOGIC EXPLAINER
-========================================================= */
-
-function explainLogic(){
-
-  const lines =
-    $("#code")
-      .value
-      .split("\n");
-
-
-  const matches = [];
-
-
-  const pattern =
-    /^(def |function |class |for |while |if |else if|elif |switch |try |public static|int main|func main|fun main)/;
-
-
-  lines.forEach(
-    (line,index) => {
-
-      if(
-        pattern.test(
-          line.trim()
-        )
-      ){
-
-        matches.push([
-          index,
-          line.trim()
-        ]);
+        throw new Error(
+          data.error ||
+          `Backend request failed (${response.status})`
+        );
 
       }
 
-    }
-  );
 
+      return {
 
-  const first =
-    matches[0] ||
-    [
-      0,
-      lines.find(
-        line =>
-          line.trim()
-      ) ||
-      "Program entry"
-    ];
+        stdout:
+          data.stdout ||
+          data.output ||
+          "",
 
+        stderr:
+          data.stderr ||
+          "",
 
-  let kind =
-    "entry point";
+        error:
+          data.error ||
+          ""
 
-
-  if(
-    /^(for |while )/.test(
-      first[1]
-    )
-  ){
-
-    kind =
-      "loop";
-
-  }else if(
-    /^(if |else if|elif |switch )/.test(
-      first[1]
-    )
-  ){
-
-    kind =
-      "decision";
-
-  }else if(
-    /^(def |function |class |func |fun )/.test(
-      first[1]
-    )
-  ){
-
-    kind =
-      "function";
-
-  }
-
-
-  $("#logicSummary").innerHTML =
-    `<strong>Main path found.</strong> ` +
-    `This ${lines.length}-line program has ` +
-    `${matches.length} detected control-flow block` +
-    `${matches.length === 1 ? "" : "s"}. ` +
-    `The first important ${kind} appears on line ` +
-    `${first[0] + 1}.`;
-
-
-  $("#logicCode").textContent =
-    lines
-      .slice(
-        Math.max(0, first[0] - 1),
-        Math.min(lines.length, first[0] + 7)
-      )
-      .map(
-        (line,index) =>
-          String(
-            Math.max(0, first[0] - 1) +
-            index +
-            1
-          ).padStart(3," ") +
-          "  " +
-          line
-      )
-      .join("\n");
-
-
-  $("#focus").textContent =
-    "✓ Main logic explained";
-
-}
-
-
-/* =========================================================
-   RUN
-========================================================= */
-
-$("#run").onclick =
-  async () => {
-
-    stopFlow();
-
-
-    const currentExecution =
-      ++executionId;
-
-
-    step =
-      0;
-
-
-    render();
-
-    explainLogic();
-
-
-    const language =
-      $("#language").value;
-
-
-    const code =
-      $("#code").value;
-
-
-    const stdin =
-      $("#stdin").value;
-
-
-    const inputRequest =
-      detectInputRequest();
-
-
-    if(
-      !code.trim()
-    ){
-
-      $("#output").textContent =
-        "✕ Your code is empty.";
-
-
-      setStatus(
-        "● Nothing to run",
-        "error"
-      );
-
-
-      return;
+      };
 
     }
 
 
-    /*
-      If the program clearly requests input but
-      the user has not entered anything yet, stop
-      here and direct attention to the blinking box.
-    */
+    /* =========================================================
+       HTML/CSS PREVIEW
+    ========================================================= */
 
-    if(
-      inputRequest.needsInput &&
-      !stdin.trim()
-    ){
+    function runPreview(
+      showOutput = true
+    ) {
+
+      const language =
+        els.language.value;
+
+
+      if (
+        language !== "html" &&
+        language !== "css"
+      ) {
+
+        return;
+
+      }
+
+
+      const code =
+        els.code.value;
+
+
+      let doc = "";
+
+
+      if (
+        language === "html"
+      ) {
+
+        doc = code;
+
+      } else {
+
+        doc =
+`<!doctype html>
+<html>
+<head>
+
+<meta charset="utf-8">
+
+<style>
+${code}
+</style>
+
+</head>
+
+<body>
+
+<h2>CSS Preview</h2>
+
+<p>
+TraceLab browser preview
+</p>
+
+</body>
+</html>`;
+
+      }
+
+
+      els.previewPanel.style.display =
+        "block";
+
+
+      els.previewFrame.srcdoc =
+        doc;
+
+
+      if (showOutput) {
+
+        setOutput(
+          "Preview rendered in the browser."
+        );
+
+      }
+
+
+      traceSteps =
+        buildStaticTrace(
+          code,
+          language,
+          ""
+        );
+
+
+      setTraceIndex(-1);
+
+      setTraceIndex(0);
+
+    }
+
+
+    /* =========================================================
+       MAIN RUN
+    ========================================================= */
+
+    async function runProgram() {
+
+      stopTrace();
+
+
+      const language =
+        selectedLanguage();
+
+
+      const code =
+        els.code.value;
+
+
+      const stdin =
+        els.stdin.value;
+
+
+      if (!code.trim()) {
+
+        setOutput(
+          "Enter some code first.",
+          true
+        );
+
+        return;
+
+      }
+
 
       updateInputUI();
 
 
-      $("#stdinWrap")
-        .classList
-        .add("needs-input");
+      /*
+       * If the current program clearly expects input
+       * and the input box is empty, stop before executing.
+       */
 
+      if (
+        inputRequest.needsInput &&
+        !stdin.trim()
+      ) {
 
-      $("#output").textContent =
-        inputRequest.prompt +
-        "\n\n" +
-        "Enter the requested value in the highlighted input box, then press Run again.";
-
-
-      setStatus(
-        "● Input required",
-        "error"
-      );
-
-
-      $("#stdin").focus();
-
-
-      return;
-
-    }
-
-
-    $("#run").disabled =
-      true;
-
-
-    try{
-
-
-      /* =========================================
-         HTML / CSS
-      ========================================== */
-
-      if(
-        language === "html" ||
-        language === "css"
-      ){
-
-        renderPreview(
-          language,
-          code
+        setOutput(
+          "This program is waiting for user input. Enter the value in the input box and press Run again.",
+          true
         );
 
 
-        $("#output").textContent =
-          "Rendered below in the live preview.";
-
-
-        setStatus(
-          "● Preview ready"
-        );
+        els.stdin.focus();
 
 
         return;
@@ -4659,606 +2766,509 @@ $("#run").onclick =
       }
 
 
-      /* =========================================
-         JAVASCRIPT
-      ========================================== */
+      els.runBtn.disabled = true;
 
-      if(
-        language === "javascript"
-      ){
-
-        hidePreview();
+      els.runBtn.textContent =
+        "Running…";
 
 
-        setStatus(
-          "● Running JavaScript…",
-          "running"
-        );
+      els.statusText.textContent =
+        `Running ${language.label}…`;
 
 
-        const logs =
-          await runJavaScriptCode(
-            code,
-            stdin
+      try {
+
+        buildLogic();
+
+
+        /* HTML / CSS */
+
+        if (
+          language.id === "html" ||
+          language.id === "css"
+        ) {
+
+          runPreview(true);
+
+
+          els.statusText.textContent =
+            "Preview ready";
+
+
+          els.statusDot.classList.add(
+            "ok"
           );
 
-
-        if(
-          currentExecution !==
-          executionId
-        ){
 
           return;
 
         }
 
 
-        $("#output").textContent =
-          logs.join("\n");
+        let result;
+
+        let runtimeTrace = null;
 
 
-        const failed =
-          logs.some(
-            line =>
-              line.startsWith("✕")
-          );
+        /* PYTHON */
+
+        if (
+          language.mode === "python"
+        ) {
+
+          result =
+            await runPython(
+              code,
+              stdin
+            );
 
 
-        setStatus(
-          failed
-            ? "● Execution failed"
-            : "● Executed live",
-          failed
-            ? "error"
-            : "ready"
-        );
-
-
-        return;
-
-      }
-
-
-      /* =========================================
-         PYTHON
-      ========================================== */
-
-      if(
-        language === "python"
-      ){
-
-        hidePreview();
-
-
-        setStatus(
-          "● Starting Python…",
-          "running"
-        );
-
-
-        const logs =
-          await runPythonCode(
-            code,
-            stdin
-          );
-
-
-        if(
-          currentExecution !==
-          executionId
-        ){
-
-          return;
+          runtimeTrace =
+            result.trace;
 
         }
 
 
-        $("#output").textContent =
-          logs.join("\n");
+        /* JAVASCRIPT */
 
+        else if (
+          language.mode === "js"
+        ) {
 
-        const failed =
-          logs.some(
-            line =>
-              line.startsWith("✕")
-          );
+          const js =
+            await runJavaScript(
+              code,
+              stdin
+            );
 
 
-        setStatus(
-          failed
-            ? "● Python execution failed"
-            : "● Executed live",
-          failed
-            ? "error"
-            : "ready"
-        );
+          if (
+            js.kind === "error"
+          ) {
 
+            result = {
 
-        return;
+              stdout: "",
 
-      }
+              stderr:
+                js.value || "",
 
+              error:
+                js.value || ""
 
-      /* =========================================
-         HOSTED LANGUAGES
-      ========================================== */
+            };
 
-      hidePreview();
+          } else {
 
+            result = {
 
-      const label =
-        $("#language")
-          .options[
-            $("#language").selectedIndex
-          ]
-          .text;
+              stdout:
+                js.value || "",
 
+              stderr: "",
 
-      setStatus(
-        `● Compiling and running ${label}…`,
-        "running"
-      );
+              error: ""
 
+            };
 
-      const result =
-        await runRemoteCode(
-          language,
-          code,
-          stdin
-        );
+          }
 
-
-      if(
-        currentExecution !==
-        executionId
-      ){
-
-        return;
-
-      }
-
-
-      $("#output").textContent =
-        result.output;
-
-
-      if(
-        result.ok
-      ){
-
-        setStatus(
-          "● Executed live"
-        );
-
-      }else{
-
-        setStatus(
-          "● Execution failed",
-          "error"
-        );
-
-      }
-
-
-      if(
-        result.runtime
-      ){
-
-        const timing =
-          result.executionTime != null
-            ? ` · ${result.executionTime} ms`
-            : "";
-
-
-        $("#modeStatus").textContent =
-          `${result.runtime} executed on backend${timing}`;
-
-      }
-
-
-    }catch(error){
-
-      $("#output").textContent =
-        "✕ Unexpected frontend error\n" +
-        (
-          error?.stack ||
-          error?.message ||
-          String(error)
-        );
-
-
-      setStatus(
-        "● Error",
-        "error"
-      );
-
-
-      console.error(
-        error
-      );
-
-
-    }finally{
-
-      if(
-        currentExecution ===
-        executionId
-      ){
-
-        $("#run").disabled =
-          false;
-
-      }
-
-    }
-
-  };
-
-
-/* =========================================================
-   RESET
-========================================================= */
-
-$("#reset").onclick =
-  () => {
-
-    executionId++;
-
-    stopFlow();
-
-    step =
-      0;
-
-    putCode();
-
-    render();
-
-    updateWebUI();
-
-    explainLogic();
-
-
-    $("#output").textContent =
-      "Ready.";
-
-
-    setStatus(
-      "● Ready"
-    );
-
-  };
-
-
-/* =========================================================
-   LANGUAGE CHANGE
-========================================================= */
-
-$("#language").onchange =
-  () => {
-
-    executionId++;
-
-    stopFlow();
-
-    step =
-      0;
-
-    putCode();
-
-    render();
-
-    updateWebUI();
-
-    explainLogic();
-
-
-    const language =
-      $("#language").value;
-
-
-    setStatus(
-      "● Ready"
-    );
-
-
-    if(
-      language === "html" ||
-      language === "css"
-    ){
-
-      $("#output").textContent =
-        "Browser preview updated.";
-
-    }else if(
-      language === "python"
-    ){
-
-      $("#output").textContent =
-        "Python selected. Run to execute locally.";
-
-    }else if(
-      language === "javascript"
-    ){
-
-      $("#output").textContent =
-        "JavaScript selected. Run to execute locally.";
-
-    }else{
-
-      $("#output").textContent =
-        "Hosted language selected. Run to execute through TraceLab.";
-
-    }
-
-  };
-
-
-/* =========================================================
-   CODE INPUT
-========================================================= */
-
-$("#code").oninput =
-  () => {
-
-    numberLines();
-
-
-    $("#detect").textContent =
-      "✦ Auto-detect";
-
-
-    explainLogic();
-
-
-    updateInputUI();
-
-
-    const language =
-      $("#language").value;
-
-
-    if(
-      language === "html" ||
-      language === "css"
-    ){
-
-      renderPreview(
-        language,
-        $("#code").value
-      );
-
-    }
-
-  };
-
-
-/* =========================================================
-   USER INPUT
-========================================================= */
-
-$("#stdin").oninput =
-  () => {
-
-    if(
-      $("#stdin").value.trim()
-    ){
-
-      $("#stdinWrap")
-        .classList
-        .add("needs-input");
-
-    }
-
-  };
-
-
-/* =========================================================
-   OPEN IN BROWSER
-========================================================= */
-
-$("#openBrowser").onclick =
-  () => {
-
-    const language =
-      $("#language").value;
-
-
-    const code =
-      $("#code").value;
-
-
-    const documentText =
-      buildFullDocument(
-        language,
-        code
-      );
-
-
-    if(!documentText){
-
-      return;
-
-    }
-
-
-    const blob =
-      new Blob(
-        [documentText],
-        {
-          type:"text/html"
         }
-      );
 
 
-    const url =
-      URL.createObjectURL(
-        blob
-      );
+        /* REMOTE */
 
+        else {
 
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
-    );
-
-
-    setTimeout(
-      () => {
-
-        URL.revokeObjectURL(
-          url
-        );
-
-      },
-      60000
-    );
-
-  };
-
-
-/* =========================================================
-   FLOW BUTTONS
-========================================================= */
-
-$("#play").onclick =
-  playFlow;
-
-
-$("#next").onclick =
-  () => {
-
-    stopFlow();
-
-    step =
-      (step + 1) %
-      getFlow().length;
-
-    render();
-
-  };
-
-
-$("#prev").onclick =
-  () => {
-
-    stopFlow();
-
-    step =
-      (step - 1 + getFlow().length) %
-      getFlow().length;
-
-    render();
-
-  };
-
-
-$("#focus").onclick =
-  explainLogic;
-
-
-$("#detect").onclick =
-  detectLanguage;
-
-
-/* =========================================================
-   MOBILE MENU
-========================================================= */
-
-$("#menuBtn").onclick =
-  () => {
-
-    const open =
-      $("#siteNav")
-        .classList
-        .toggle("open");
-
-
-    $("#menuBtn")
-      .setAttribute(
-        "aria-expanded",
-        String(open)
-      );
-
-  };
-
-
-$("#siteNav")
-  .querySelectorAll("a")
-  .forEach(
-    link => {
-
-      link.addEventListener(
-        "click",
-        () => {
-
-          $("#siteNav")
-            .classList
-            .remove("open");
-
-
-          $("#menuBtn")
-            .setAttribute(
-              "aria-expanded",
-              "false"
+          result =
+            await runRemote(
+              language.id,
+              code,
+              stdin
             );
 
         }
-      );
+
+
+        const output =
+          result.stdout ||
+          result.output ||
+          "";
+
+
+        const errorText =
+          result.error ||
+          result.stderr ||
+          "";
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Output only contains actual program output.
+         * Python's input() prompt is not printed.
+         */
+
+        setOutput(
+          output ||
+          errorText ||
+          "(no output)",
+
+          !!errorText
+        );
+
+
+        /*
+         * Python:
+         * use actual runtime line events.
+         *
+         * Other languages:
+         * build trace from current source code.
+         */
+
+        traceSteps =
+          runtimeTrace &&
+          runtimeTrace.length
+
+            ? buildPythonTrace(
+                code,
+                runtimeTrace,
+                output
+              )
+
+            : buildStaticTrace(
+                code,
+                language.id,
+                output
+              );
+
+
+        traceIndex = -1;
+
+
+        renderTrace();
+
+
+        /*
+         * Automatically play ONLY the newly
+         * generated trace.
+         */
+
+        playTrace();
+
+
+        els.statusDot.classList.add(
+          "ok"
+        );
+
+
+        els.statusText.textContent =
+          errorText
+            ? "Finished with an error"
+            : "Execution complete";
+
+      }
+
+      catch (error) {
+
+        setOutput(
+          error?.message ||
+          String(error),
+          true
+        );
+
+
+        traceSteps =
+          buildStaticTrace(
+            code,
+            language.id,
+            ""
+          );
+
+
+        traceIndex = -1;
+
+
+        renderTrace();
+
+
+        els.statusText.textContent =
+          "Execution failed";
+
+      }
+
+      finally {
+
+        els.runBtn.disabled = false;
+
+        els.runBtn.textContent =
+          "▶ Run";
+
+      }
 
     }
-  );
 
 
-/* =========================================================
-   CTRL + ENTER
-========================================================= */
+    /* =========================================================
+       BACKEND CHECK
+    ========================================================= */
 
-document.addEventListener(
-  "keydown",
-  event => {
+    async function checkBackend() {
 
-    if(
-      (event.ctrlKey ||
-       event.metaKey) &&
-      event.key === "Enter"
-    ){
+      try {
 
-      event.preventDefault();
+        const response =
+          await fetch(
+            `${API_BASE}/api/health`
+          );
 
-      $("#run").click();
+
+        const data =
+          await response.json();
+
+
+        const ok =
+          !!data.ok;
+
+
+        els.statusDot.classList.toggle(
+          "ok",
+          ok
+        );
+
+
+        els.statusText.textContent =
+          ok
+            ? "Backend connected"
+            : "Backend unavailable";
+
+      }
+
+      catch {
+
+        els.statusDot.classList.remove(
+          "ok"
+        );
+
+
+        els.statusText.textContent =
+          "Backend unavailable";
+
+      }
 
     }
 
-  }
-);
+
+    /* =========================================================
+       INITIALIZE LANGUAGES
+    ========================================================= */
+
+    els.language.innerHTML =
+      LANGUAGES
+        .map(
+          language =>
+            `<option value="${language.id}">
+              ${language.label}
+            </option>`
+        )
+        .join("");
 
 
-/* =========================================================
-   STARTUP
-========================================================= */
-
-$("#year").textContent =
-  new Date().getFullYear();
+    els.language.value =
+      "python";
 
 
-putCode();
-
-render();
-
-explainLogic();
-
-updateWebUI();
-
-checkBackend();
+    setExample();
 
 
-setInterval(
-  checkBackend,
-  30000
-);
+    /* =========================================================
+       LANGUAGE CHANGE
+    ========================================================= */
 
-</script>
+    els.language.addEventListener(
+      "change",
+      () => {
+
+        setExample();
+
+      }
+    );
+
+
+    /* =========================================================
+       CODE EDITOR
+    ========================================================= */
+
+    els.code.addEventListener(
+      "input",
+      () => {
+
+        updateInputUI();
+
+        buildLogic();
+
+        resetTrace();
+
+      }
+    );
+
+
+    /* =========================================================
+       INPUT BOX
+    ========================================================= */
+
+    els.stdin.addEventListener(
+      "input",
+      () => {
+
+        if (
+          els.stdin.value.trim()
+        ) {
+
+          els.stdinWrap.classList.remove(
+            "needs-input"
+          );
+
+        } else {
+
+          updateInputUI();
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       BUTTONS
+    ========================================================= */
+
+    els.runBtn.addEventListener(
+      "click",
+      runProgram
+    );
+
+
+    els.resetBtn.addEventListener(
+      "click",
+      setExample
+    );
+
+
+    els.playBtn.addEventListener(
+      "click",
+      playTrace
+    );
+
+
+    els.prevBtn.addEventListener(
+      "click",
+      () => {
+
+        stopTrace();
+
+
+        setTraceIndex(
+          Math.max(
+            0,
+            traceIndex - 1
+          )
+        );
+
+      }
+    );
+
+
+    els.nextBtn.addEventListener(
+      "click",
+      () => {
+
+        stopTrace();
+
+
+        if (!traceSteps.length) {
+          return;
+        }
+
+
+        setTraceIndex(
+          Math.min(
+            traceSteps.length - 1,
+            traceIndex + 1
+          )
+        );
+
+      }
+    );
+
+
+    /* =========================================================
+       KEYBOARD
+    ========================================================= */
+
+    els.code.addEventListener(
+      "keydown",
+      event => {
+
+        /* Ctrl + Enter */
+
+        if (
+          event.ctrlKey &&
+          event.key === "Enter"
+        ) {
+
+          event.preventDefault();
+
+          runProgram();
+
+          return;
+
+        }
+
+
+        /* TAB */
+
+        if (
+          event.key === "Tab"
+        ) {
+
+          event.preventDefault();
+
+
+          const start =
+            els.code.selectionStart;
+
+
+          const end =
+            els.code.selectionEnd;
+
+
+          els.code.setRangeText(
+            "  ",
+            start,
+            end,
+            "end"
+          );
+
+        }
+
+      }
+    );
+
+
+    /* =========================================================
+       STARTUP
+    ========================================================= */
+
+    updateInputUI();
+
+    buildLogic();
+
+    updatePreview();
+
+    checkBackend();
+
+  </script>
 
 </body>
 </html>
