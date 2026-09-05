@@ -24,13 +24,9 @@
   --danger:#d84b4b;
 }
 
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
-html{
-  scroll-behavior:smooth;
-}
+html{scroll-behavior:smooth}
 
 body{
   margin:0;
@@ -39,20 +35,14 @@ body{
   font-family:Manrope,Arial,sans-serif;
 }
 
-button,
-select,
-textarea{
-  font:inherit;
-}
+button,select,textarea{font:inherit}
 
 button{
   border:0;
   cursor:pointer;
 }
 
-button:disabled{
-  cursor:wait;
-}
+button:disabled{cursor:wait}
 
 .top{
   height:72px;
@@ -102,9 +92,7 @@ button:disabled{
   text-decoration:none;
 }
 
-.nav a:hover{
-  color:var(--ink);
-}
+.nav a:hover{color:var(--ink)}
 
 .top-actions{
   display:flex;
@@ -135,9 +123,7 @@ main{
   padding:42px clamp(18px,6vw,88px) 65px;
 }
 
-.hero{
-  padding-top:5px;
-}
+.hero{padding-top:5px}
 
 .eyebrow{
   color:#657ed8;
@@ -154,9 +140,7 @@ h1{
   line-height:1.15;
 }
 
-h1 span{
-  color:var(--blue);
-}
+h1 span{color:var(--blue)}
 
 .sub{
   margin:0;
@@ -244,9 +228,7 @@ h1 span{
   white-space:nowrap;
 }
 
-.detect:hover{
-  background:#e9edff;
-}
+.detect:hover{background:#e9edff}
 
 .codearea{
   position:relative;
@@ -286,9 +268,7 @@ h1 span{
   overflow:auto;
 }
 
-#code::selection{
-  background:#dfe6ff;
-}
+#code::selection{background:#dfe6ff}
 
 .runbar{
   padding:13px 16px;
@@ -310,13 +290,9 @@ h1 span{
   box-shadow:0 5px 13px #5277f542;
 }
 
-.run:hover{
-  background:#456bea;
-}
+.run:hover{background:#456bea}
 
-.run:disabled{
-  opacity:.65;
-}
+.run:disabled{opacity:.65}
 
 .reset{
   background:#f1f3f8;
@@ -340,17 +316,9 @@ h1 span{
   white-space:nowrap;
 }
 
-.server-pill.online{
-  color:#229a78;
-}
-
-.server-pill.warning{
-  color:#bd8524;
-}
-
-.server-pill.offline{
-  color:#c14d4d;
-}
+.server-pill.online{color:#229a78}
+.server-pill.warning{color:#bd8524}
+.server-pill.offline{color:#c14d4d}
 
 .console{
   min-height:145px;
@@ -371,9 +339,7 @@ h1 span{
   margin-bottom:10px;
 }
 
-.ok{
-  color:#28a87f;
-}
+.ok{color:#28a87f}
 
 .console pre{
   margin:0;
@@ -399,9 +365,7 @@ h1 span{
   background:#fff;
 }
 
-.visual{
-  min-width:0;
-}
+.visual{min-width:0}
 
 .title{
   font-size:13px;
@@ -473,9 +437,7 @@ h1 span{
   font-weight:800;
 }
 
-.node span{
-  font-size:20px;
-}
+.node span{font-size:20px}
 
 .n1{left:11%}
 .n2{left:30%}
@@ -520,13 +482,9 @@ h1 span{
   font-size:12px;
 }
 
-.note b{
-  color:var(--ink);
-}
+.note b{color:var(--ink)}
 
-.timeline{
-  padding:20px 25px;
-}
+.timeline{padding:20px 25px}
 
 .toptime{
   display:flex;
@@ -535,9 +493,7 @@ h1 span{
   margin-bottom:18px;
 }
 
-.toptime strong{
-  font-size:13px;
-}
+.toptime strong{font-size:13px}
 
 .toptime span{
   color:#8792a8;
@@ -557,9 +513,7 @@ h1 span{
   transition:.2s;
 }
 
-.track.done{
-  background:#78dfc5;
-}
+.track.done{background:#78dfc5}
 
 .track.now{
   background:var(--blue);
@@ -658,9 +612,7 @@ h1 span{
   font:12px "DM Mono";
 }
 
-.var b{
-  color:#293650;
-}
+.var b{color:#293650}
 
 .focus{
   background:var(--pale);
@@ -713,9 +665,7 @@ h1 span{
   margin-top:20px;
 }
 
-.hint b{
-  color:#5570e9;
-}
+.hint b{color:#5570e9}
 
 .steps,
 .capabilities,
@@ -788,13 +738,9 @@ h1 span{
   margin:0;
 }
 
-.cap-grid{
-  grid-template-columns:repeat(4,1fr);
-}
+.cap-grid{grid-template-columns:repeat(4,1fr)}
 
-.cap-card .badge{
-  display:inline-block;
-}
+.cap-card .badge{display:inline-block}
 
 .site-footer{
   border-top:1px solid var(--line);
@@ -829,33 +775,23 @@ h1 span{
 }
 
 @media(max-width:1050px){
-  .workspace{
-    grid-template-columns:1fr;
-  }
+  .workspace{grid-template-columns:1fr}
 
   .editor{
     border-right:0;
     border-bottom:1px solid var(--line);
   }
 
-  .lower{
-    grid-template-columns:1fr;
-  }
+  .lower{grid-template-columns:1fr}
 
-  .cap-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
+  .cap-grid{grid-template-columns:repeat(2,1fr)}
 }
 
 @media(max-width:760px){
   .nav,
-  .top-actions .cta{
-    display:none;
-  }
+  .top-actions .cta{display:none}
 
-  .menu-btn{
-    display:block;
-  }
+  .menu-btn{display:block}
 
   .nav.open{
     display:flex;
@@ -882,40 +818,25 @@ h1 span{
     justify-content:flex-end;
   }
 
-  .codearea{
-    min-height:340px;
-  }
+  .codearea,
+  #code{min-height:340px}
 
-  #code{
-    min-height:340px;
-  }
-
-  .stage{
-    height:290px;
-  }
+  .stage{height:290px}
 
   .node{
     width:55px;
     height:55px;
   }
 
-  .node small{
-    top:65px;
-  }
+  .node small{top:65px}
 
-  .line{
-    top:143px;
-  }
+  .line{top:143px}
 
-  .pulse{
-    top:138px;
-  }
+  .pulse{top:138px}
 
   .step-grid,
   .cap-grid,
-  .faq-grid{
-    grid-template-columns:1fr;
-  }
+  .faq-grid{grid-template-columns:1fr}
 
   .foot-top{
     flex-direction:column;
@@ -923,9 +844,7 @@ h1 span{
     gap:18px;
   }
 
-  .foot-links{
-    flex-wrap:wrap;
-  }
+  .foot-links{flex-wrap:wrap}
 }
 </style>
 </head>
@@ -968,10 +887,7 @@ h1 span{
   </p>
 </section>
 
-
 <section class="workspace" id="playground">
-
-<!-- ================= EDITOR ================= -->
 
 <div class="editor">
 
@@ -1000,7 +916,7 @@ h1 span{
         </optgroup>
 
         <optgroup label="Popular">
-          <option value="python">Python 3</option>
+          <option value="python" selected>Python 3</option>
           <option value="javascript">JavaScript</option>
           <option value="typescript">TypeScript</option>
           <option value="c">C</option>
@@ -1027,9 +943,6 @@ h1 span{
     </div>
   </div>
 
-
-  <!-- CODE EDITOR WITH LINE NUMBERS -->
-
   <div class="codearea">
 
     <pre class="nums" id="nums">1</pre>
@@ -1044,7 +957,6 @@ h1 span{
     ></textarea>
 
   </div>
-
 
   <div class="runbar">
 
@@ -1066,9 +978,6 @@ h1 span{
 
   </div>
 
-
-  <!-- OUTPUT -->
-
   <div class="console">
 
     <div class="chead">
@@ -1079,9 +988,6 @@ h1 span{
     <pre id="output">Analyze your code to see its execution flow.</pre>
 
   </div>
-
-
-  <!-- HTML/CSS PREVIEW -->
 
   <div class="preview" id="previewWrap">
 
@@ -1100,16 +1006,12 @@ h1 span{
 
 </div>
 
-
-<!-- ================= VISUAL FLOW ================= -->
-
 <div class="visual">
 
   <div class="bar">
     <span class="title">Program flow</span>
-    <span class="badge" id="badge">Step 1 of 5</span>
+    <span class="badge" id="badge">Step 1 of 1</span>
   </div>
-
 
   <div class="stage">
 
@@ -1123,12 +1025,12 @@ h1 span{
     </div>
 
     <div class="node n2">
-      <small>Setup</small>
-      <span>📦</span>
+      <small>Analyze</small>
+      <span>🔍</span>
     </div>
 
     <div class="node n3">
-      <small>Loop</small>
+      <small>Process</small>
       <span>↻</span>
     </div>
 
@@ -1143,39 +1045,33 @@ h1 span{
     </div>
 
     <p class="note" id="note">
-      <b>Start</b> — the program enters its first instruction.
+      <b>Start</b> — analyze your code to generate its actual flow.
     </p>
 
   </div>
 
-
   <div class="timeline">
 
     <div class="toptime">
-      <strong id="stepname">Start program</strong>
-      <span id="lineref">line 1</span>
+      <strong id="stepname">Analyze your program</strong>
+      <span id="lineref">waiting</span>
     </div>
 
-
     <div class="tracks">
-
       <i class="track now"></i>
       <i class="track"></i>
       <i class="track"></i>
       <i class="track"></i>
       <i class="track"></i>
-
     </div>
-
 
     <div class="labels">
-      <span>Start</span>
-      <span>Setup</span>
-      <span>Loop</span>
-      <span>Update</span>
-      <span>Print</span>
+      <span id="label1">Start</span>
+      <span id="label2">Analyze</span>
+      <span id="label3">Process</span>
+      <span id="label4">Update</span>
+      <span id="label5">Output</span>
     </div>
-
 
     <div class="controls">
 
@@ -1195,7 +1091,6 @@ h1 span{
 
       </div>
 
-
       <select class="speed" id="speed">
 
         <option value="1400">1× speed</option>
@@ -1212,9 +1107,6 @@ h1 span{
 
 </section>
 
-
-<!-- ================= LOWER CARDS ================= -->
-
 <section class="lower">
 
   <div class="card">
@@ -1225,11 +1117,10 @@ h1 span{
 
     <p id="insight">
       <strong>Execution begins.</strong>
-      We prepare the workspace before reading your variables and instructions.
+      Analyze your program to generate a code-specific flow.
     </p>
 
   </div>
-
 
   <div class="card">
 
@@ -1240,7 +1131,6 @@ h1 span{
     <div class="variables" id="vars"></div>
 
   </div>
-
 
   <div class="card">
 
@@ -1257,7 +1147,7 @@ h1 span{
     </div>
 
     <p id="logicSummary">
-      TraceLab finds loops, decisions, and functions so you can start with the important path.
+      TraceLab finds loops, decisions, sorting, searching, and data structures.
     </p>
 
     <pre class="logic-code" id="logicCode">
@@ -1267,7 +1157,6 @@ Run this view on any pasted code.
   </div>
 
 </section>
-
 
 <div class="languages">
 
@@ -1288,15 +1177,11 @@ Run this view on any pasted code.
 
 </div>
 
-
 <p class="hint">
   Use <b>Analyze & visualize</b> to run your code and watch the execution flow.
 </p>
 
 </main>
-
-
-<!-- ================= HOW IT WORKS ================= -->
 
 <section class="steps" id="how-it-works">
 
@@ -1307,55 +1192,37 @@ Run this view on any pasted code.
     </p>
   </div>
 
-
   <div class="step-grid">
 
     <div class="step">
-
       <span class="num">1</span>
-
       <h3>Write or paste code</h3>
-
       <p>
         Start with the built-in example or paste your own code.
         Line numbers make it easy to follow the execution.
       </p>
-
     </div>
 
-
     <div class="step">
-
       <span class="num">2</span>
-
       <h3>Choose a language</h3>
-
       <p>
         Choose from the supported languages or use Auto-detect.
       </p>
-
     </div>
 
-
     <div class="step">
-
       <span class="num">3</span>
-
       <h3>Analyze and run</h3>
-
       <p>
-        TraceLab executes supported code and shows the result
-        together with a visual execution flow.
+        TraceLab executes supported code and creates a
+        code-specific visual execution flow.
       </p>
-
     </div>
 
   </div>
 
 </section>
-
-
-<!-- ================= CAPABILITIES ================= -->
 
 <section class="capabilities" id="capabilities">
 
@@ -1370,7 +1237,6 @@ Run this view on any pasted code.
 
   </div>
 
-
   <div class="cap-grid">
 
     <div class="cap-card">
@@ -1381,7 +1247,6 @@ Run this view on any pasted code.
       </p>
     </div>
 
-
     <div class="cap-card">
       <span class="badge">Live</span>
       <h3>JavaScript</h3>
@@ -1390,7 +1255,6 @@ Run this view on any pasted code.
       </p>
     </div>
 
-
     <div class="cap-card">
       <span class="badge">Live</span>
       <h3>HTML & CSS</h3>
@@ -1398,7 +1262,6 @@ Run this view on any pasted code.
         HTML and CSS render directly inside the live preview.
       </p>
     </div>
-
 
     <div class="cap-card">
       <span class="badge">Live</span>
@@ -1413,71 +1276,49 @@ Run this view on any pasted code.
 
 </section>
 
-
-<!-- ================= FAQ ================= -->
-
 <section class="faq" id="faq">
 
   <div class="section-head">
-
     <h2>Frequently asked</h2>
-
   </div>
-
 
   <div class="faq-grid">
 
     <div class="faq-item">
-
       <h3>Is this real execution?</h3>
-
       <p>
         Yes. Browser languages run in the browser and the
         hosted languages are sent to the TraceLab execution backend.
       </p>
-
     </div>
 
-
     <div class="faq-item">
-
       <h3>Where does my code run?</h3>
-
       <p>
         Server languages are sent to the TraceLab backend only
         when you press the Analyze button.
       </p>
-
     </div>
 
-
     <div class="faq-item">
-
       <h3>Can multiple people use it?</h3>
-
       <p>
         Yes. Each execution request is handled independently.
         The backend does not use one shared code state for all visitors.
       </p>
-
     </div>
 
-
     <div class="faq-item">
-
       <h3>Why can the first request be slow?</h3>
-
       <p>
         The free Render service can sleep when unused.
         The first request after sleeping may therefore take longer.
       </p>
-
     </div>
 
   </div>
 
 </section>
-
 
 <footer class="site-footer">
 
@@ -1497,7 +1338,6 @@ Run this view on any pasted code.
 
   </div>
 
-
   <p class="foot-note">
     TraceLab is an interactive code playground for learning
     programming through real execution and visual flow.
@@ -1506,430 +1346,1260 @@ Run this view on any pasted code.
 
 </footer>
 
-
 <script>
 
 /* =========================================================
-   TRACE LAB
-   FRONTEND
-   ========================================================= */
-
-
-/* ---------- SAMPLE CODE ---------- */
-
-const codes = {
-
-  html: [
-    "index.html",
-    [
-      "<!doctype html>",
-      "<html>",
-      "<head>",
-      "  <title>TraceLab</title>",
-      "</head>",
-      "<body>",
-      "  <h1>Hello, world!</h1>",
-      "  <p>Welcome to TraceLab.</p>",
-      "</body>",
-      "</html>"
-    ]
-  ],
-
-  css: [
-    "style.css",
-    [
-      "body {",
-      "  font-family: sans-serif;",
-      "  background: #f4f6fb;",
-      "}",
-      "",
-      "h1 {",
-      "  color: #5277f5;",
-      "}",
-      "",
-      "button {",
-      "  background: #5277f5;",
-      "  color: white;",
-      "  padding: 10px 15px;",
-      "  border: 0;",
-      "  border-radius: 8px;",
-      "}"
-    ]
-  ],
-
-  python: [
-    "main.py",
-    [
-      "numbers = [3, 7, 2, 9]",
-      "total = 0",
-      "",
-      "for number in numbers:",
-      "    total += number",
-      "",
-      "print(total)"
-    ]
-  ],
-
-  javascript: [
-    "main.js",
-    [
-      "const numbers = [3, 7, 2, 9];",
-      "let total = 0;",
-      "",
-      "for (const number of numbers) {",
-      "  total += number;",
-      "}",
-      "",
-      "console.log(total);"
-    ]
-  ],
-
-  typescript: [
-    "main.ts",
-    [
-      "const numbers: number[] = [3, 7, 2, 9];",
-      "const total = numbers.reduce((sum, n) => sum + n, 0);",
-      "console.log(total);"
-    ]
-  ],
-
-  c: [
-    "main.c",
-    [
-      "#include <stdio.h>",
-      "",
-      "int main(void) {",
-      "    int numbers[] = {3, 7, 2, 9};",
-      "    int total = 0;",
-      "    for (int i = 0; i < 4; i++) {",
-      "        total += numbers[i];",
-      "    }",
-      "    printf(\"%d\\n\", total);",
-      "    return 0;",
-      "}"
-    ]
-  ],
-
-  cpp: [
-    "main.cpp",
-    [
-      "#include <iostream>",
-      "",
-      "int main() {",
-      "    int numbers[] = {3, 7, 2, 9};",
-      "    int total = 0;",
-      "",
-      "    for (int number : numbers) {",
-      "        total += number;",
-      "    }",
-      "",
-      "    std::cout << total << \"\\n\";",
-      "    return 0;",
-      "}"
-    ]
-  ],
-
-  java: [
-    "Main.java",
-    [
-      "class Main {",
-      "  public static void main(String[] args) {",
-      "    int[] numbers = {3, 7, 2, 9};",
-      "    int total = 0;",
-      "",
-      "    for (int number : numbers) {",
-      "      total += number;",
-      "    }",
-      "",
-      "    System.out.println(total);",
-      "  }",
-      "}"
-    ]
-  ],
-
-  go: [
-    "main.go",
-    [
-      "package main",
-      "",
-      "import \"fmt\"",
-      "",
-      "func main() {",
-      "  numbers := []int{3, 7, 2, 9}",
-      "  total := 0",
-      "",
-      "  for _, number := range numbers {",
-      "    total += number",
-      "  }",
-      "",
-      "  fmt.Println(total)",
-      "}"
-    ]
-  ],
-
-  kotlin: [
-    "Main.kt",
-    [
-      "fun main() {",
-      "  val numbers = intArrayOf(3, 7, 2, 9)",
-      "  var total = 0",
-      "",
-      "  for (number in numbers) {",
-      "    total += number",
-      "  }",
-      "",
-      "  println(total)",
-      "}"
-    ]
-  ],
-
-  swift: [
-    "main.swift",
-    [
-      "let numbers = [3, 7, 2, 9]",
-      "var total = 0",
-      "",
-      "for number in numbers {",
-      "    total += number",
-      "}",
-      "",
-      "print(total)"
-    ]
-  ],
-
-  ruby: [
-    "main.rb",
-    [
-      "numbers = [3, 7, 2, 9]",
-      "total = 0",
-      "",
-      "numbers.each do |number|",
-      "  total += number",
-      "end",
-      "",
-      "puts total"
-    ]
-  ],
-
-  php: [
-    "main.php",
-    [
-      "<?php",
-      "$numbers = [3, 7, 2, 9];",
-      "$total = 0;",
-      "",
-      "foreach ($numbers as $number) {",
-      "    $total += $number;",
-      "}",
-      "",
-      "echo $total, PHP_EOL;"
-    ]
-  ],
-
-  perl: [
-    "main.pl",
-    [
-      "my @numbers = (3, 7, 2, 9);",
-      "my $total = 0;",
-      "",
-      "for my $number (@numbers) {",
-      "    $total += $number;",
-      "}",
-      "",
-      "print \"$total\\n\";"
-    ]
-  ],
-
-  bash: [
-    "main.sh",
-    [
-      "total=0",
-      "",
-      "for number in 3 7 2 9; do",
-      "  total=$((total + number))",
-      "done",
-      "",
-      "echo \"$total\""
-    ]
-  ],
-
-  sql: [
-    "main.sql",
-    [
-      "SELECT 3 + 7 + 2 + 9 AS total;"
-    ]
-  ]
-
-};
-
-
-/* ---------- DOM HELPER ---------- */
+   TRACE LAB - DYNAMIC DSA VISUALIZATION ENGINE
+========================================================= */
 
 const $ = selector => document.querySelector(selector);
 
 
-/* ---------- FLOW ---------- */
+/* =========================================================
+   SAMPLE CODE
+========================================================= */
 
-const nodes = [...document.querySelectorAll(".node")];
-const tracks = [...document.querySelectorAll(".track")];
+const codes = {
 
+html:[
+"index.html",
+[
+"<!doctype html>",
+"<html>",
+"<head>",
+"  <title>TraceLab</title>",
+"</head>",
+"<body>",
+"  <h1>Hello, world!</h1>",
+"  <p>Welcome to TraceLab.</p>",
+"</body>",
+"</html>"
+]],
+
+css:[
+"style.css",
+[
+"body {",
+"  font-family: sans-serif;",
+"  background: #f4f6fb;",
+"}",
+"",
+"h1 {",
+"  color: #5277f5;",
+"}"
+]],
+
+python:[
+"main.py",
+[
+"numbers = [3, 7, 2, 9]",
+"total = 0",
+"",
+"for number in numbers:",
+"    total += number",
+"",
+"print(total)"
+]],
+
+javascript:[
+"main.js",
+[
+"const numbers = [3, 7, 2, 9];",
+"let total = 0;",
+"",
+"for (const number of numbers) {",
+"  total += number;",
+"}",
+"",
+"console.log(total);"
+]],
+
+typescript:[
+"main.ts",
+[
+"const numbers: number[] = [3, 7, 2, 9];",
+"const total = numbers.reduce((sum, n) => sum + n, 0);",
+"console.log(total);"
+]],
+
+c:[
+"main.c",
+[
+"#include <stdio.h>",
+"",
+"int main(void) {",
+"    int numbers[] = {3, 7, 2, 9};",
+"    int total = 0;",
+"    for (int i = 0; i < 4; i++) {",
+"        total += numbers[i];",
+"    }",
+"    printf(\"%d\\n\", total);",
+"    return 0;",
+"}"
+]],
+
+cpp:[
+"main.cpp",
+[
+"#include <iostream>",
+"",
+"int main() {",
+"    int numbers[] = {3, 7, 2, 9};",
+"    int total = 0;",
+"",
+"    for (int number : numbers) {",
+"        total += number;",
+"    }",
+"",
+"    std::cout << total << \"\\n\";",
+"    return 0;",
+"}"
+]],
+
+java:[
+"Main.java",
+[
+"class Main {",
+"  public static void main(String[] args) {",
+"    int[] numbers = {3, 7, 2, 9};",
+"    int total = 0;",
+"",
+"    for (int number : numbers) {",
+"      total += number;",
+"    }",
+"",
+"    System.out.println(total);",
+"  }",
+"}"
+]],
+
+go:[
+"main.go",
+[
+"package main",
+"",
+"import \"fmt\"",
+"",
+"func main() {",
+"  numbers := []int{3, 7, 2, 9}",
+"  total := 0",
+"",
+"  for _, number := range numbers {",
+"    total += number",
+"  }",
+"",
+"  fmt.Println(total)",
+"}"
+]],
+
+kotlin:[
+"Main.kt",
+[
+"fun main() {",
+"  val numbers = intArrayOf(3, 7, 2, 9)",
+"  var total = 0",
+"",
+"  for (number in numbers) {",
+"    total += number",
+"  }",
+"",
+"  println(total)",
+"}"
+]],
+
+swift:[
+"main.swift",
+[
+"let numbers = [3, 7, 2, 9]",
+"var total = 0",
+"",
+"for number in numbers {",
+"    total += number",
+"}",
+"",
+"print(total)"
+]],
+
+ruby:[
+"main.rb",
+[
+"numbers = [3, 7, 2, 9]",
+"total = 0",
+"",
+"numbers.each do |number|",
+"  total += number",
+"end",
+"",
+"puts total"
+]],
+
+php:[
+"main.php",
+[
+"<?php",
+"$numbers = [3, 7, 2, 9];",
+"$total = 0;",
+"",
+"foreach ($numbers as $number) {",
+"    $total += $number;",
+"}",
+"",
+"echo $total, PHP_EOL;"
+]],
+
+perl:[
+"main.pl",
+[
+"my @numbers = (3, 7, 2, 9);",
+"my $total = 0;",
+"",
+"for my $number (@numbers) {",
+"    $total += $number;",
+"}",
+"",
+"print \"$total\\n\";"
+]],
+
+bash:[
+"main.sh",
+[
+"total=0",
+"",
+"for number in 3 7 2 9; do",
+"  total=$((total + number))",
+"done",
+"",
+"echo \"$total\""
+]],
+
+sql:[
+"main.sql",
+[
+"SELECT 3 + 7 + 2 + 9 AS total;"
+]]
+
+};
+
+
+/* =========================================================
+   DYNAMIC FLOW STATE
+========================================================= */
+
+let steps = [];
 let step = 0;
 let timer = null;
 
 
-const steps = [
+/* =========================================================
+   DEFAULT FLOW
+========================================================= */
 
-  [
-    "Start program",
-    "line 1",
-    "<b>Start</b> — the program enters its first instruction.",
-    "<strong>Execution begins.</strong> TraceLab starts reading the program.",
-    '<span class="var"><b>program</b> = starting</span>'
-  ],
+function makeDefaultFlow(code){
 
-  [
-    "Create variables",
-    "setup",
-    "<b>Setup</b> — variables are created.",
-    "<strong>Variables are prepared.</strong> The program stores the values it needs.",
-    '<span class="var"><b>numbers</b> = [3,7,2,9]</span><span class="var"><b>total</b> = 0</span>'
-  ],
+  const lines = code.split("\n");
 
-  [
-    "Read next value",
-    "loop",
-    "<b>Loop</b> — the program reads a value.",
-    "<strong>The loop repeats.</strong> One item is processed at a time.",
-    '<span class="var"><b>number</b> = 3</span>'
-  ],
+  const firstLine =
+    lines.findIndex(line => line.trim()) + 1;
 
-  [
-    "Update value",
-    "inside loop",
-    "<b>Update</b> — the current value changes the result.",
-    "<strong>An expression is evaluated.</strong> The new value is stored.",
-    '<span class="var"><b>total</b> = 3</span>'
-  ],
+  return [
 
-  [
-    "Show result",
-    "output",
-    "<b>Output</b> — the program reaches its output statement.",
-    "<strong>The program finishes.</strong> The result is displayed.",
-    '<span class="var"><b>status</b> = complete</span>'
-  ]
+    [
+      "Start program",
+      "line " + Math.max(1,firstLine),
+      "<b>Start</b> — TraceLab begins analyzing your program.",
+      "<strong>Execution begins.</strong> The code is being inspected.",
+      '<span class="var"><b>program</b> = started</span>'
+    ],
 
-];
+    [
+      "Analyze instructions",
+      "lines " + lines.length,
+      "<b>Analyze</b> — TraceLab identifies the important instructions.",
+      "<strong>Code structure detected.</strong> Loops, conditions and operations are inspected.",
+      '<span class="var"><b>lines</b> = ' + lines.length + '</span>'
+    ],
+
+    [
+      "Execute logic",
+      "program flow",
+      "<b>Process</b> — the program follows its main logic.",
+      "<strong>Main logic executing.</strong> The detected instructions are followed.",
+      '<span class="var"><b>state</b> = processing</span>'
+    ],
+
+    [
+      "Update state",
+      "runtime",
+      "<b>Update</b> — program values change as instructions execute.",
+      "<strong>Variables update.</strong> Values move through the program.",
+      '<span class="var"><b>state</b> = updated</span>'
+    ],
+
+    [
+      "Show result",
+      "output",
+      "<b>Output</b> — execution reaches its result.",
+      "<strong>Execution finished.</strong> The final result is available below.",
+      '<span class="var"><b>status</b> = complete</span>'
+    ]
+
+  ];
+}
 
 
-/* ---------- LINE NUMBERS ---------- */
+/* =========================================================
+   ARRAY EXTRACTION
+========================================================= */
 
-function numberLines(){
+function extractArray(code){
 
-  const code = $("#code");
-  const nums = $("#nums");
+  let match =
+    code.match(
+      /(?:arr|array|numbers|data)\s*[\=\:]\s*(?:\w+\s*)?\[([^\]]+)\]/i
+    );
 
-  if(!code || !nums) return;
+  if(!match){
 
-  const count = Math.max(
-    1,
-    code.value.split("\n").length
+    match =
+      code.match(
+        /\{([0-9,\s-]+)\}/
+      );
+
+  }
+
+  if(!match) return null;
+
+  const values =
+    match[1]
+      .split(",")
+      .map(x=>x.trim())
+      .map(Number)
+      .filter(x=>Number.isFinite(x));
+
+  return values.length ? values : null;
+
+}
+
+
+/* =========================================================
+   BUBBLE SORT DETECTION
+========================================================= */
+
+function detectBubbleSort(code){
+
+  const c = code.toLowerCase();
+
+  return (
+    (
+      c.includes("bubble") ||
+      (
+        c.includes("swap") &&
+        (c.includes("arr[j]") ||
+         c.includes("array[j]") ||
+         c.includes("numbers[j]"))
+      )
+    ) &&
+    (
+      c.includes("arr[j] > arr[j+1]") ||
+      c.includes("arr[j+1] < arr[j]") ||
+      c.includes("swap")
+    )
   );
+}
 
-  nums.textContent =
-    Array.from(
-      {length:count},
-      (_,i) => i + 1
-    ).join("\n");
+
+/* =========================================================
+   BUBBLE SORT FLOW
+========================================================= */
+
+function createBubbleSortFlow(code){
+
+  let arr =
+    extractArray(code);
+
+  if(!arr){
+    arr = [5,1,4,2,8];
+  }
+
+  const original =
+    [...arr];
+
+  const result = [];
+
+  result.push([
+    "Start Bubble Sort",
+    "array setup",
+    "<b>Start</b> — Bubble Sort receives the array.",
+    "<strong>Bubble Sort detected.</strong> The algorithm repeatedly compares adjacent values.",
+    '<span class="var"><b>array</b> = [' + arr.join(", ") + ']</span>'
+  ]);
+
+  result.push([
+    "Check adjacent values",
+    "outer loop",
+    "<b>Loop</b> — compare neighboring elements.",
+    "<strong>Adjacent comparison.</strong> The larger value should move toward the right.",
+    '<span class="var"><b>array</b> = [' + arr.join(", ") + ']</span>'
+  ]);
+
+  let comparisons = 0;
+  let swaps = 0;
+
+  for(let i=0;i<arr.length-1;i++){
+
+    for(let j=0;j<arr.length-i-1;j++){
+
+      comparisons++;
+
+      const a = arr[j];
+      const b = arr[j+1];
+
+      result.push([
+        "Compare " + a + " and " + b,
+        "compare " + (comparisons),
+        "<b>Compare</b> — inspect adjacent values " + a + " and " + b + ".",
+        "<strong>Decision:</strong> " +
+        a +
+        (a > b ? " is greater than " : " is not greater than ") +
+        b +
+        ".",
+        '<span class="var"><b>left</b> = ' + a +
+        '</span><span class="var"><b>right</b> = ' + b +
+        '</span>'
+      ]);
+
+      if(a > b){
+
+        arr[j] = b;
+        arr[j+1] = a;
+
+        swaps++;
+
+        result.push([
+          "Swap " + a + " and " + b,
+          "swap " + swaps,
+          "<b>Swap</b> — the larger value moves one position right.",
+          "<strong>Array changed.</strong> The two adjacent elements exchange positions.",
+          '<span class="var"><b>array</b> = [' +
+          arr.join(", ") +
+          ']</span>'
+        ]);
+
+      }
+
+    }
+
+    result.push([
+      "Finish pass " + (i+1),
+      "pass " + (i+1),
+      "<b>Pass complete</b> — the largest remaining value is now near the end.",
+      "<strong>Sorted suffix grows.</strong> Bubble Sort has completed one pass.",
+      '<span class="var"><b>array</b> = [' +
+      arr.join(", ") +
+      ']</span>'
+    ]);
+
+  }
+
+  result.push([
+    "Bubble Sort complete",
+    "output",
+    "<b>Output</b> — the array is sorted.",
+    "<strong>Bubble Sort finished.</strong> Every required comparison and swap has been processed.",
+    '<span class="var"><b>sorted</b> = [' +
+    arr.join(", ") +
+    ']</span>'
+  ]);
+
+  return result;
+}
+
+
+/* =========================================================
+   SELECTION SORT DETECTION
+========================================================= */
+
+function detectSelectionSort(code){
+
+  const c = code.toLowerCase();
+
+  return (
+    c.includes("selection sort") ||
+    (
+      c.includes("min") &&
+      c.includes("swap") &&
+      c.includes("arr")
+    )
+  );
+}
+
+
+function createSelectionSortFlow(code){
+
+  let arr =
+    extractArray(code) || [64,25,12,22,11];
+
+  const result = [];
+
+  result.push([
+    "Start Selection Sort",
+    "array setup",
+    "<b>Start</b> — Selection Sort receives the array.",
+    "<strong>Selection Sort detected.</strong> The smallest remaining value is selected.",
+    '<span class="var"><b>array</b> = [' + arr.join(", ") + ']</span>'
+  ]);
+
+  for(let i=0;i<arr.length-1;i++){
+
+    let minIndex = i;
+
+    result.push([
+      "Select minimum",
+      "index " + i,
+      "<b>Select</b> — search for the smallest remaining value.",
+      "<strong>Minimum search.</strong> The unsorted portion is inspected.",
+      '<span class="var"><b>min</b> = ' + arr[minIndex] + '</span>'
+    ]);
+
+    for(let j=i+1;j<arr.length;j++){
+
+      result.push([
+        "Compare " + arr[j] + " with minimum",
+        "compare",
+        "<b>Compare</b> — check the current value against the minimum.",
+        "<strong>Minimum candidate updated</strong> when a smaller value is found.",
+        '<span class="var"><b>current</b> = ' + arr[j] +
+        '</span><span class="var"><b>min</b> = ' +
+        arr[minIndex] + '</span>'
+      ]);
+
+      if(arr[j] < arr[minIndex]){
+        minIndex = j;
+      }
+
+    }
+
+    if(minIndex !== i){
+
+      const temp = arr[i];
+      arr[i] = arr[minIndex];
+      arr[minIndex] = temp;
+
+      result.push([
+        "Place minimum",
+        "swap",
+        "<b>Swap</b> — place the smallest value at the current position.",
+        "<strong>Array updated.</strong> The selected minimum joins the sorted section.",
+        '<span class="var"><b>array</b> = [' +
+        arr.join(", ") +
+        ']</span>'
+      ]);
+
+    }
+
+  }
+
+  result.push([
+    "Selection Sort complete",
+    "output",
+    "<b>Output</b> — the array is sorted.",
+    "<strong>Selection Sort finished.</strong>",
+    '<span class="var"><b>sorted</b> = [' +
+    arr.join(", ") +
+    ']</span>'
+  ]);
+
+  return result;
+}
+
+
+/* =========================================================
+   INSERTION SORT
+========================================================= */
+
+function detectInsertionSort(code){
+
+  const c = code.toLowerCase();
+
+  return (
+    c.includes("insertion sort") ||
+    (
+      c.includes("key") &&
+      c.includes("arr[j]") &&
+      c.includes("arr[j+1]")
+    )
+  );
+}
+
+
+function createInsertionSortFlow(code){
+
+  let arr =
+    extractArray(code) || [12,11,13,5,6];
+
+  const result = [];
+
+  result.push([
+    "Start Insertion Sort",
+    "array setup",
+    "<b>Start</b> — Insertion Sort begins with the array.",
+    "<strong>Insertion Sort detected.</strong> Values are inserted into the sorted portion.",
+    '<span class="var"><b>array</b> = [' +
+    arr.join(", ") +
+    ']</span>'
+  ]);
+
+  for(let i=1;i<arr.length;i++){
+
+    const key = arr[i];
+    let j = i-1;
+
+    result.push([
+      "Choose key " + key,
+      "i = " + i,
+      "<b>Choose</b> — the next value becomes the key.",
+      "<strong>Key selected.</strong> Compare it with the sorted portion.",
+      '<span class="var"><b>key</b> = ' + key + '</span>'
+    ]);
+
+    while(j>=0 && arr[j]>key){
+
+      result.push([
+        "Shift " + arr[j],
+        "j = " + j,
+        "<b>Shift</b> — move the larger value one position right.",
+        "<strong>Array shifts.</strong> Space is created for the key.",
+        '<span class="var"><b>moving</b> = ' +
+        arr[j] + '</span>'
+      ]);
+
+      arr[j+1] = arr[j];
+      j--;
+
+    }
+
+    arr[j+1] = key;
+
+    result.push([
+      "Insert key",
+      "position " + (j+1),
+      "<b>Insert</b> — place the key into its correct position.",
+      "<strong>Sorted portion grows.</strong>",
+      '<span class="var"><b>array</b> = [' +
+      arr.join(", ") +
+      ']</span>'
+    ]);
+
+  }
+
+  result.push([
+    "Insertion Sort complete",
+    "output",
+    "<b>Output</b> — the array is sorted.",
+    "<strong>Insertion Sort finished.</strong>",
+    '<span class="var"><b>sorted</b> = [' +
+    arr.join(", ") +
+    ']</span>'
+  ]);
+
+  return result;
+}
+
+
+/* =========================================================
+   LINEAR SEARCH
+========================================================= */
+
+function detectLinearSearch(code){
+
+  const c = code.toLowerCase();
+
+  return (
+    c.includes("linear search") ||
+    (
+      (c.includes("target") || c.includes("key")) &&
+      c.includes("for") &&
+      !c.includes("mid")
+    )
+  );
+}
+
+
+function createLinearSearchFlow(code){
+
+  const arr =
+    extractArray(code) || [10,20,30,40,50];
+
+  const targetMatch =
+    code.match(
+      /(?:target|key)\s*=\s*(-?\d+)/i
+    );
+
+  const target =
+    targetMatch
+      ? Number(targetMatch[1])
+      : arr[Math.floor(arr.length/2)];
+
+  const result = [];
+
+  result.push([
+    "Start Linear Search",
+    "array setup",
+    "<b>Start</b> — Linear Search scans the array from left to right.",
+    "<strong>Linear Search detected.</strong>",
+    '<span class="var"><b>array</b> = [' +
+    arr.join(", ") + ']</span><span class="var"><b>target</b> = ' +
+    target + '</span>'
+  ]);
+
+  for(let i=0;i<arr.length;i++){
+
+    const found =
+      arr[i] === target;
+
+    result.push([
+      "Check index " + i,
+      "index " + i,
+      "<b>Check</b> — compare " + arr[i] + " with target " + target + ".",
+      found
+        ? "<strong>Match found!</strong> The target is at index " + i + "."
+        : "<strong>No match.</strong> Continue to the next element.",
+      '<span class="var"><b>current</b> = ' +
+      arr[i] + '</span><span class="var"><b>target</b> = ' +
+      target + '</span>'
+    ]);
+
+    if(found) break;
+
+  }
+
+  if(!result.some(x=>x[0].includes("Match found"))){
+
+    result.push([
+      "Search complete",
+      "output",
+      "<b>Output</b> — the target was not found.",
+      "<strong>Search finished.</strong> No matching element exists in the scanned array.",
+      '<span class="var"><b>found</b> = false</span>'
+    ]);
+
+  }else{
+
+    result.push([
+      "Search complete",
+      "output",
+      "<b>Output</b> — the target was found.",
+      "<strong>Search finished.</strong>",
+      '<span class="var"><b>found</b> = true</span>'
+    ]);
+
+  }
+
+  return result;
+}
+
+
+/* =========================================================
+   BINARY SEARCH
+========================================================= */
+
+function detectBinarySearch(code){
+
+  const c = code.toLowerCase();
+
+  return (
+    c.includes("binary search") ||
+    (
+      c.includes("mid") &&
+      (c.includes("low") || c.includes("high")) &&
+      c.includes("target")
+    )
+  );
+}
+
+
+function createBinarySearchFlow(code){
+
+  const arr =
+    extractArray(code) || [10,20,30,40,50,60,70];
+
+  const sorted =
+    [...arr].sort((a,b)=>a-b);
+
+  const targetMatch =
+    code.match(
+      /target\s*=\s*(-?\d+)/i
+    );
+
+  const target =
+    targetMatch
+      ? Number(targetMatch[1])
+      : sorted[Math.floor(sorted.length/2)];
+
+  let low = 0;
+  let high = sorted.length - 1;
+
+  const result = [];
+
+  result.push([
+    "Start Binary Search",
+    "array setup",
+    "<b>Start</b> — Binary Search works on a sorted array.",
+    "<strong>Binary Search detected.</strong> The search range will repeatedly be divided.",
+    '<span class="var"><b>target</b> = ' +
+    target + '</span><span class="var"><b>array</b> = [' +
+    sorted.join(", ") + ']</span>'
+  ]);
+
+  while(low<=high){
+
+    const mid =
+      Math.floor((low+high)/2);
+
+    result.push([
+      "Check middle value " + sorted[mid],
+      "mid = " + mid,
+      "<b>Mid</b> — inspect the middle element.",
+      "<strong>Binary decision.</strong> Compare the middle value with the target.",
+      '<span class="var"><b>low</b> = ' + low +
+      '</span><span class="var"><b>mid</b> = ' + mid +
+      '</span><span class="var"><b>high</b> = ' + high +
+      '</span><span class="var"><b>value</b> = ' +
+      sorted[mid] + '</span>'
+    ]);
+
+    if(sorted[mid] === target){
+
+      result.push([
+        "Target found",
+        "index " + mid,
+        "<b>Found</b> — the middle value matches the target.",
+        "<strong>Target found!</strong> Binary Search finishes immediately.",
+        '<span class="var"><b>index</b> = ' +
+        mid + '</span><span class="var"><b>value</b> = ' +
+        target + '</span>'
+      ]);
+
+      return result;
+    }
+
+    if(sorted[mid] < target){
+
+      low = mid + 1;
+
+      result.push([
+        "Search right half",
+        "low = " + low,
+        "<b>Move right</b> — the target is larger than the middle value.",
+        "<strong>Discard left half.</strong> Continue searching the right side.",
+        '<span class="var"><b>low</b> = ' +
+        low + '</span><span class="var"><b>high</b> = ' +
+        high + '</span>'
+      ]);
+
+    }else{
+
+      high = mid - 1;
+
+      result.push([
+        "Search left half",
+        "high = " + high,
+        "<b>Move left</b> — the target is smaller than the middle value.",
+        "<strong>Discard right half.</strong> Continue searching the left side.",
+        '<span class="var"><b>low</b> = ' +
+        low + '</span><span class="var"><b>high</b> = ' +
+        high + '</span>'
+      ]);
+
+    }
+
+  }
+
+  result.push([
+    "Target not found",
+    "output",
+    "<b>Output</b> — the search range is empty.",
+    "<strong>Binary Search finished.</strong> The target does not exist in the array.",
+    '<span class="var"><b>found</b> = false</span>'
+  ]);
+
+  return result;
+}
+
+
+/* =========================================================
+   STACK
+========================================================= */
+
+function detectStack(code){
+
+  const c = code.toLowerCase();
+
+  return (
+    c.includes("stack") ||
+    c.includes(".push(") ||
+    c.includes(".pop(") ||
+    c.includes("push(") ||
+    c.includes("pop(")
+  );
+}
+
+
+function createStackFlow(code){
+
+  const result = [];
+
+  const operations =
+    [...code.matchAll(
+      /(?:push|append)\s*\(\s*(-?\d+)\s*\)|(?:pop)\s*\(\s*\)/gi
+    )];
+
+  const stack = [];
+
+  result.push([
+    "Create Stack",
+    "setup",
+    "<b>Start</b> — an empty stack is created.",
+    "<strong>Stack detected.</strong> Stack follows Last-In, First-Out (LIFO).",
+    '<span class="var"><b>stack</b> = []</span>'
+  ]);
+
+  operations.forEach(match=>{
+
+    const text =
+      match[0].toLowerCase();
+
+    if(text.includes("pop")){
+
+      const value =
+        stack.length
+          ? stack.pop()
+          : null;
+
+      result.push([
+        "Pop element",
+        "pop()",
+        "<b>Pop</b> — remove the top element from the stack.",
+        value === null
+          ? "<strong>Stack is empty.</strong> Nothing can be removed."
+          : "<strong>" + value + " removed.</strong> The top element leaves the stack.",
+        '<span class="var"><b>stack</b> = [' +
+        stack.join(", ") + ']</span>'
+      ]);
+
+    }else{
+
+      const value =
+        Number(match[1]);
+
+      stack.push(value);
+
+      result.push([
+        "Push " + value,
+        "push()",
+        "<b>Push</b> — place " + value + " on top of the stack.",
+        "<strong>Element added.</strong> The newest element becomes TOP.",
+        '<span class="var"><b>stack</b> = [' +
+        stack.join(", ") + ']</span>'
+      ]);
+
+    }
+
+  });
+
+  result.push([
+    "Stack complete",
+    "output",
+    "<b>Output</b> — stack operations finished.",
+    "<strong>Stack trace complete.</strong>",
+    '<span class="var"><b>top</b> = ' +
+    (stack.length ? stack[stack.length-1] : "empty") +
+    '</span>'
+  ]);
+
+  return result;
+}
+
+
+/* =========================================================
+   QUEUE
+========================================================= */
+
+function detectQueue(code){
+
+  const c = code.toLowerCase();
+
+  return (
+    c.includes("queue") ||
+    c.includes("enqueue") ||
+    c.includes("dequeue") ||
+    c.includes(".shift(")
+  );
+}
+
+
+function createQueueFlow(code){
+
+  const result = [];
+
+  const queue = [];
+
+  const operations =
+    [...code.matchAll(
+      /(?:enqueue|push|append)\s*\(\s*(-?\d+)\s*\)|(?:dequeue|shift)\s*\(\s*\)/gi
+    )];
+
+  result.push([
+    "Create Queue",
+    "setup",
+    "<b>Start</b> — an empty queue is created.",
+    "<strong>Queue detected.</strong> Queue follows First-In, First-Out (FIFO).",
+    '<span class="var"><b>queue</b> = []</span>'
+  ]);
+
+  operations.forEach(match=>{
+
+    const text =
+      match[0].toLowerCase();
+
+    if(
+      text.includes("dequeue") ||
+      text.includes("shift")
+    ){
+
+      const value =
+        queue.length
+          ? queue.shift()
+          : null;
+
+      result.push([
+        "Dequeue",
+        "remove front",
+        "<b>Dequeue</b> — remove the first element.",
+        value === null
+          ? "<strong>Queue is empty.</strong>"
+          : "<strong>" + value + " removed.</strong>",
+        '<span class="var"><b>queue</b> = [' +
+        queue.join(", ") + ']</span>'
+      ]);
+
+    }else{
+
+      const value =
+        Number(match[1]);
+
+      queue.push(value);
+
+      result.push([
+        "Enqueue " + value,
+        "add rear",
+        "<b>Enqueue</b> — add " + value + " to the rear.",
+        "<strong>Element added.</strong> The new value joins the back of the queue.",
+        '<span class="var"><b>queue</b> = [' +
+        queue.join(", ") + ']</span>'
+      ]);
+
+    }
+
+  });
+
+  result.push([
+    "Queue complete",
+    "output",
+    "<b>Output</b> — queue operations finished.",
+    "<strong>Queue trace complete.</strong>",
+    '<span class="var"><b>front</b> = ' +
+    (queue.length ? queue[0] : "empty") +
+    '</span>'
+  ]);
+
+  return result;
+}
+
+
+/* =========================================================
+   ALGORITHM DETECTOR
+========================================================= */
+
+function generateFlow(code){
+
+  const c =
+    code.toLowerCase();
+
+  if(detectBubbleSort(code)){
+    return {
+      name:"Bubble Sort",
+      steps:createBubbleSortFlow(code)
+    };
+  }
+
+  if(detectSelectionSort(code)){
+    return {
+      name:"Selection Sort",
+      steps:createSelectionSortFlow(code)
+    };
+  }
+
+  if(detectInsertionSort(code)){
+    return {
+      name:"Insertion Sort",
+      steps:createInsertionSortFlow(code)
+    };
+  }
+
+  if(detectBinarySearch(code)){
+    return {
+      name:"Binary Search",
+      steps:createBinarySearchFlow(code)
+    };
+  }
+
+  if(detectLinearSearch(code)){
+    return {
+      name:"Linear Search",
+      steps:createLinearSearchFlow(code)
+    };
+  }
+
+  if(detectStack(code)){
+    return {
+      name:"Stack",
+      steps:createStackFlow(code)
+    };
+  }
+
+  if(detectQueue(code)){
+    return {
+      name:"Queue",
+      steps:createQueueFlow(code)
+    };
+  }
+
+  return {
+    name:"Program Flow",
+    steps:makeDefaultFlow(code)
+  };
+}
+
+
+/* =========================================================
+   FLOW LABELS
+========================================================= */
+
+function updateFlowLabels(){
+
+  const labels =
+    steps.map(s=>s[0]);
+
+  const five =
+    [
+      labels[0] || "Start",
+      labels[Math.floor(labels.length*.25)] || "Analyze",
+      labels[Math.floor(labels.length*.5)] || "Process",
+      labels[Math.floor(labels.length*.75)] || "Update",
+      labels[labels.length-1] || "Output"
+    ];
+
+  $("#label1").textContent = shortenLabel(five[0]);
+  $("#label2").textContent = shortenLabel(five[1]);
+  $("#label3").textContent = shortenLabel(five[2]);
+  $("#label4").textContent = shortenLabel(five[3]);
+  $("#label5").textContent = shortenLabel(five[4]);
 
 }
 
 
-/* ---------- KEEP LINE NUMBERS SCROLLING ---------- */
+function shortenLabel(text){
 
-function syncLineNumbers(){
+  if(!text) return "";
 
-  const code = $("#code");
-  const nums = $("#nums");
+  if(text.length <= 13) return text;
 
-  if(!code || !nums) return;
-
-  nums.scrollTop = code.scrollTop;
+  return text.substring(0,12) + "…";
 
 }
 
 
-/* ---------- LOAD SAMPLE CODE ---------- */
-
-function putCode(){
-
-  const language = $("#language");
-
-  if(!language) return;
-
-  const key = language.value;
-
-  const sample = codes[key];
-
-  if(!sample) return;
-
-  $("#file").textContent = sample[0];
-
-  $("#code").value = sample[1].join("\n");
-
-  numberLines();
-
-  $("#code").scrollTop = 0;
-
-  $("#nums").scrollTop = 0;
-
-}
-
-
-/* ---------- FLOW RENDER ---------- */
+/* =========================================================
+   RENDER FLOW
+========================================================= */
 
 function render(){
 
-  const data = steps[step];
+  if(!steps.length) return;
+
+  const data =
+    steps[step];
 
   $("#badge").textContent =
-    "Step " + (step + 1) + " of " + steps.length;
+    "Step " +
+    (step+1) +
+    " of " +
+    steps.length;
 
-  $("#stepname").textContent = data[0];
+  $("#stepname").textContent =
+    data[0];
 
-  $("#lineref").textContent = data[1];
+  $("#lineref").textContent =
+    data[1];
 
-  $("#note").innerHTML = data[2];
+  $("#note").innerHTML =
+    data[2];
 
-  $("#insight").innerHTML = data[3];
+  $("#insight").innerHTML =
+    data[3];
 
-  $("#vars").innerHTML = data[4];
+  $("#vars").innerHTML =
+    data[4];
+
+  const positions =
+    [11,30,50,70,89];
+
+  const progress =
+    steps.length <= 1
+      ? 0
+      : step/(steps.length-1);
 
   $("#pulse").style.left =
-    [11,30,50,70,89][step] + "%";
+    (11 + progress*78) + "%";
 
   nodes.forEach((node,index)=>{
 
+    const nodeStep =
+      Math.floor(
+        (index/(nodes.length-1)) *
+        Math.max(0,steps.length-1)
+      );
+
     node.className =
-      "node n" + (index + 1) +
-      (index < step ? " done" : "") +
-      (index === step ? " active" : "");
+      "node n" +
+      (index+1) +
+      (step > nodeStep ? " done" : "") +
+      (step === nodeStep ? " active" : "");
 
   });
 
   tracks.forEach((track,index)=>{
 
+    const trackStep =
+      Math.floor(
+        (index/(tracks.length-1)) *
+        Math.max(0,steps.length-1)
+      );
+
     track.className =
       "track" +
-      (index < step ? " done" : "") +
-      (index === step ? " now" : "");
+      (step > trackStep ? " done" : "") +
+      (step === trackStep ? " now" : "");
 
   });
 
 }
 
 
-/* ---------- PLAY FLOW ---------- */
+/* =========================================================
+   PLAY FLOW
+========================================================= */
 
 function stop(){
 
@@ -1938,9 +2608,12 @@ function stop(){
     timer = null;
   }
 
-  $("#play").textContent = "▶ Play flow";
+  $("#play").textContent =
+    "▶ Play flow";
 
-  $("#play").classList.remove("playing");
+  $("#play").classList.remove(
+    "playing"
+  );
 
 }
 
@@ -1952,24 +2625,103 @@ function play(){
     return;
   }
 
-  $("#play").textContent = "❚❚ Pause";
+  if(!steps.length) return;
 
-  $("#play").classList.add("playing");
+  $("#play").textContent =
+    "❚❚ Pause";
 
-  timer = setInterval(()=>{
+  $("#play").classList.add(
+    "playing"
+  );
 
-    step = step >= steps.length - 1
-      ? 0
-      : step + 1;
+  timer =
+    setInterval(()=>{
 
-    render();
+      if(step >= steps.length-1){
 
-  }, Number($("#speed").value));
+        stop();
+
+        return;
+
+      }
+
+      step++;
+
+      render();
+
+    },Number($("#speed").value));
 
 }
 
 
-/* ---------- AUTO DETECT ---------- */
+/* =========================================================
+   LINE NUMBERS
+========================================================= */
+
+function numberLines(){
+
+  const code =
+    $("#code");
+
+  const nums =
+    $("#nums");
+
+  if(!code || !nums) return;
+
+  const count =
+    Math.max(
+      1,
+      code.value.split("\n").length
+    );
+
+  nums.textContent =
+    Array.from(
+      {length:count},
+      (_,i)=>i+1
+    ).join("\n");
+
+}
+
+
+function syncLineNumbers(){
+
+  $("#nums").scrollTop =
+    $("#code").scrollTop;
+
+}
+
+
+/* =========================================================
+   LOAD SAMPLE
+========================================================= */
+
+function putCode(){
+
+  const key =
+    $("#language").value;
+
+  const sample =
+    codes[key];
+
+  if(!sample) return;
+
+  $("#file").textContent =
+    sample[0];
+
+  $("#code").value =
+    sample[1].join("\n");
+
+  numberLines();
+
+  $("#code").scrollTop = 0;
+  $("#nums").scrollTop = 0;
+
+}
+
+
+/* =========================================================
+   AUTO DETECT LANGUAGE
+========================================================= */
 
 function detectLanguage(){
 
@@ -1981,15 +2733,12 @@ function detectLanguage(){
     html:[
       "<!doctype html",
       "<html",
-      "<body",
-      "<div",
-      "<p>"
+      "<body"
     ],
 
     css:[
       "font-family:",
       "background:",
-      "margin:",
       "padding:",
       "border-radius:"
     ],
@@ -2082,31 +2831,31 @@ function detectLanguage(){
 
   };
 
-
   let best = "python";
   let score = 0;
 
-  Object.entries(markers).forEach(([name,words])=>{
+  Object.entries(markers).forEach(
+    ([name,words])=>{
 
-    let current = 0;
+      let current = 0;
 
-    words.forEach(word=>{
+      words.forEach(word=>{
 
-      if(code.includes(word)){
-        current++;
+        if(code.includes(word)){
+          current++;
+        }
+
+      });
+
+      if(current > score){
+
+        score = current;
+        best = name;
+
       }
 
-    });
-
-    if(current > score){
-
-      score = current;
-      best = name;
-
     }
-
-  });
-
+  );
 
   if(score === 0){
 
@@ -2120,8 +2869,8 @@ function detectLanguage(){
 
   }
 
-
-  $("#language").value = best;
+  $("#language").value =
+    best;
 
   putCode();
 
@@ -2146,7 +2895,9 @@ function detectLanguage(){
 }
 
 
-/* ---------- HTML / CSS PREVIEW ---------- */
+/* =========================================================
+   HTML / CSS / JAVASCRIPT PREVIEW
+========================================================= */
 
 function buildFullDoc(language,code){
 
@@ -2170,7 +2921,6 @@ ${code}
 
   }
 
-
   if(language === "css"){
 
     return `
@@ -2191,7 +2941,6 @@ ${code}
 </html>`;
 
   }
-
 
   if(language === "javascript"){
 
@@ -2214,16 +2963,16 @@ ${code}
 
   }
 
-
   return code;
 
 }
 
 
-/* ---------- PYTHON ---------- */
+/* =========================================================
+   PYTHON
+========================================================= */
 
 let pyodidePromise = null;
-
 
 function getPyodide(){
 
@@ -2231,57 +2980,58 @@ function getPyodide(){
     return pyodidePromise;
   }
 
-  pyodidePromise = new Promise((resolve,reject)=>{
+  pyodidePromise =
+    new Promise((resolve,reject)=>{
 
-    const version = "0.26.4";
+      const version =
+        "0.26.4";
 
-    const base =
-      "https://cdn.jsdelivr.net/pyodide/v" +
-      version +
-      "/full/";
+      const base =
+        "https://cdn.jsdelivr.net/pyodide/v" +
+        version +
+        "/full/";
 
-    if(window.loadPyodide){
+      if(window.loadPyodide){
 
-      window.loadPyodide({
-        indexURL:base
-      })
-      .then(resolve)
-      .catch(reject);
+        window.loadPyodide({
+          indexURL:base
+        })
+        .then(resolve)
+        .catch(reject);
 
-      return;
+        return;
 
-    }
+      }
 
+      const script =
+        document.createElement("script");
 
-    const script =
-      document.createElement("script");
+      script.src =
+        base + "pyodide.js";
 
-    script.src =
-      base + "pyodide.js";
+      script.onload = ()=>{
 
-    script.onload = ()=>{
+        window.loadPyodide({
+          indexURL:base
+        })
+        .then(resolve)
+        .catch(reject);
 
-      window.loadPyodide({
-        indexURL:base
-      })
-      .then(resolve)
-      .catch(reject);
+      };
 
-    };
+      script.onerror = ()=>{
 
-    script.onerror = ()=>{
+        reject(
+          new Error(
+            "Could not load the Python runtime."
+          )
+        );
 
-      reject(
-        new Error(
-          "Could not load the Python runtime."
-        )
-      );
+      };
 
-    };
+      document.head.appendChild(script);
 
-    document.head.appendChild(script);
-
-  });
+    });
 
   return pyodidePromise;
 
@@ -2316,19 +3066,14 @@ async function runPythonCode(code){
 
   }catch(error){
 
-    const message =
-      String(
-        error && error.message
-          ? error.message
-          : error
-      );
-
     logs.push(
       "✕ " +
-      message
-        .split("\n")
-        .filter(Boolean)
-        .slice(-1)[0]
+      String(
+        error?.message || error
+      )
+      .split("\n")
+      .filter(Boolean)
+      .slice(-1)[0]
     );
 
   }
@@ -2346,7 +3091,9 @@ async function runPythonCode(code){
 }
 
 
-/* ---------- JAVASCRIPT ---------- */
+/* =========================================================
+   JAVASCRIPT
+========================================================= */
 
 function runJavaScriptCode(code){
 
@@ -2359,11 +3106,11 @@ function runJavaScriptCode(code){
     const iframe =
       document.createElement("iframe");
 
-    iframe.style.display = "none";
+    iframe.style.display =
+      "none";
 
     iframe.sandbox =
       "allow-scripts";
-
 
     const source = `
 <!doctype html>
@@ -2416,9 +3163,7 @@ send("done",[]);
 }catch(error){
 
 send("error",[
-  error && error.message
-    ? error.message
-    : String(error)
+  error?.message || String(error)
 ]);
 
 send("done",[]);
@@ -2429,7 +3174,6 @@ send("done",[]);
 </body>
 </html>
 `;
-
 
     function finish(result){
 
@@ -2442,24 +3186,18 @@ send("done",[]);
         handler
       );
 
-      if(iframe.parentNode){
-        iframe.remove();
-      }
+      iframe.remove();
 
       resolve(result);
 
     }
-
 
     function handler(event){
 
       if(
         !event.data ||
         !event.data.__tracelab
-      ){
-        return;
-      }
-
+      ) return;
 
       if(event.data.type === "done"){
 
@@ -2475,7 +3213,6 @@ send("done",[]);
 
       }
 
-
       const prefix =
         event.data.type === "error"
           ? "✕ "
@@ -2490,19 +3227,17 @@ send("done",[]);
 
     }
 
-
     window.addEventListener(
       "message",
       handler
     );
 
-
-    iframe.srcdoc = source;
+    iframe.srcdoc =
+      source;
 
     document.body.appendChild(
       iframe
     );
-
 
     setTimeout(()=>{
 
@@ -2521,7 +3256,9 @@ send("done",[]);
 }
 
 
-/* ---------- PREVIEW ---------- */
+/* =========================================================
+   PREVIEW
+========================================================= */
 
 function renderPreview(language,code){
 
@@ -2545,7 +3282,9 @@ function hidePreview(){
 }
 
 
-/* ---------- WEB UI ---------- */
+/* =========================================================
+   WEB UI
+========================================================= */
 
 function updateWebUI(){
 
@@ -2601,31 +3340,22 @@ function updateModeStatus(){
 
 
 /* =========================================================
-   IMPORTANT BACKEND CONFIGURATION
-   ========================================================= */
+   BACKEND
+========================================================= */
 
 const TRACE_BACKEND =
   "https://tracelab-free.onrender.com";
 
-
-/* ---------- BACKEND HEALTH ---------- */
 
 async function checkBackend(){
 
   const status =
     $("#serverStatus");
 
-
-  /*
-   If the page is opened directly from
-   Render, use the same Render origin.
-  */
-
   const backend =
     location.hostname.endsWith("onrender.com")
       ? location.origin
       : TRACE_BACKEND;
-
 
   try{
 
@@ -2641,21 +3371,14 @@ async function checkBackend(){
         }
       );
 
-
     const data =
-      await response
-        .json()
-        .catch(()=>({}));
-
+      await response.json().catch(()=>({}));
 
     if(!response.ok){
-
       throw new Error(
         "HTTP " + response.status
       );
-
     }
-
 
     if(data.ok){
 
@@ -2685,7 +3408,6 @@ async function checkBackend(){
 
     }
 
-
   }catch(error){
 
     status.textContent =
@@ -2699,7 +3421,9 @@ async function checkBackend(){
 }
 
 
-/* ---------- REMOTE EXECUTION ---------- */
+/* =========================================================
+   REMOTE EXECUTION
+========================================================= */
 
 async function runRemoteCode(
   language,
@@ -2711,7 +3435,6 @@ async function runRemoteCode(
     location.hostname.endsWith("onrender.com")
       ? location.origin
       : TRACE_BACKEND;
-
 
   try{
 
@@ -2731,10 +3454,8 @@ async function runRemoteCode(
 
           body:JSON.stringify({
 
-            language:language,
-
-            code:code,
-
+            language,
+            code,
             stdin:""
 
           })
@@ -2742,20 +3463,11 @@ async function runRemoteCode(
         }
       );
 
-
     let data = {};
 
     try{
-
-      data =
-        await response.json();
-
-    }catch(error){
-
-      data = {};
-
-    }
-
+      data = await response.json();
+    }catch(error){}
 
     if(!response.ok){
 
@@ -2777,7 +3489,6 @@ async function runRemoteCode(
 
     }
 
-
     return {
 
       ok:Boolean(data.ok),
@@ -2790,7 +3501,6 @@ async function runRemoteCode(
 
     };
 
-
   }catch(error){
 
     return {
@@ -2800,9 +3510,7 @@ async function runRemoteCode(
       output:
         "✕ Could not reach TraceLab backend.\n\n" +
         String(
-          error && error.message
-            ? error.message
-            : error
+          error?.message || error
         ) +
         "\n\n" +
         "Make sure the Render Web Service is deployed."
@@ -2814,22 +3522,51 @@ async function runRemoteCode(
 }
 
 
-/* ---------- EXPLAIN MAIN LOGIC ---------- */
+/* =========================================================
+   MAIN LOGIC EXPLANATION
+========================================================= */
 
 function explainLogic(){
 
-  const lines =
-    $("#code").value.split("\n");
+  const code =
+    $("#code").value;
 
+  const lines =
+    code.split("\n");
+
+  const lower =
+    code.toLowerCase();
+
+  let type =
+    "general program";
+
+  if(detectBubbleSort(code))
+    type = "Bubble Sort";
+
+  else if(detectSelectionSort(code))
+    type = "Selection Sort";
+
+  else if(detectInsertionSort(code))
+    type = "Insertion Sort";
+
+  else if(detectBinarySearch(code))
+    type = "Binary Search";
+
+  else if(detectLinearSearch(code))
+    type = "Linear Search";
+
+  else if(detectStack(code))
+    type = "Stack";
+
+  else if(detectQueue(code))
+    type = "Queue";
 
   const hits = [];
-
 
   lines.forEach((line,index)=>{
 
     const text =
       line.trim();
-
 
     if(
       /^(def |function |class |for |while |if |else if|elif |switch |try |public static|int main|fun main|func main)/i
@@ -2845,7 +3582,6 @@ function explainLogic(){
 
   });
 
-
   const first =
     hits[0] ||
     [
@@ -2854,77 +3590,39 @@ function explainLogic(){
       "Program entry"
     ];
 
-
-  let kind =
-    "entry point";
-
-
-  if(/for |while /i.test(first[1])){
-    kind = "loop";
-  }
-  else if(/if |switch |elif /i.test(first[1])){
-    kind = "decision";
-  }
-  else if(/def |function |class |func /i.test(first[1])){
-    kind = "function";
-  }
-
-
   $("#logicSummary").innerHTML =
-
-    "<strong>Main path found.</strong> " +
-
-    "This " +
-    lines.length +
-    "-line program has " +
-
+    "<strong>" +
+    type +
+    " detected.</strong> " +
+    "TraceLab found " +
     hits.length +
-
     " important control-flow block" +
-
     (hits.length === 1 ? "" : "s") +
-
-    ". Start at the " +
-
-    kind +
-
-    " on line " +
-
-    (first[0] + 1) +
-
-    ".";
-
+    " in this program.";
 
   const start =
     Math.max(
       0,
-      first[0] - 1
+      first[0]-1
     );
-
 
   const end =
     Math.min(
       lines.length,
-      first[0] + 7
+      first[0]+8
     );
 
-
-  const selected =
+  $("#logicCode").textContent =
     lines
       .slice(start,end)
       .map(
         (line,index)=>
-          String(start + index + 1)
+          String(start+index+1)
             .padStart(3," ") +
           "  " +
           line
       )
       .join("\n");
-
-
-  $("#logicCode").textContent =
-    selected;
-
 
   $("#focus").textContent =
     "✓ Main logic explained";
@@ -2933,19 +3631,12 @@ function explainLogic(){
 
 
 /* =========================================================
-   RUN BUTTON
-   ========================================================= */
+   RUN PROGRAM
+========================================================= */
 
 async function runProgram(){
 
   stop();
-
-  step = 0;
-
-  render();
-
-  explainLogic();
-
 
   const language =
     $("#language").value;
@@ -2957,7 +3648,6 @@ async function runProgram(){
     $("#language").options[
       $("#language").selectedIndex
     ].text;
-
 
   if(!code.trim()){
 
@@ -2971,14 +3661,33 @@ async function runProgram(){
 
   }
 
+  /* -----------------------------------------
+     GENERATE CODE-SPECIFIC FLOW
+  ----------------------------------------- */
+
+  const generated =
+    generateFlow(code);
+
+  steps =
+    generated.steps;
+
+  step = 0;
+
+  updateFlowLabels();
+
+  render();
+
+  explainLogic();
+
+  $("#badge").title =
+    generated.name;
+
 
   $("#run").disabled = true;
 
-
   try{
 
-
-    /* ---------- JAVASCRIPT ---------- */
+    /* JAVASCRIPT */
 
     if(language === "javascript"){
 
@@ -3003,8 +3712,7 @@ async function runProgram(){
 
     }
 
-
-    /* ---------- PYTHON ---------- */
+    /* PYTHON */
 
     else if(language === "python"){
 
@@ -3029,8 +3737,7 @@ async function runProgram(){
 
     }
 
-
-    /* ---------- HTML / CSS ---------- */
+    /* HTML / CSS */
 
     else if(
       language === "html" ||
@@ -3051,8 +3758,7 @@ async function runProgram(){
 
     }
 
-
-    /* ---------- SERVER LANGUAGES ---------- */
+    /* SERVER LANGUAGES */
 
     else{
 
@@ -3063,7 +3769,6 @@ async function runProgram(){
         label +
         "…";
 
-
       const result =
         await runRemoteCode(
           language,
@@ -3071,10 +3776,8 @@ async function runProgram(){
           label
         );
 
-
       $("#output").textContent =
         result.output;
-
 
       $("#status").textContent =
         result.ok
@@ -3083,15 +3786,12 @@ async function runProgram(){
 
     }
 
-
   }catch(error){
 
     $("#output").textContent =
       "✕ Unexpected error\n\n" +
       String(
-        error && error.message
-          ? error.message
-          : error
+        error?.message || error
       );
 
     $("#status").textContent =
@@ -3099,16 +3799,18 @@ async function runProgram(){
 
   }
 
-
   $("#run").disabled = false;
 
+  /* Start the newly generated flow */
 
   play();
 
 }
 
 
-/* ---------- OPEN PREVIEW ---------- */
+/* =========================================================
+   OPEN PREVIEW
+========================================================= */
 
 function openBrowser(){
 
@@ -3118,13 +3820,11 @@ function openBrowser(){
   const code =
     $("#code").value;
 
-
   const html =
     buildFullDoc(
       language,
       code
     );
-
 
   const blob =
     new Blob(
@@ -3132,10 +3832,8 @@ function openBrowser(){
       {type:"text/html"}
     );
 
-
   const url =
     URL.createObjectURL(blob);
-
 
   window.open(
     url,
@@ -3147,8 +3845,7 @@ function openBrowser(){
 
 /* =========================================================
    EVENTS
-   ========================================================= */
-
+========================================================= */
 
 $("#run").addEventListener(
   "click",
@@ -3162,10 +3859,12 @@ $("#prev").addEventListener(
 
     stop();
 
+    if(!steps.length) return;
+
     step =
       step <= 0
-        ? steps.length - 1
-        : step - 1;
+        ? steps.length-1
+        : step-1;
 
     render();
 
@@ -3179,10 +3878,12 @@ $("#next").addEventListener(
 
     stop();
 
+    if(!steps.length) return;
+
     step =
-      step >= steps.length - 1
+      step >= steps.length-1
         ? 0
-        : step + 1;
+        : step+1;
 
     render();
 
@@ -3202,9 +3903,19 @@ $("#reset").addEventListener(
 
     stop();
 
+    putCode();
+
+    const generated =
+      generateFlow(
+        $("#code").value
+      );
+
+    steps =
+      generated.steps;
+
     step = 0;
 
-    putCode();
+    updateFlowLabels();
 
     render();
 
@@ -3249,9 +3960,19 @@ $("#language").addEventListener(
 
     stop();
 
+    putCode();
+
+    const generated =
+      generateFlow(
+        $("#code").value
+      );
+
+    steps =
+      generated.steps;
+
     step = 0;
 
-    putCode();
+    updateFlowLabels();
 
     render();
 
@@ -3292,7 +4013,9 @@ $("#code").addEventListener(
 );
 
 
-/* ---------- TAB KEY IN EDITOR ---------- */
+/* =========================================================
+   TAB SUPPORT
+========================================================= */
 
 $("#code").addEventListener(
   "keydown",
@@ -3311,17 +4034,14 @@ $("#code").addEventListener(
       const end =
         textarea.selectionEnd;
 
-
       textarea.value =
         textarea.value.substring(0,start) +
         "    " +
         textarea.value.substring(end);
 
-
       textarea.selectionStart =
         textarea.selectionEnd =
-          start + 4;
-
+          start+4;
 
       numberLines();
 
@@ -3331,7 +4051,9 @@ $("#code").addEventListener(
 );
 
 
-/* ---------- CTRL + ENTER ---------- */
+/* =========================================================
+   CTRL + ENTER
+========================================================= */
 
 document.addEventListener(
   "keydown",
@@ -3352,7 +4074,9 @@ document.addEventListener(
 );
 
 
-/* ---------- MOBILE MENU ---------- */
+/* =========================================================
+   MOBILE MENU
+========================================================= */
 
 $("#menuBtn").addEventListener(
   "click",
@@ -3381,13 +4105,23 @@ $("#siteNav")
   });
 
 
-/* ---------- INITIALIZE ---------- */
+/* =========================================================
+   INITIALIZE
+========================================================= */
 
 $("#year").textContent =
   new Date().getFullYear();
 
-
 putCode();
+
+steps =
+  generateFlow(
+    $("#code").value
+  ).steps;
+
+step = 0;
+
+updateFlowLabels();
 
 render();
 
@@ -3397,8 +4131,6 @@ updateWebUI();
 
 checkBackend();
 
-
-/* Check backend every 30 seconds */
 
 setInterval(
   checkBackend,
