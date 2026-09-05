@@ -1,1285 +1,3411 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TraceLab | Learn code by watching it run</title>
-<meta name="description" content="Paste code in 16 languages and watch TraceLab trace the execution flow step by step. JavaScript runs live, HTML/CSS render instantly, and every other language gets a guided flow visualization.">
-<meta name="theme-color" content="#5277f5" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e1423" media="(prefers-color-scheme: dark)">
-<meta property="og:type" content="website">
-<meta property="og:title" content="TraceLab | Learn code by watching it run">
-<meta property="og:description" content="An interactive playground that traces how your code runs, step by step, across 16 languages.">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TraceLab | Learn code by watching it run">
-<meta name="twitter:description" content="An interactive playground that traces how your code runs, step by step, across 16 languages.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%235277f5'/%3E%3Ctext x='16' y='21' font-family='monospace' font-size='13' font-weight='600' fill='white' text-anchor='middle'%3E%3E_%3C/text%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{--ink:#18223b;--muted:#6e7890;--line:#e6eaf1;--blue:#5277f5;--mint:#35cba4;--bg:#f8f9fc;--pale:#eff2ff}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,sans-serif}button,select,textarea{font:inherit}button{border:0;cursor:pointer}.top{height:72px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(22px,6vw,88px)}.brand{font-size:20px;font-weight:800;letter-spacing:-1px;display:flex;align-items:center;gap:10px}.mark{width:32px;height:32px;border-radius:10px;background:var(--blue);color:#fff;font:500 13px 'DM Mono';display:grid;place-items:center;box-shadow:0 7px 16px #5277f54d}.nav{display:flex;gap:27px;align-items:center;font-size:12px;font-weight:700;color:#737d90}.nav b{color:var(--ink)}.avatar{width:31px;height:31px;border-radius:50%;background:#efad98;color:#fff;display:grid;place-items:center;font-size:10px}main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebrow{color:#657ed8;text-transform:uppercase;letter-spacing:1.2px;font-weight:800;font-size:10px}h1{font-size:clamp(28px,3vw,40px);letter-spacing:-2px;margin:7px 0 8px;line-height:1.15}h1 span{color:var(--blue)}.sub{margin:0;color:var(--muted);font-size:14px}.workspace{margin-top:29px;display:grid;grid-template-columns:minmax(330px,.94fr) minmax(430px,1.35fr);background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 18px 50px #1a29420d}.editor{min-height:594px;border-right:1px solid var(--line);display:flex;flex-direction:column}.bar{height:58px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}.bar-actions{display:flex;align-items:center;gap:7px}.file{font:12px 'DM Mono';color:#4d5870}.file i{display:inline-block;width:10px;height:10px;background:#f3c158;border-radius:3px;margin-right:8px}.lang,.speed{border:0;background:transparent;color:#6d7790;font-size:12px;font-weight:700;outline:0}.detect{border:1px solid #dce3ff;background:#f6f7ff;color:#526de5;border-radius:7px;padding:6px 8px;font-size:10px;font-weight:800}.detect:hover{background:#e9edff}.codearea{position:relative;flex:1;background:#fcfcfe}.nums{position:absolute;left:0;top:16px;width:40px;text-align:right;color:#adb5c6;font:12px/27px 'DM Mono';user-select:none}textarea{width:100%;height:100%;min-height:300px;padding:16px 18px 16px 58px;border:0;outline:0;resize:none;background:transparent;color:#2b3852;font:13px/27px 'DM Mono'}.runbar{padding:13px 16px;display:flex;gap:10px;border-top:1px solid var(--line);align-items:center}.run{background:var(--blue);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:800;box-shadow:0 5px 13px #5277f542}.run:disabled{opacity:.6;cursor:progress}.reset,.circle{background:#f1f3f8;color:#536079;font-weight:800;border-radius:8px}.reset{padding:10px 13px;font-size:12px}.saved{margin-left:auto;font-size:11px;color:#9aa3b3;max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.server-pill{font-size:11px;font-weight:800;white-space:nowrap}.server-pill.online{color:#15956f}.server-pill.warning{color:#b07a12}.server-pill.offline{color:#e35b5b}.server-test{border:1px solid #dce3ff;background:#f6f7ff;color:#526de5;border-radius:7px;padding:6px 8px;font-size:10px;font-weight:800;cursor:pointer}.server-test:disabled{opacity:.55;cursor:wait}.console{min-height:128px;padding:14px 18px;background:#fbfcff;border-top:1px solid var(--line)}.chead{display:flex;justify-content:space-between;color:#929baa;text-transform:uppercase;letter-spacing:1px;font-size:10px;font-weight:800;margin-bottom:10px}.ok{color:#28a87f}.console pre{margin:0;color:#5b6881;font:12px/21px 'DM Mono';white-space:pre-wrap}.visual{min-width:0}.title{font-size:13px;font-weight:800}.badge{padding:5px 9px;border-radius:6px;background:var(--pale);color:#5570e9;font-size:10px;font-weight:800}.stage{height:317px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);background-image:radial-gradient(#d8deea 1px,transparent 1px);background-size:19px 19px}.line{position:absolute;left:9%;right:9%;top:156px;height:2px;background:#cdd6eb}.pulse{position:absolute;left:11%;top:151px;width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 7px #5277f523;z-index:2;transition:left .45s ease}.node{position:absolute;top:125px;transform:translateX(-50%);z-index:1;width:64px;height:64px;border:2px solid #dce1ec;border-radius:18px;display:grid;place-items:center;background:#fff;transition:.35s}.node small{position:absolute;top:74px;white-space:nowrap;color:#6e7890;font-size:10px;font-weight:800}.node span{font-size:20px}.n1{left:11%}.n2{left:30%}.n3{left:50%}.n4{left:70%}.n5{left:89%}.node.active{border-color:var(--blue);background:#edf1ff;transform:translateX(-50%) translateY(-8px) scale(1.08);box-shadow:0 10px 25px #5277f538}.node.done{background:#edfff9;border-color:#8adeca}.node.done:after{content:'✓';position:absolute;right:-7px;bottom:-7px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--mint);color:#fff;font-size:11px}.note{position:absolute;bottom:17px;left:25px;right:25px;text-align:center;color:#68738a;font-size:12px}.note b{color:var(--ink)}.timeline{padding:20px 25px}.toptime{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.toptime strong{font-size:13px}.toptime span{color:#8792a8;font:11px 'DM Mono'}.tracks{display:flex;gap:9px}.track{height:6px;flex:1;border-radius:8px;background:#edf0f5;transition:.2s}.track.done{background:#78dfc5}.track.now{background:var(--blue);box-shadow:0 0 0 4px #5277f51c}.labels{display:flex;justify-content:space-between;margin-top:7px;color:#9ba4b4;font-size:9px;font-weight:700}.controls{margin-top:18px;display:flex;justify-content:space-between;align-items:center}.circle{width:34px;height:34px;margin-right:6px;font-size:14px}.play{padding:9px 13px;border-radius:8px;background:var(--ink);color:#fff;font-size:11px;font-weight:800}.playing{background:var(--blue)!important;color:#fff!important}.lower{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:18px;margin-top:18px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px}.tiny{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#9099aa;font-weight:800;margin-bottom:12px}.card p{color:#68738a;font-size:13px;line-height:1.65;margin:0}.card p strong{color:#4b60d3}.variables{display:flex;gap:10px;flex-wrap:wrap}.var,.chip{padding:8px 11px;border-radius:7px;background:#f4f6fb;color:#53617b;font:12px 'DM Mono'}.var b{color:#293650}.focus{background:var(--pale);color:#4e69de;padding:8px 10px;border-radius:7px;font-size:11px;font-weight:800}.logic-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.logic-code{margin:10px 0 0;background:#fbfcff;border-left:3px solid var(--blue);padding:8px 10px;color:#48556d;font:11px/1.55 'DM Mono';white-space:pre-wrap;max-height:86px;overflow:auto}.languages{margin-top:16px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}.chip{font-size:10px;padding:5px 8px}.more{color:#8893a7;font-size:10px;font-weight:700}.hint{text-align:center;color:#929bac;font-size:12px;margin-top:20px}.hint b{color:#5570e9}.preview{display:none;padding:14px 18px;border-top:1px solid var(--line);background:#fbfcff}.preview iframe{width:100%;height:220px;border:1px solid var(--line);border-radius:10px;background:#fff}#openBrowser{color:#28a87f;border-color:#bfe9d9;background:#f2fbf8}#openBrowser:hover{background:#e6f8f2}
-html{scroll-behavior:smooth}.top{position:sticky;top:0;z-index:50}#playground,#how-it-works,#capabilities,#faq{scroll-margin-top:88px}.nav{gap:24px}.nav a{color:inherit;text-decoration:none}.nav a:hover{color:var(--ink)}.top-actions{display:flex;align-items:center;gap:14px}.cta{background:var(--ink);color:#fff;text-decoration:none;font-size:12px;font-weight:800;padding:10px 16px;border-radius:8px}.menu-btn{display:none;background:transparent;font-size:20px;color:var(--ink)}
-.hero{padding-top:6px}
-.section-head{max-width:520px;margin:0 auto 30px;text-align:center}.section-head h2{font-size:clamp(22px,2.4vw,28px);letter-spacing:-1px;margin:0 0 8px}.section-head p{color:var(--muted);font-size:14px;margin:0}
-.steps,.capabilities,.faq{max-width:1440px;margin:auto;padding:64px clamp(20px,6vw,88px)}
-.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.step .num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--pale);color:#4e69de;font:700 13px 'DM Mono';margin-bottom:14px}.step h3{margin:0 0 8px;font-size:15px}.step p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
-.cap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.cap-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.cap-card h3{margin:12px 0 8px;font-size:15px}.cap-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.cap-card code{background:var(--pale);color:#4e69de;padding:1px 5px;border-radius:4px;font:12px 'DM Mono'}
-.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px 40px}.faq-item h3{margin:0 0 6px;font-size:14px}.faq-item p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}
-.site-footer{border-top:1px solid var(--line);padding:32px clamp(20px,6vw,88px) 40px;max-width:1440px;margin:auto}.foot-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}.foot-links{display:flex;gap:22px;font-size:12px;font-weight:700;color:#737d90}.foot-links a{color:inherit;text-decoration:none}.foot-links a:hover{color:var(--ink)}.foot-note{margin:18px 0 0;color:#9099aa;font-size:12px}@media(max-width:1050px){.lower{grid-template-columns:1fr 1fr}.logic{grid-column:span 2}.cap-grid{grid-template-columns:1fr 1fr}}@media(max-width:860px){.nav{position:absolute;top:72px;left:0;right:0;background:#fff;flex-direction:column;align-items:flex-start;gap:0;border-bottom:1px solid var(--line);max-height:0;overflow:hidden;transition:max-height .25s ease}.nav.open{max-height:260px}.nav a{padding:14px clamp(22px,6vw,88px);width:100%}.menu-btn{display:block}.cta{display:none}.workspace{grid-template-columns:1fr}.editor{border-right:0;border-bottom:1px solid var(--line);min-height:450px}.lower{grid-template-columns:1fr}.logic{grid-column:auto}.step-grid,.cap-grid{grid-template-columns:1fr}.faq-grid{grid-template-columns:1fr}}@media(max-width:480px){main{padding-top:28px}.node{width:48px;height:48px;border-radius:15px;top:115px}.node small{top:57px;font-size:9px;white-space:normal;width:60px;text-align:center}.node span{font-size:16px}.line{top:139px}.pulse{top:134px}.stage{height:275px}.saved{display:none}.bar{padding:0 12px}.detect{font-size:9px;padding:5px}}
-@media (prefers-color-scheme: dark){:root{--ink:#edf2ff;--muted:#aeb8cc;--line:#2a3550;--blue:#86a0ff;--mint:#56dbb8;--bg:#0e1423;--pale:#202b4d}body{background:var(--bg);color:var(--ink)}.top,.workspace,.card,.node{background:#141c30;border-color:var(--line)}.nav{color:#a9b4ca}.nav b,.note b,.var b{color:var(--ink)}.brand{color:#f4f6ff}.editor{border-color:var(--line)}.bar,.console,.preview{background:#141c30;border-color:var(--line)}#openBrowser{background:#16302a;border-color:#2c5747;color:#7fe0bd}#openBrowser:hover{background:#1c3c33}.file{color:#b7c2d8}.lang,.speed{color:#bac5dd}.codearea{background:#11182a}.nums{color:#66728c}textarea{color:#d9e2f6}.reset,.circle{background:#28334c;color:#c7d1e6}.console{background:#11182a}.console pre{color:#bdc9df}.stage{background-color:#10182a;background-image:radial-gradient(#34415a 1px,transparent 1px);border-color:var(--line)}.line{background:#3a4764}.node{border-color:#40506f}.node.active{background:#26345e;border-color:var(--blue);box-shadow:0 10px 25px #86a0ff2e}.node.done{background:#173b37;border-color:#4d9f91}.note{color:#b3bed3}.toptime span,.labels{color:#96a3bd}.track{background:#29344b}.card p{color:#bac5d9}.var,.chip{background:#222d45;color:#c1cbe1}.logic-code{background:#101827;color:#cbd5e8;border-color:var(--blue)}.focus,.detect{background:#222e53;border-color:#40558f;color:#aebdff}.languages .tiny,.more,.hint{color:#9daac3}.badge{background:#27355f;color:#adbdff}.saved{color:#8794ac}.step,.cap-card{background:#141c30;border-color:var(--line)}.step .num{background:#202b4d;color:#aebdff}.step p,.cap-card p,.section-head p,.foot-note{color:#aeb8cc}.cap-card code{background:#202b4d;color:#aebdff}.faq-item p{color:#aeb8cc}.site-footer{border-color:var(--line)}.foot-links{color:#a9b4ca}.foot-links a:hover,.nav a:hover{color:#fff}.cta{background:#eef2ff;color:#18223b}.nav.open{background:#141c30}.menu-btn{color:#edf2ff}}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* Language selector readability */
-.lang{
-  color:var(--ink)!important;
-  background:var(--bg)!important;
-  border:1px solid var(--line)!important;
-  border-radius:7px;
-  padding:6px 8px;
-  color-scheme:light dark;
+<title>TraceLab | Learn Code by Watching It Run</title>
+<meta name="description" content="TraceLab is an interactive code playground with real execution and visual code flow.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --ink:#18223b;
+  --muted:#6e7890;
+  --line:#e5e9f1;
+  --blue:#5277f5;
+  --mint:#35cba4;
+  --bg:#f7f8fc;
+  --pale:#eef2ff;
+  --white:#fff;
+  --danger:#d84b4b;
 }
-.lang option,.lang optgroup,.speed option{
-  color:#18223b;
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:Manrope,Arial,sans-serif;
+}
+
+button,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  border:0;
+  cursor:pointer;
+}
+
+button:disabled{
+  cursor:wait;
+}
+
+.top{
+  height:72px;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 clamp(20px,6vw,88px);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-1px;
+}
+
+.mark{
+  width:32px;
+  height:32px;
+  border-radius:10px;
+  background:var(--blue);
+  color:#fff;
+  display:grid;
+  place-items:center;
+  font:500 13px "DM Mono";
+  box-shadow:0 7px 16px #5277f54d;
+}
+
+.nav{
+  display:flex;
+  gap:25px;
+  align-items:center;
+  font-size:12px;
+  font-weight:700;
+  color:#737d90;
+}
+
+.nav a{
+  color:inherit;
+  text-decoration:none;
+}
+
+.nav a:hover{
+  color:var(--ink);
+}
+
+.top-actions{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.cta{
+  background:var(--ink);
+  color:#fff;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+  padding:10px 15px;
+  border-radius:8px;
+}
+
+.menu-btn{
+  display:none;
+  background:transparent;
+  color:var(--ink);
+  font-size:20px;
+}
+
+main{
+  max-width:1440px;
+  margin:auto;
+  padding:42px clamp(18px,6vw,88px) 65px;
+}
+
+.hero{
+  padding-top:5px;
+}
+
+.eyebrow{
+  color:#657ed8;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+  font-weight:800;
+  font-size:10px;
+}
+
+h1{
+  font-size:clamp(30px,3vw,42px);
+  letter-spacing:-2px;
+  margin:8px 0;
+  line-height:1.15;
+}
+
+h1 span{
+  color:var(--blue);
+}
+
+.sub{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.6;
+}
+
+.workspace{
+  margin-top:30px;
+  display:grid;
+  grid-template-columns:minmax(350px,.95fr) minmax(430px,1.35fr);
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 18px 50px #1a29420d;
+}
+
+.editor{
+  min-height:620px;
+  border-right:1px solid var(--line);
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+
+.bar{
+  min-height:58px;
+  padding:0 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+  gap:10px;
+}
+
+.bar-actions{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  min-width:0;
+}
+
+.file{
+  font:12px "DM Mono";
+  color:#4d5870;
+  white-space:nowrap;
+}
+
+.file i{
+  display:inline-block;
+  width:10px;
+  height:10px;
+  background:#f3c158;
+  border-radius:3px;
+  margin-right:8px;
+}
+
+.lang{
+  border:1px solid #dfe4ef;
+  background:#fff;
+  color:#4e5a72;
+  border-radius:7px;
+  padding:7px 8px;
+  font-size:11px;
+  font-weight:800;
+  outline:none;
+  max-width:145px;
+}
+
+.lang:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px #5277f51a;
+}
+
+.detect{
+  border:1px solid #dce3ff;
+  background:#f6f7ff;
+  color:#526de5;
+  border-radius:7px;
+  padding:7px 9px;
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.detect:hover{
+  background:#e9edff;
+}
+
+.codearea{
+  position:relative;
+  flex:1;
+  min-height:360px;
+  display:grid;
+  grid-template-columns:55px minmax(0,1fr);
+  background:#fcfcfe;
+  overflow:hidden;
+}
+
+.nums{
+  margin:0;
+  padding:16px 10px 16px 0;
+  text-align:right;
+  color:#a9b1c0;
+  font:13px/27px "DM Mono",monospace;
+  user-select:none;
+  overflow:hidden;
+  white-space:pre;
+  border-right:1px solid #edf0f5;
+  background:#f8f9fc;
+}
+
+#code{
+  width:100%;
+  height:100%;
+  min-height:360px;
+  padding:16px 18px;
+  border:0;
+  outline:0;
+  resize:none;
+  background:#fcfcfe;
+  color:#263550;
+  font:13px/27px "DM Mono",monospace;
+  tab-size:4;
+  overflow:auto;
+}
+
+#code::selection{
+  background:#dfe6ff;
+}
+
+.runbar{
+  padding:13px 16px;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  border-top:1px solid var(--line);
+  background:#fff;
+  flex-wrap:wrap;
+}
+
+.run{
+  background:var(--blue);
+  color:#fff;
+  padding:10px 16px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:800;
+  box-shadow:0 5px 13px #5277f542;
+}
+
+.run:hover{
+  background:#456bea;
+}
+
+.run:disabled{
+  opacity:.65;
+}
+
+.reset{
+  background:#f1f3f8;
+  color:#536079;
+  padding:10px 13px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:800;
+}
+
+.saved{
+  margin-left:auto;
+  color:#8993a7;
+  font-size:10px;
+  white-space:nowrap;
+}
+
+.server-pill{
+  font-size:10px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+.server-pill.online{
+  color:#229a78;
+}
+
+.server-pill.warning{
+  color:#bd8524;
+}
+
+.server-pill.offline{
+  color:#c14d4d;
+}
+
+.console{
+  min-height:145px;
+  padding:14px 18px;
+  background:#fbfcff;
+  border-top:1px solid var(--line);
+}
+
+.chead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#929baa;
+  text-transform:uppercase;
+  letter-spacing:1px;
+  font-size:10px;
+  font-weight:800;
+  margin-bottom:10px;
+}
+
+.ok{
+  color:#28a87f;
+}
+
+.console pre{
+  margin:0;
+  color:#53617a;
+  font:12px/21px "DM Mono",monospace;
+  white-space:pre-wrap;
+  overflow:auto;
+  max-height:150px;
+}
+
+.preview{
+  display:none;
+  padding:14px 18px;
+  border-top:1px solid var(--line);
+  background:#fbfcff;
+}
+
+.preview iframe{
+  width:100%;
+  height:240px;
+  border:1px solid var(--line);
+  border-radius:10px;
   background:#fff;
 }
-@media (prefers-color-scheme:dark){
-  .lang{color:#edf2ff!important;background:#141c30!important;border-color:#40506f!important}
-  .lang option,.lang optgroup,.speed option{color:#edf2ff;background:#141c30}
+
+.visual{
+  min-width:0;
 }
-/* Blue pause state */
-.play{background:var(--blue)!important;color:#fff!important;box-shadow:0 5px 13px #5277f542}
-.play:hover{filter:brightness(.95)}
-.playing{background:var(--blue)!important;color:#fff!important}
-.speed{border:1px solid var(--line);border-radius:7px;padding:6px 8px;background:var(--bg);color:var(--ink)!important}
 
-/* TraceLab launch polish */
-.lang,.speed{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 28px 7px 10px;font-weight:800;cursor:pointer}
-.lang{min-width:136px}
-.lang option,.lang optgroup,.speed option{color:#18223b;background:#fff}
-.server-pill{font:700 10px 'DM Mono';color:#6b7892;white-space:nowrap}
-.server-pill.online{color:#25b98f}
-.server-pill.warning{color:#f3c158}
-.server-pill.offline{color:#e06d69}
-.playing{background:var(--blue)!important;color:#fff!important;box-shadow:0 5px 16px #5277f542}
-.play:hover{transform:translateY(-1px)}
-.runbar .saved{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.console pre{tab-size:2}
-@media(max-width:700px){.server-pill{display:none}.lang{min-width:115px}.runbar{flex-wrap:wrap}.runbar .saved{margin-left:0;width:100%}}
-@media (prefers-color-scheme:dark){.lang,.speed{background:#141c30;color:#edf2ff;border-color:#40506f}.lang option,.lang optgroup,.speed option{color:#edf2ff;background:#141c30}}
+.title{
+  font-size:13px;
+  font-weight:800;
+}
 
-.preview-link{color:#28a87f;text-decoration:none;font-weight:800}
-.preview-link:hover{text-decoration:underline}
-.preview-url{display:inline-block;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;margin-left:8px;color:#8792a8;font:10px 'DM Mono'}
-.node.empty{opacity:.28}
+.badge{
+  padding:5px 9px;
+  border-radius:6px;
+  background:var(--pale);
+  color:#5570e9;
+  font-size:10px;
+  font-weight:800;
+}
+
+.stage{
+  height:330px;
+  position:relative;
+  overflow:hidden;
+  border-bottom:1px solid var(--line);
+  background-color:#fff;
+  background-image:radial-gradient(#d8deea 1px,transparent 1px);
+  background-size:19px 19px;
+}
+
+.line{
+  position:absolute;
+  left:9%;
+  right:9%;
+  top:156px;
+  height:2px;
+  background:#cdd6eb;
+}
+
+.pulse{
+  position:absolute;
+  left:11%;
+  top:151px;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:var(--blue);
+  box-shadow:0 0 0 7px #5277f523;
+  z-index:3;
+  transition:left .45s ease;
+}
+
+.node{
+  position:absolute;
+  top:125px;
+  transform:translateX(-50%);
+  z-index:2;
+  width:64px;
+  height:64px;
+  border:2px solid #dce1ec;
+  border-radius:18px;
+  display:grid;
+  place-items:center;
+  background:#fff;
+  transition:.35s;
+}
+
+.node small{
+  position:absolute;
+  top:74px;
+  white-space:nowrap;
+  color:#6e7890;
+  font-size:10px;
+  font-weight:800;
+}
+
+.node span{
+  font-size:20px;
+}
+
+.n1{left:11%}
+.n2{left:30%}
+.n3{left:50%}
+.n4{left:70%}
+.n5{left:89%}
+
+.node.active{
+  border-color:var(--blue);
+  background:#edf1ff;
+  transform:translateX(-50%) translateY(-8px) scale(1.08);
+  box-shadow:0 10px 25px #5277f538;
+}
+
+.node.done{
+  background:#edfff9;
+  border-color:#8adeca;
+}
+
+.node.done:after{
+  content:"✓";
+  position:absolute;
+  right:-7px;
+  bottom:-7px;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--mint);
+  color:#fff;
+  font-size:11px;
+}
+
+.note{
+  position:absolute;
+  bottom:18px;
+  left:25px;
+  right:25px;
+  text-align:center;
+  color:#68738a;
+  font-size:12px;
+}
+
+.note b{
+  color:var(--ink);
+}
+
+.timeline{
+  padding:20px 25px;
+}
+
+.toptime{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.toptime strong{
+  font-size:13px;
+}
+
+.toptime span{
+  color:#8792a8;
+  font:11px "DM Mono";
+}
+
+.tracks{
+  display:flex;
+  gap:9px;
+}
+
+.track{
+  height:6px;
+  flex:1;
+  border-radius:8px;
+  background:#edf0f5;
+  transition:.2s;
+}
+
+.track.done{
+  background:#78dfc5;
+}
+
+.track.now{
+  background:var(--blue);
+  box-shadow:0 0 0 4px #5277f51c;
+}
+
+.labels{
+  display:flex;
+  justify-content:space-between;
+  margin-top:7px;
+  color:#9ba4b4;
+  font-size:9px;
+  font-weight:700;
+}
+
+.controls{
+  margin-top:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.circle{
+  width:34px;
+  height:34px;
+  margin-right:6px;
+  background:#f1f3f8;
+  color:#536079;
+  border-radius:8px;
+  font-weight:800;
+}
+
+.play{
+  padding:9px 13px;
+  border-radius:8px;
+  background:var(--ink);
+  color:#fff;
+  font-size:11px;
+  font-weight:800;
+}
+
+.playing{
+  background:var(--blue)!important;
+}
+
+.speed{
+  border:0;
+  background:transparent;
+  color:#6d7790;
+  font-size:11px;
+  font-weight:700;
+  outline:0;
+}
+
+.lower{
+  display:grid;
+  grid-template-columns:1fr 1fr 1.25fr;
+  gap:18px;
+  margin-top:18px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:20px 22px;
+}
+
+.tiny{
+  font-size:10px;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  color:#9099aa;
+  font-weight:800;
+  margin-bottom:12px;
+}
+
+.card p{
+  color:#68738a;
+  font-size:13px;
+  line-height:1.65;
+  margin:0;
+}
+
+.variables{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.var{
+  padding:8px 11px;
+  border-radius:7px;
+  background:#f4f6fb;
+  color:#53617b;
+  font:12px "DM Mono";
+}
+
+.var b{
+  color:#293650;
+}
+
+.focus{
+  background:var(--pale);
+  color:#4e69de;
+  padding:8px 10px;
+  border-radius:7px;
+  font-size:11px;
+  font-weight:800;
+}
+
+.logic-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.logic-code{
+  margin:10px 0 0;
+  background:#fbfcff;
+  border-left:3px solid var(--blue);
+  padding:8px 10px;
+  color:#48556d;
+  font:11px/1.55 "DM Mono";
+  white-space:pre-wrap;
+  max-height:100px;
+  overflow:auto;
+}
+
+.languages{
+  margin-top:17px;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
+.chip{
+  padding:5px 8px;
+  border-radius:7px;
+  background:#f4f6fb;
+  color:#53617b;
+  font:10px "DM Mono";
+}
+
+.hint{
+  text-align:center;
+  color:#929bac;
+  font-size:12px;
+  margin-top:20px;
+}
+
+.hint b{
+  color:#5570e9;
+}
+
+.steps,
+.capabilities,
+.faq{
+  max-width:1440px;
+  margin:auto;
+  padding:65px clamp(18px,6vw,88px);
+}
+
+.section-head{
+  max-width:540px;
+  margin:0 auto 30px;
+  text-align:center;
+}
+
+.section-head h2{
+  font-size:clamp(22px,2.4vw,28px);
+  letter-spacing:-1px;
+  margin:0 0 8px;
+}
+
+.section-head p{
+  color:var(--muted);
+  font-size:14px;
+  margin:0;
+}
+
+.step-grid,
+.cap-grid,
+.faq-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.step,
+.cap-card,
+.faq-item{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:24px;
+}
+
+.step .num{
+  display:inline-grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border-radius:8px;
+  background:var(--pale);
+  color:var(--blue);
+  font-weight:800;
+  font-size:12px;
+}
+
+.step h3,
+.cap-card h3,
+.faq-item h3{
+  font-size:15px;
+  margin:14px 0 8px;
+}
+
+.step p,
+.cap-card p,
+.faq-item p{
+  color:#68738a;
+  font-size:13px;
+  line-height:1.65;
+  margin:0;
+}
+
+.cap-grid{
+  grid-template-columns:repeat(4,1fr);
+}
+
+.cap-card .badge{
+  display:inline-block;
+}
+
+.site-footer{
+  border-top:1px solid var(--line);
+  background:#fff;
+  padding:35px clamp(18px,6vw,88px);
+}
+
+.foot-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.foot-links{
+  display:flex;
+  gap:20px;
+}
+
+.foot-links a{
+  color:#7b8598;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:700;
+}
+
+.foot-note{
+  max-width:700px;
+  color:#8993a7;
+  font-size:11px;
+  line-height:1.7;
+  margin:18px 0 0;
+}
+
+@media(max-width:1050px){
+  .workspace{
+    grid-template-columns:1fr;
+  }
+
+  .editor{
+    border-right:0;
+    border-bottom:1px solid var(--line);
+  }
+
+  .lower{
+    grid-template-columns:1fr;
+  }
+
+  .cap-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:760px){
+  .nav,
+  .top-actions .cta{
+    display:none;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+
+  .nav.open{
+    display:flex;
+    position:absolute;
+    top:72px;
+    left:0;
+    right:0;
+    padding:18px 22px;
+    background:#fff;
+    border-bottom:1px solid var(--line);
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+  .bar{
+    align-items:flex-start;
+    padding-top:12px;
+    padding-bottom:12px;
+    flex-wrap:wrap;
+  }
+
+  .bar-actions{
+    width:100%;
+    justify-content:flex-end;
+  }
+
+  .codearea{
+    min-height:340px;
+  }
+
+  #code{
+    min-height:340px;
+  }
+
+  .stage{
+    height:290px;
+  }
+
+  .node{
+    width:55px;
+    height:55px;
+  }
+
+  .node small{
+    top:65px;
+  }
+
+  .line{
+    top:143px;
+  }
+
+  .pulse{
+    top:138px;
+  }
+
+  .step-grid,
+  .cap-grid,
+  .faq-grid{
+    grid-template-columns:1fr;
+  }
+
+  .foot-top{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:18px;
+  }
+
+  .foot-links{
+    flex-wrap:wrap;
+  }
+}
 </style>
-
-<script src="https://cdn.jsdelivr.net/pyodide/v314.0.6/full/pyodide.js"></script>
 </head>
+
 <body>
-<header class="top"><div class="brand"><div class="mark">&gt;_</div>TraceLab</div><nav class="nav" id="siteNav"><a href="#playground">Playground</a><a href="#how-it-works">How it works</a><a href="#capabilities">What runs live</a><a href="#faq">FAQ</a></nav><div class="top-actions"><a class="cta" href="#playground">Start coding</a><button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button></div></header>
+
+<header class="top">
+
+  <div class="brand">
+    <div class="mark">&gt;_</div>
+    TraceLab
+  </div>
+
+  <nav class="nav" id="siteNav">
+    <a href="#playground">Playground</a>
+    <a href="#how-it-works">How it works</a>
+    <a href="#capabilities">What runs live</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+
+  <div class="top-actions">
+    <a class="cta" href="#playground">Start coding</a>
+    <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+  </div>
+
+</header>
+
 <main>
+
 <section class="hero">
-<div class="eyebrow">Interactive code playground</div><h1>Don’t just run code. <span>Watch it think.</span></h1><p class="sub">Write, run, and understand code in 16 supported languages — with real output and a visual execution flow.</p>
+  <div class="eyebrow">Interactive code playground</div>
+
+  <h1>
+    Don't just run code.
+    <span>Watch it think.</span>
+  </h1>
+
+  <p class="sub">
+    Write, run, and understand code with real output and a visual execution flow.
+  </p>
 </section>
+
+
 <section class="workspace" id="playground">
-<div class="editor"><div class="bar"><div class="file"><i></i><span id="file">main.py</span></div><div class="bar-actions"><button class="detect" id="detect">✦ Auto-detect</button><button class="detect" id="openBrowser" style="display:none">↗ Open in browser</button><select class="lang" id="language" aria-label="Select programming language"><optgroup label="Web"><option value="html">HTML</option><option value="css">CSS</option></optgroup><optgroup label="Popular"><option value="python">Python 3</option><option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="c">C</option><option value="cpp">C++</option><option value="java">Java</option><option value="go">Go</option></optgroup><optgroup label="Modern & mobile"><option value="kotlin">Kotlin</option><option value="swift">Swift</option></optgroup><optgroup label="Scripting & data"><option value="ruby">Ruby</option><option value="php">PHP</option><option value="perl">Perl</option><option value="bash">Bash</option><option value="sql">SQL</option></optgroup></select></div></div><div class="codearea"><div class="nums" id="nums"></div><textarea id="code" spellcheck="false" aria-label="Code editor"></textarea></div><div class="runbar"><button class="run" id="run">▶ Analyze & visualize</button><button class="reset" id="reset">↻ Reset</button><span class="saved" id="modeStatus">Python runs locally in your browser</span><span class="server-pill" id="serverStatus">● Checking backend…</span></div><div class="console"><div class="chead"><span>Output</span><span class="ok" id="status">● Ready</span></div><pre id="output">Analyze your code to see its execution flow.</pre></div><div class="preview" id="previewWrap"><div class="chead"><span>Live preview</span><span id="previewNote" style="color:#8792a8">Rendered in a sandboxed frame</span></div><iframe id="previewFrame" title="Live preview" sandbox="allow-scripts"></iframe></div></div>
-<div class="visual"><div class="bar"><span class="title">Program flow</span><span class="badge" id="badge">Step 1 of 5</span></div><div class="stage"><div class="line"></div><div class="pulse" id="pulse"></div><div class="node n1 active"><small>Start</small><span>▶</span></div><div class="node n2"><small>Get input</small><span>⌨</span></div><div class="node n3"><small>Work it out</small><span>⚙</span></div><div class="node n4"><small>Make a choice</small><span>◆</span></div><div class="node n5"><small>Show result</small><span>✓</span></div><p class="note" id="note"><b>Start</b> — the program enters its first instruction.</p></div><div class="timeline"><div class="toptime"><strong id="stepname">Start program</strong><span id="lineref">line 1</span></div><div class="tracks" id="tracks"><i class="track now"></i><i class="track"></i><i class="track"></i><i class="track"></i><i class="track"></i></div><div class="labels" id="labels"><span>Start</span><span>Get input</span><span>Work it out</span><span>Make a choice</span><span>Show result</span></div><div class="controls"><div><button class="circle" id="prev" aria-label="Previous step">←</button><button class="circle" id="next" aria-label="Next step">→</button><button class="play" id="play">▶ Play flow</button></div><select class="speed" id="speed"><option value="1400">1× speed</option><option value="800">1.5× speed</option><option value="500">2× speed</option></select></div></div></div>
+
+<!-- ================= EDITOR ================= -->
+
+<div class="editor">
+
+  <div class="bar">
+
+    <div class="file">
+      <i></i>
+      <span id="file">main.py</span>
+    </div>
+
+    <div class="bar-actions">
+
+      <button class="detect" id="detect">
+        ✦ Auto-detect
+      </button>
+
+      <button class="detect" id="openBrowser" style="display:none">
+        ↗ Open in browser
+      </button>
+
+      <select class="lang" id="language" aria-label="Programming language">
+
+        <optgroup label="Web">
+          <option value="html">HTML</option>
+          <option value="css">CSS</option>
+        </optgroup>
+
+        <optgroup label="Popular">
+          <option value="python">Python 3</option>
+          <option value="javascript">JavaScript</option>
+          <option value="typescript">TypeScript</option>
+          <option value="c">C</option>
+          <option value="cpp">C++</option>
+          <option value="java">Java</option>
+          <option value="go">Go</option>
+        </optgroup>
+
+        <optgroup label="Modern & Mobile">
+          <option value="kotlin">Kotlin</option>
+          <option value="swift">Swift</option>
+        </optgroup>
+
+        <optgroup label="Scripting & Data">
+          <option value="ruby">Ruby</option>
+          <option value="php">PHP</option>
+          <option value="perl">Perl</option>
+          <option value="bash">Bash</option>
+          <option value="sql">SQL</option>
+        </optgroup>
+
+      </select>
+
+    </div>
+  </div>
+
+
+  <!-- CODE EDITOR WITH LINE NUMBERS -->
+
+  <div class="codearea">
+
+    <pre class="nums" id="nums">1</pre>
+
+    <textarea
+      id="code"
+      spellcheck="false"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="off"
+      aria-label="Code editor"
+    ></textarea>
+
+  </div>
+
+
+  <div class="runbar">
+
+    <button class="run" id="run">
+      ▶ Analyze & visualize
+    </button>
+
+    <button class="reset" id="reset">
+      ↻ Reset
+    </button>
+
+    <span class="saved" id="modeStatus">
+      Python runs locally in your browser
+    </span>
+
+    <span class="server-pill" id="serverStatus">
+      ● Checking backend…
+    </span>
+
+  </div>
+
+
+  <!-- OUTPUT -->
+
+  <div class="console">
+
+    <div class="chead">
+      <span>Output</span>
+      <span class="ok" id="status">● Ready</span>
+    </div>
+
+    <pre id="output">Analyze your code to see its execution flow.</pre>
+
+  </div>
+
+
+  <!-- HTML/CSS PREVIEW -->
+
+  <div class="preview" id="previewWrap">
+
+    <div class="chead">
+      <span>Live preview</span>
+      <span>Sandboxed preview</span>
+    </div>
+
+    <iframe
+      id="previewFrame"
+      title="Live preview"
+      sandbox="allow-scripts"
+    ></iframe>
+
+  </div>
+
+</div>
+
+
+<!-- ================= VISUAL FLOW ================= -->
+
+<div class="visual">
+
+  <div class="bar">
+    <span class="title">Program flow</span>
+    <span class="badge" id="badge">Step 1 of 5</span>
+  </div>
+
+
+  <div class="stage">
+
+    <div class="line"></div>
+
+    <div class="pulse" id="pulse"></div>
+
+    <div class="node n1 active">
+      <small>Start</small>
+      <span>⚡</span>
+    </div>
+
+    <div class="node n2">
+      <small>Setup</small>
+      <span>📦</span>
+    </div>
+
+    <div class="node n3">
+      <small>Loop</small>
+      <span>↻</span>
+    </div>
+
+    <div class="node n4">
+      <small>Update</small>
+      <span>＋</span>
+    </div>
+
+    <div class="node n5">
+      <small>Output</small>
+      <span>⌁</span>
+    </div>
+
+    <p class="note" id="note">
+      <b>Start</b> — the program enters its first instruction.
+    </p>
+
+  </div>
+
+
+  <div class="timeline">
+
+    <div class="toptime">
+      <strong id="stepname">Start program</strong>
+      <span id="lineref">line 1</span>
+    </div>
+
+
+    <div class="tracks">
+
+      <i class="track now"></i>
+      <i class="track"></i>
+      <i class="track"></i>
+      <i class="track"></i>
+      <i class="track"></i>
+
+    </div>
+
+
+    <div class="labels">
+      <span>Start</span>
+      <span>Setup</span>
+      <span>Loop</span>
+      <span>Update</span>
+      <span>Print</span>
+    </div>
+
+
+    <div class="controls">
+
+      <div>
+
+        <button class="circle" id="prev" aria-label="Previous step">
+          ←
+        </button>
+
+        <button class="circle" id="next" aria-label="Next step">
+          →
+        </button>
+
+        <button class="play" id="play">
+          ▶ Play flow
+        </button>
+
+      </div>
+
+
+      <select class="speed" id="speed">
+
+        <option value="1400">1× speed</option>
+        <option value="800">1.5× speed</option>
+        <option value="500">2× speed</option>
+
+      </select>
+
+    </div>
+
+  </div>
+
+</div>
+
 </section>
-<section class="lower"><div class="card"><div class="tiny">What’s happening now</div><p id="insight"><strong>Execution begins.</strong> We prepare the workspace before reading your variables and instructions.</p></div><div class="card"><div class="tiny">Live variables</div><div class="variables" id="vars"></div></div><div class="card logic"><div class="logic-top"><div class="tiny" style="margin:0">Main logic finder</div><button class="focus" id="focus">⌘ Explain main logic</button></div><p id="logicSummary">For larger programs, TraceLab finds loops, decisions, and functions so students can start with the important path.</p><pre class="logic-code" id="logicCode">Run this view on any pasted code.</pre></div></section><div class="languages"><span class="tiny" style="margin:0 4px 0 0">16 supported</span><span class="chip">HTML / CSS</span><span class="chip">Python</span><span class="chip">JavaScript</span><span class="chip">TypeScript</span><span class="chip">C / C++</span><span class="chip">Java / Go</span><span class="chip">Kotlin / Swift</span><span class="chip">Ruby / PHP</span><span class="chip">Perl / Bash</span><span class="chip">SQL</span></div><p class="hint">Choose any point in the timeline with <b>← →</b>, or let TraceLab play the whole story for you.</p>
+
+
+<!-- ================= LOWER CARDS ================= -->
+
+<section class="lower">
+
+  <div class="card">
+
+    <div class="tiny">
+      What's happening now
+    </div>
+
+    <p id="insight">
+      <strong>Execution begins.</strong>
+      We prepare the workspace before reading your variables and instructions.
+    </p>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="tiny">
+      Live variables
+    </div>
+
+    <div class="variables" id="vars"></div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="logic-top">
+
+      <div class="tiny" style="margin:0">
+        Main logic finder
+      </div>
+
+      <button class="focus" id="focus">
+        ⌘ Explain main logic
+      </button>
+
+    </div>
+
+    <p id="logicSummary">
+      TraceLab finds loops, decisions, and functions so you can start with the important path.
+    </p>
+
+    <pre class="logic-code" id="logicCode">
+Run this view on any pasted code.
+    </pre>
+
+  </div>
+
+</section>
+
+
+<div class="languages">
+
+  <span class="tiny" style="margin:0 4px 0 0">
+    16 supported
+  </span>
+
+  <span class="chip">HTML / CSS</span>
+  <span class="chip">Python</span>
+  <span class="chip">JavaScript</span>
+  <span class="chip">TypeScript</span>
+  <span class="chip">C / C++</span>
+  <span class="chip">Java / Go</span>
+  <span class="chip">Kotlin / Swift</span>
+  <span class="chip">Ruby / PHP</span>
+  <span class="chip">Perl / Bash</span>
+  <span class="chip">SQL</span>
+
+</div>
+
+
+<p class="hint">
+  Use <b>Analyze & visualize</b> to run your code and watch the execution flow.
+</p>
+
 </main>
-<section class="steps" id="how-it-works"><div class="section-head"><h2>How it works</h2><p>Three steps between a blank editor and a traced program.</p></div><div class="step-grid"><div class="step"><span class="num">1</span><h3>Write or paste code</h3><p>Start from the built-in example or bring your own. TraceLab keeps line numbers so you can follow along.</p></div><div class="step"><span class="num">2</span><h3>Pick a language, or let TraceLab guess</h3><p>Choose from 16 supported languages, or hit Auto-detect to match your code against language signatures on the spot.</p></div><div class="step"><span class="num">3</span><h3>Run it</h3><p>Python, JavaScript, HTML, and CSS execute for real. The remaining languages are compiled or interpreted through a sandboxed execution service.</p></div></div></section>
-<section class="capabilities" id="capabilities"><div class="section-head"><h2>What actually runs</h2><p>TraceLab is upfront about how each supported language is executed.</p></div><div class="cap-grid"><div class="cap-card"><span class="badge">Live</span><h3>Python</h3><p>Runs for real using Pyodide, a full Python build compiled to WebAssembly. The first run loads the runtime in your browser; after that it's instant.</p></div><div class="cap-card"><span class="badge">Live</span><h3>JavaScript</h3><p>Runs in a sandboxed frame right in your browser. <code>console.log</code> output shows up in the console, for real — nothing is sent to a server.</p></div><div class="cap-card"><span class="badge">Live</span><h3>HTML &amp; CSS</h3><p>Renders in an inline preview as you edit, with an "Open in browser" button to view the full page in its own tab.</p></div><div class="cap-card"><span class="badge">Live</span><h3>12 hosted runtimes</h3><p>TypeScript, C, C++, Java, Go, Kotlin, Swift, Ruby, PHP, Perl, Bash, and SQL run through the TraceLab hosted execution backend.</p></div></div></section>
-<section class="faq" id="faq"><div class="section-head"><h2>Frequently asked</h2></div><div class="faq-grid"><div class="faq-item"><h3>Is this a real compiler?</h3><p>Yes. Python, JavaScript, HTML, and CSS execute in the browser, while the other supported languages use the connected sandbox execution service for real compile/run output.</p></div><div class="faq-item"><h3>Where does my code run?</h3><p>Your source code is sent to the TraceLab execution backend only when you run a server language. The backend forwards it to an isolated sandbox and returns stdout/stderr.</p></div><div class="faq-item"><h3>Can I use this to teach a class?</h3><p>Yes — it's built for walking through control flow one step at a time, which works well alongside live instruction.</p></div><div class="faq-item"><h3>Will more languages get real execution?</h3><p>The playground now supports a connected execution service for the non-browser languages. For this free launch, the Node backend keeps the execution API key private; the free provider is intended for demos and light usage.</p></div></div></section>
-<footer class="site-footer"><div class="foot-top"><div class="brand"><div class="mark">&gt;_</div>TraceLab</div><nav class="foot-links"><a href="#playground">Playground</a><a href="#how-it-works">How it works</a><a href="#capabilities">What runs live</a><a href="#faq">FAQ</a></nav></div><p class="foot-note">TraceLab traces execution flow across 16 languages, with live execution for Python, JavaScript, HTML, and CSS. © <span id="year"></span> · Built for people learning to read code.</p></footer>
+
+
+<!-- ================= HOW IT WORKS ================= -->
+
+<section class="steps" id="how-it-works">
+
+  <div class="section-head">
+    <h2>How it works</h2>
+    <p>
+      Three steps between a blank editor and a traced program.
+    </p>
+  </div>
+
+
+  <div class="step-grid">
+
+    <div class="step">
+
+      <span class="num">1</span>
+
+      <h3>Write or paste code</h3>
+
+      <p>
+        Start with the built-in example or paste your own code.
+        Line numbers make it easy to follow the execution.
+      </p>
+
+    </div>
+
+
+    <div class="step">
+
+      <span class="num">2</span>
+
+      <h3>Choose a language</h3>
+
+      <p>
+        Choose from the supported languages or use Auto-detect.
+      </p>
+
+    </div>
+
+
+    <div class="step">
+
+      <span class="num">3</span>
+
+      <h3>Analyze and run</h3>
+
+      <p>
+        TraceLab executes supported code and shows the result
+        together with a visual execution flow.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= CAPABILITIES ================= -->
+
+<section class="capabilities" id="capabilities">
+
+  <div class="section-head">
+
+    <h2>What actually runs</h2>
+
+    <p>
+      TraceLab uses browser execution for some languages and
+      the hosted backend for compiled languages.
+    </p>
+
+  </div>
+
+
+  <div class="cap-grid">
+
+    <div class="cap-card">
+      <span class="badge">Live</span>
+      <h3>Python</h3>
+      <p>
+        Python runs locally in the browser using Pyodide.
+      </p>
+    </div>
+
+
+    <div class="cap-card">
+      <span class="badge">Live</span>
+      <h3>JavaScript</h3>
+      <p>
+        JavaScript executes inside a sandboxed browser frame.
+      </p>
+    </div>
+
+
+    <div class="cap-card">
+      <span class="badge">Live</span>
+      <h3>HTML & CSS</h3>
+      <p>
+        HTML and CSS render directly inside the live preview.
+      </p>
+    </div>
+
+
+    <div class="cap-card">
+      <span class="badge">Live</span>
+      <h3>Hosted runtimes</h3>
+      <p>
+        C, C++, Java, Go, Kotlin, Swift, Ruby, PHP, Perl,
+        Bash, SQL and TypeScript use the TraceLab backend.
+      </p>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= FAQ ================= -->
+
+<section class="faq" id="faq">
+
+  <div class="section-head">
+
+    <h2>Frequently asked</h2>
+
+  </div>
+
+
+  <div class="faq-grid">
+
+    <div class="faq-item">
+
+      <h3>Is this real execution?</h3>
+
+      <p>
+        Yes. Browser languages run in the browser and the
+        hosted languages are sent to the TraceLab execution backend.
+      </p>
+
+    </div>
+
+
+    <div class="faq-item">
+
+      <h3>Where does my code run?</h3>
+
+      <p>
+        Server languages are sent to the TraceLab backend only
+        when you press the Analyze button.
+      </p>
+
+    </div>
+
+
+    <div class="faq-item">
+
+      <h3>Can multiple people use it?</h3>
+
+      <p>
+        Yes. Each execution request is handled independently.
+        The backend does not use one shared code state for all visitors.
+      </p>
+
+    </div>
+
+
+    <div class="faq-item">
+
+      <h3>Why can the first request be slow?</h3>
+
+      <p>
+        The free Render service can sleep when unused.
+        The first request after sleeping may therefore take longer.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<footer class="site-footer">
+
+  <div class="foot-top">
+
+    <div class="brand">
+      <div class="mark">&gt;_</div>
+      TraceLab
+    </div>
+
+    <nav class="foot-links">
+      <a href="#playground">Playground</a>
+      <a href="#how-it-works">How it works</a>
+      <a href="#capabilities">What runs live</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+  </div>
+
+
+  <p class="foot-note">
+    TraceLab is an interactive code playground for learning
+    programming through real execution and visual flow.
+    © <span id="year"></span> TraceLab.
+  </p>
+
+</footer>
+
+
 <script>
-"use strict";
 
 /* =========================================================
-   TRACE LAB - EXECUTION / FLOW PROCESS
-   The page structure and visual frame stay unchanged.
-========================================================= */
+   TRACE LAB
+   FRONTEND
+   ========================================================= */
 
-const TRACELAB_BACKEND = "https://tracelab-free.onrender.com";
-const TRACELAB_EXECUTOR_URL = `${TRACELAB_BACKEND}/api/execute`;
-const PYODIDE_VERSION = "314.0.6";
-const PYODIDE_INDEX = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`;
 
-const $ = selector => document.querySelector(selector);
-const nodes = [...document.querySelectorAll(".node")];
-const tracks = [...document.querySelectorAll(".track")];
-const nodeLabels = [...document.querySelectorAll(".node small")];
-const nodeIcons = [...document.querySelectorAll(".node span")];
+/* ---------- SAMPLE CODE ---------- */
 
 const codes = {
-  html:["index.html",["<!doctype html>","<html>","  <head>","    <title>My Page</title>","  </head>","  <body>","    <h1>Hello, world!</h1>","    <p>Edit this HTML, then click Run or \\\"Open in browser\\\".</p>","  </body>","</html>"]],
-  css:["style.css",["body {","  font-family: sans-serif;","  background: #f4f6fb;","}","","h1 {","  color: #5277f5;","}","","button {","  background: #5277f5;","  color: #fff;","  border: 0;","  padding: 8px 14px;","  border-radius: 8px;","}"]],
-  python:["main.py",["numbers = [3, 7, 2, 9]","total = 0","","for number in numbers:","    total += number","","print(total)"]],
-  javascript:["main.js",["const numbers = [3, 7, 2, 9];","let total = 0;","","for (const number of numbers) {","  total += number;","}","","console.log(total);"]],
-  typescript:["main.ts",["const numbers: number[] = [3, 7, 2, 9];","const total = numbers.reduce((sum, n) => sum + n, 0);","console.log(total);"]],
-  c:["main.c",["#include <stdio.h>","","int main(void) {","    int numbers[] = {3, 7, 2, 9};","    int total = 0;","    for (int i = 0; i < 4; i++) total += numbers[i];","    printf(\"%d\\n\", total);","    return 0;","}"]],
-  cpp:["main.cpp",["#include <iostream>","","int main() {","    int numbers[] = {3, 7, 2, 9};","    int total = 0;","    for (int number : numbers) total += number;","    std::cout << total << \"\\n\";","    return 0;","}"]],
-  java:["Main.java",["class Main {","  public static void main(String[] args) {","    int[] numbers = {3, 7, 2, 9};","    int total = 0;","    for (int number : numbers) total += number;","    System.out.println(total);","  }","}"]],
-  go:["main.go",["package main","","import \"fmt\"","","func main() {","  numbers := []int{3, 7, 2, 9}","  total := 0","  for _, number := range numbers {","    total += number","  }","  fmt.Println(total)","}"]],
-  kotlin:["Main.kt",["fun main() {","  val numbers = intArrayOf(3, 7, 2, 9)","  var total = 0","  for (number in numbers) total += number","  println(total)","}"]],
-  swift:["main.swift",["let numbers = [3, 7, 2, 9]","var total = 0","","for number in numbers {","    total += number","}","","print(total)"]],
-  ruby:["main.rb",["numbers = [3, 7, 2, 9]","total = 0","","numbers.each do |number|","  total += number","end","","puts total"]],
-  php:["main.php",["<?php","$numbers = [3, 7, 2, 9];","$total = 0;","foreach ($numbers as $number) {","    $total += $number;","}","echo $total, PHP_EOL;"]],
-  perl:["main.pl",["my @numbers = (3, 7, 2, 9);","my $total = 0;","for my $number (@numbers) {","    $total += $number;","}","print \"$total\\n\";"]],
-  bash:["main.sh",["total=0","for number in 3 7 2 9; do","  total=$((total + number))","done","echo \"$total\""]],
-  sql:["main.sql",["SELECT 3 + 7 + 2 + 9 AS total;"]]
+
+  html: [
+    "index.html",
+    [
+      "<!doctype html>",
+      "<html>",
+      "<head>",
+      "  <title>TraceLab</title>",
+      "</head>",
+      "<body>",
+      "  <h1>Hello, world!</h1>",
+      "  <p>Welcome to TraceLab.</p>",
+      "</body>",
+      "</html>"
+    ]
+  ],
+
+  css: [
+    "style.css",
+    [
+      "body {",
+      "  font-family: sans-serif;",
+      "  background: #f4f6fb;",
+      "}",
+      "",
+      "h1 {",
+      "  color: #5277f5;",
+      "}",
+      "",
+      "button {",
+      "  background: #5277f5;",
+      "  color: white;",
+      "  padding: 10px 15px;",
+      "  border: 0;",
+      "  border-radius: 8px;",
+      "}"
+    ]
+  ],
+
+  python: [
+    "main.py",
+    [
+      "numbers = [3, 7, 2, 9]",
+      "total = 0",
+      "",
+      "for number in numbers:",
+      "    total += number",
+      "",
+      "print(total)"
+    ]
+  ],
+
+  javascript: [
+    "main.js",
+    [
+      "const numbers = [3, 7, 2, 9];",
+      "let total = 0;",
+      "",
+      "for (const number of numbers) {",
+      "  total += number;",
+      "}",
+      "",
+      "console.log(total);"
+    ]
+  ],
+
+  typescript: [
+    "main.ts",
+    [
+      "const numbers: number[] = [3, 7, 2, 9];",
+      "const total = numbers.reduce((sum, n) => sum + n, 0);",
+      "console.log(total);"
+    ]
+  ],
+
+  c: [
+    "main.c",
+    [
+      "#include <stdio.h>",
+      "",
+      "int main(void) {",
+      "    int numbers[] = {3, 7, 2, 9};",
+      "    int total = 0;",
+      "    for (int i = 0; i < 4; i++) {",
+      "        total += numbers[i];",
+      "    }",
+      "    printf(\"%d\\n\", total);",
+      "    return 0;",
+      "}"
+    ]
+  ],
+
+  cpp: [
+    "main.cpp",
+    [
+      "#include <iostream>",
+      "",
+      "int main() {",
+      "    int numbers[] = {3, 7, 2, 9};",
+      "    int total = 0;",
+      "",
+      "    for (int number : numbers) {",
+      "        total += number;",
+      "    }",
+      "",
+      "    std::cout << total << \"\\n\";",
+      "    return 0;",
+      "}"
+    ]
+  ],
+
+  java: [
+    "Main.java",
+    [
+      "class Main {",
+      "  public static void main(String[] args) {",
+      "    int[] numbers = {3, 7, 2, 9};",
+      "    int total = 0;",
+      "",
+      "    for (int number : numbers) {",
+      "      total += number;",
+      "    }",
+      "",
+      "    System.out.println(total);",
+      "  }",
+      "}"
+    ]
+  ],
+
+  go: [
+    "main.go",
+    [
+      "package main",
+      "",
+      "import \"fmt\"",
+      "",
+      "func main() {",
+      "  numbers := []int{3, 7, 2, 9}",
+      "  total := 0",
+      "",
+      "  for _, number := range numbers {",
+      "    total += number",
+      "  }",
+      "",
+      "  fmt.Println(total)",
+      "}"
+    ]
+  ],
+
+  kotlin: [
+    "Main.kt",
+    [
+      "fun main() {",
+      "  val numbers = intArrayOf(3, 7, 2, 9)",
+      "  var total = 0",
+      "",
+      "  for (number in numbers) {",
+      "    total += number",
+      "  }",
+      "",
+      "  println(total)",
+      "}"
+    ]
+  ],
+
+  swift: [
+    "main.swift",
+    [
+      "let numbers = [3, 7, 2, 9]",
+      "var total = 0",
+      "",
+      "for number in numbers {",
+      "    total += number",
+      "}",
+      "",
+      "print(total)"
+    ]
+  ],
+
+  ruby: [
+    "main.rb",
+    [
+      "numbers = [3, 7, 2, 9]",
+      "total = 0",
+      "",
+      "numbers.each do |number|",
+      "  total += number",
+      "end",
+      "",
+      "puts total"
+    ]
+  ],
+
+  php: [
+    "main.php",
+    [
+      "<?php",
+      "$numbers = [3, 7, 2, 9];",
+      "$total = 0;",
+      "",
+      "foreach ($numbers as $number) {",
+      "    $total += $number;",
+      "}",
+      "",
+      "echo $total, PHP_EOL;"
+    ]
+  ],
+
+  perl: [
+    "main.pl",
+    [
+      "my @numbers = (3, 7, 2, 9);",
+      "my $total = 0;",
+      "",
+      "for my $number (@numbers) {",
+      "    $total += $number;",
+      "}",
+      "",
+      "print \"$total\\n\";"
+    ]
+  ],
+
+  bash: [
+    "main.sh",
+    [
+      "total=0",
+      "",
+      "for number in 3 7 2 9; do",
+      "  total=$((total + number))",
+      "done",
+      "",
+      "echo \"$total\""
+    ]
+  ],
+
+  sql: [
+    "main.sql",
+    [
+      "SELECT 3 + 7 + 2 + 9 AS total;"
+    ]
+  ]
+
 };
 
-const languageLabels = {
-  html:"HTML", css:"CSS", python:"Python", javascript:"JavaScript",
-  typescript:"TypeScript", c:"C", cpp:"C++", java:"Java", go:"Go",
-  kotlin:"Kotlin", swift:"Swift", ruby:"Ruby", php:"PHP", perl:"Perl",
-  bash:"Bash", sql:"SQL"
-};
 
-const STEP_TYPES = {
-  start:{label:"Start",icon:"▶"},
-  input:{label:"Get input",icon:"⌨"},
-  process:{label:"Work it out",icon:"⚙"},
-  condition:{label:"Make a choice",icon:"◆"},
-  loop:{label:"Repeat",icon:"↻"},
-  output:{label:"Show result",icon:"✓"},
-  finish:{label:"Done",icon:"✓"},
-  error:{label:"Fix error",icon:"!"}
-};
+/* ---------- DOM HELPER ---------- */
 
-let flowTimer = null;
+const $ = selector => document.querySelector(selector);
+
+
+/* ---------- FLOW ---------- */
+
+const nodes = [...document.querySelectorAll(".node")];
+const tracks = [...document.querySelectorAll(".track")];
+
 let step = 0;
-let executionId = 0;
-let currentFlow = [];
-let previewUrl = null;
-let pyodidePromise = null;
+let timer = null;
 
-function escapeHtml(value){
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
 
-function setStatus(text,type="ready"){
-  $("#status").textContent = text;
-  $("#status").className =
-    type === "error" ? "status-error" :
-    type === "running" ? "status-running" :
-    "status-ready";
-}
+const steps = [
 
-function stop(){
-  if(flowTimer){
-    clearInterval(flowTimer);
-    flowTimer = null;
-  }
-  $("#play").textContent = "▶ Play flow";
-  $("#play").classList.remove("playing");
-}
+  [
+    "Start program",
+    "line 1",
+    "<b>Start</b> — the program enters its first instruction.",
+    "<strong>Execution begins.</strong> TraceLab starts reading the program.",
+    '<span class="var"><b>program</b> = starting</span>'
+  ],
+
+  [
+    "Create variables",
+    "setup",
+    "<b>Setup</b> — variables are created.",
+    "<strong>Variables are prepared.</strong> The program stores the values it needs.",
+    '<span class="var"><b>numbers</b> = [3,7,2,9]</span><span class="var"><b>total</b> = 0</span>'
+  ],
+
+  [
+    "Read next value",
+    "loop",
+    "<b>Loop</b> — the program reads a value.",
+    "<strong>The loop repeats.</strong> One item is processed at a time.",
+    '<span class="var"><b>number</b> = 3</span>'
+  ],
+
+  [
+    "Update value",
+    "inside loop",
+    "<b>Update</b> — the current value changes the result.",
+    "<strong>An expression is evaluated.</strong> The new value is stored.",
+    '<span class="var"><b>total</b> = 3</span>'
+  ],
+
+  [
+    "Show result",
+    "output",
+    "<b>Output</b> — the program reaches its output statement.",
+    "<strong>The program finishes.</strong> The result is displayed.",
+    '<span class="var"><b>status</b> = complete</span>'
+  ]
+
+];
+
+
+/* ---------- LINE NUMBERS ---------- */
 
 function numberLines(){
-  $("#nums").innerHTML = $("#code").value
-    .split("\n")
-    .map((_,i)=>i+1)
-    .join("<br>");
+
+  const code = $("#code");
+  const nums = $("#nums");
+
+  if(!code || !nums) return;
+
+  const count = Math.max(
+    1,
+    code.value.split("\n").length
+  );
+
+  nums.textContent =
+    Array.from(
+      {length:count},
+      (_,i) => i + 1
+    ).join("\n");
+
 }
+
+
+/* ---------- KEEP LINE NUMBERS SCROLLING ---------- */
+
+function syncLineNumbers(){
+
+  const code = $("#code");
+  const nums = $("#nums");
+
+  if(!code || !nums) return;
+
+  nums.scrollTop = code.scrollTop;
+
+}
+
+
+/* ---------- LOAD SAMPLE CODE ---------- */
 
 function putCode(){
-  const language = $("#language").value;
-  const data = codes[language];
-  if(!data) return;
-  $("#file").textContent = data[0];
-  $("#code").value = data[1].join("\n");
-  $("#stdin").value = "";
+
+  const language = $("#language");
+
+  if(!language) return;
+
+  const key = language.value;
+
+  const sample = codes[key];
+
+  if(!sample) return;
+
+  $("#file").textContent = sample[0];
+
+  $("#code").value = sample[1].join("\n");
+
   numberLines();
-  updateInputUI();
+
+  $("#code").scrollTop = 0;
+
+  $("#nums").scrollTop = 0;
+
 }
 
-function classifyLine(line,language){
-  const text = line.trim();
-  if(!text) return {kind:"process",label:"Work it out"};
-  if(language === "python" && /^#/.test(text)) return {kind:"comment",label:"Comment"};
-  if(/^\/\//.test(text)) return {kind:"comment",label:"Comment"};
 
-  if(language === "python"){
-    if(/\binput\s*\(/.test(text)) return {kind:"input",label:"Get input"};
-    if(/\bprint\s*\(/.test(text)) return {kind:"output",label:"Show result"};
-    if(/^\s*(for|while)\b/.test(text)) return {kind:"loop",label:"Repeat"};
-    if(/^\s*(if|elif|else)\b/.test(text)) return {kind:"condition",label:"Make a choice"};
-  }
-
-  if(language === "javascript"){
-    if(/\bprompt\s*\(/.test(text)) return {kind:"input",label:"Get input"};
-    if(/\bconsole\.(log|info|warn|error)\s*\(/.test(text)) return {kind:"output",label:"Show result"};
-    if(/^\s*(for|while)\b/.test(text)) return {kind:"loop",label:"Repeat"};
-    if(/^\s*(if|else|switch)\b/.test(text)) return {kind:"condition",label:"Make a choice"};
-  }
-
-  if(/(scanf\s*\(|cin\s*>>|getline\s*\(|Scanner|\.nextInt\s*\(|\.nextLine\s*\(|fmt\.(Scan|Scanln|Scanf)|readLine\s*\(|\bgets\b|STDIN|\bread\s+)/.test(text)) return {kind:"input",label:"Get input"};
-  if(/(printf|cout|System\.out|fmt\.Print|println|puts|echo|SELECT\b|console\.)/.test(text)) return {kind:"output",label:"Show result"};
-  if(/(\bfor\b|\bwhile\b|foreach|forEach)/.test(text)) return {kind:"loop",label:"Repeat"};
-  if(/(\bif\b|\belse\b|\belif\b|\bswitch\b|\bcase\b|\bwhen\b)/.test(text)) return {kind:"condition",label:"Make a choice"};
-  if(/(class|def|func|function|fun|public static|int main|package|import)/.test(text)) return {kind:"process",label:"Set things up"};
-  return {kind:"process",label:"Work it out"};
-}
-
-function describeStep(item,output,success){
-  const n = item.lineNumber;
-  const line = item.source.trim();
-
-  if(item.kind === "input"){
-    return {
-      note:`<b>Getting input</b> — the program asks you for information on line ${n}.`,
-      insight:`<strong>The program is asking you for information.</strong> Enter the value in the highlighted input box. The line being followed is <code>${escapeHtml(line)}</code>.`,
-      variable:`<span class="var"><b>input</b> = waiting</span>`
-    };
-  }
-
-  if(item.kind === "output"){
-    return {
-      note:`<b>Showing the result</b> — line ${n} sends information to the output.`,
-      insight:`<strong>The program is producing an answer.</strong> TraceLab is following the line that displays output.`,
-      variable:`<span class="var"><b>output</b> = produced</span>`
-    };
-  }
-
-  if(item.kind === "loop"){
-    return {
-      note:`<b>Repeating</b> — line ${n} tells the program to do work more than once.`,
-      insight:`<strong>The program is repeating a step.</strong> A loop is being used to process multiple values or repeat instructions.`,
-      variable:`<span class="var"><b>flow</b> = repeating</span>`
-    };
-  }
-
-  if(item.kind === "condition"){
-    return {
-      note:`<b>Making a choice</b> — line ${n} checks a condition.`,
-      insight:`<strong>The program is deciding what to do next.</strong> This line controls which path the program follows.`,
-      variable:`<span class="var"><b>flow</b> = decision</span>`
-    };
-  }
-
-  if(item.kind === "process"){
-    return {
-      note:`<b>Working with data</b> — line ${n} is doing part of the program's work.`,
-      insight:`<strong>The program is processing information.</strong> It may be creating, changing, comparing, or calculating a value.`,
-      variable:`<span class="var"><b>line</b> = ${n}</span>`
-    };
-  }
-
-  return {
-    note:`<b>Running your code</b> — TraceLab is following line ${n}.`,
-    insight:`<strong>The program is executing.</strong> This step comes directly from the code in your editor.`,
-    variable:`<span class="var"><b>line</b> = ${n}</span>`
-  };
-}
-
-function sourceSteps(code,language,runtimeTrace){
-  const lines = code.replace(/\r\n/g,"\n").split("\n");
-  const steps = [];
-
-  if(language === "python" && Array.isArray(runtimeTrace) && runtimeTrace.length){
-    for(const n of runtimeTrace){
-      const source = lines[n-1];
-      if(!source || !source.trim()) continue;
-      const info = classifyLine(source,language);
-      if(info.kind === "comment") continue;
-      steps.push({lineNumber:n,source,kind:info.kind,label:info.label});
-    }
-  }
-
-  if(!steps.length){
-    lines.forEach((source,index)=>{
-      if(!source.trim()) return;
-      const info = classifyLine(source,language);
-      if(info.kind === "comment") return;
-      steps.push({lineNumber:index+1,source,kind:info.kind,label:info.label});
-    });
-  }
-
-  return steps;
-}
-
-function buildFlow(code,language,runtimeTrace,output,success){
-  const program = sourceSteps(code,language,runtimeTrace);
-  const flow = [];
-
-  flow.push({
-    label:"Start",
-    shortLabel:"Start",
-    icon:"▶",
-    ref:"program start",
-    note:"<b>Start</b> — TraceLab is following the program you entered.",
-    insight:"<strong>Your program is starting.</strong> The next steps are taken from the current code, not from a fixed animation.",
-    variable:'<span class="var"><b>status</b> = started</span>',
-    source:"Your current program starts here."
-  });
-
-  const chosen = [];
-  const preferred = ["input","condition","loop","process","output"];
-
-  for(const kind of preferred){
-    for(const item of program){
-      if(item.kind === kind && !chosen.some(x=>x.lineNumber === item.lineNumber)){
-        chosen.push(item);
-      }
-      if(chosen.length >= 3) break;
-    }
-    if(chosen.length >= 3) break;
-  }
-
-  chosen.sort((a,b)=>a.lineNumber-b.lineNumber);
-
-  for(const item of chosen){
-    const description = describeStep(item,output,success);
-    const style = STEP_TYPES[item.kind] || STEP_TYPES.process;
-
-    flow.push({
-      label:style.label,
-      shortLabel:style.label,
-      icon:style.icon,
-      ref:`line ${item.lineNumber}`,
-      note:description.note,
-      insight:description.insight,
-      variable:description.variable,
-      source:item.source
-    });
-  }
-
-  if(flow.length < 5){
-    flow.push({
-      label:success ? "Show result" : "Fix error",
-      shortLabel:success ? "Result" : "Error",
-      icon:success ? "✓" : "!",
-      ref:success ? "program result" : "runtime error",
-      note:success
-        ? "<b>Result</b> — the program finished and returned its result."
-        : "<b>Error</b> — the program could not finish successfully.",
-      insight:success
-        ? `<strong>Your program finished.</strong> ${output ? "The Output panel shows the actual result from this run." : "The program finished without producing output."}`
-        : "<strong>The program stopped with an error.</strong> Read the Output panel, fix the code, and run it again.",
-      variable:success
-        ? '<span class="var"><b>status</b> = complete</span>'
-        : '<span class="var"><b>status</b> = error</span>',
-      source:success ? (output || "Program finished.") : "Execution returned an error."
-    });
-  }
-
-  while(flow.length < 5){
-    flow.push({
-      label:"Done",
-      shortLabel:"Done",
-      icon:"✓",
-      ref:"complete",
-      note:"<b>Done</b> — TraceLab has finished showing this run.",
-      insight:"<strong>Trace complete.</strong> There are no more important steps to show in this small program.",
-      variable:'<span class="var"><b>status</b> = complete</span>',
-      source:"Execution complete."
-    });
-  }
-
-  return flow.slice(0,5);
-}
+/* ---------- FLOW RENDER ---------- */
 
 function render(){
-  if(!currentFlow.length) return;
 
-  step = Math.max(0,Math.min(step,currentFlow.length-1));
-  const current = currentFlow[step];
+  const data = steps[step];
 
-  $("#badge").textContent = `Step ${step+1} of ${currentFlow.length}`;
-  $("#stepname").textContent = current.label;
-  $("#lineref").textContent = current.ref;
-  $("#note").innerHTML = current.note;
-  $("#insight").innerHTML = current.insight;
-  $("#vars").innerHTML = current.variable;
+  $("#badge").textContent =
+    "Step " + (step + 1) + " of " + steps.length;
 
-  const positions = [11,30,50,70,89];
-  $("#pulse").style.left = `${positions[step]}%`;
+  $("#stepname").textContent = data[0];
 
-  for(let i=0;i<5;i++){
-    const item = currentFlow[i];
-    const node = nodes[i];
-    node.className = `node n${i+1}`;
+  $("#lineref").textContent = data[1];
 
-    if(!item){
-      node.classList.add("empty");
-      nodeLabels[i].textContent = "";
-      nodeIcons[i].textContent = "";
-      continue;
-    }
+  $("#note").innerHTML = data[2];
 
-    node.classList.remove("empty");
-    nodeLabels[i].textContent = item.shortLabel;
-    nodeIcons[i].textContent = item.icon;
+  $("#insight").innerHTML = data[3];
 
-    if(i < step) node.classList.add("done");
-    if(i === step) node.classList.add("active");
-  }
+  $("#vars").innerHTML = data[4];
 
-  tracks.forEach((track,i)=>{
-    track.className = "track" +
-      (i < step ? " done" : "") +
-      (i === step ? " now" : "");
+  $("#pulse").style.left =
+    [11,30,50,70,89][step] + "%";
+
+  nodes.forEach((node,index)=>{
+
+    node.className =
+      "node n" + (index + 1) +
+      (index < step ? " done" : "") +
+      (index === step ? " active" : "");
+
   });
 
-  $("#labels").innerHTML = currentFlow
-    .map(item=>`<span>${escapeHtml(item.shortLabel)}</span>`)
-    .join("");
-}
+  tracks.forEach((track,index)=>{
 
-function initializeReady(){
-  currentFlow = [
-    {
-      label:"Start",shortLabel:"Start",icon:"▶",ref:"waiting",
-      note:"<b>Ready</b> — run the code in your editor.",
-      insight:"<strong>Ready to run.</strong> TraceLab will build the visual flow from the code you currently have in the editor.",
-      variable:'<span class="var"><b>status</b> = ready</span>',
-      source:"Press Analyze & visualize."
-    },
-    {
-      label:"Get input",shortLabel:"Get input",icon:"⌨",ref:"waiting",
-      note:"<b>Waiting</b> — input steps appear here when your program asks for data.",
-      insight:"<strong>Your code has not run yet.</strong> When it needs input, the input box will be highlighted.",
-      variable:'<span class="var"><b>input</b> = waiting</span>',
-      source:"No execution yet."
-    },
-    {
-      label:"Work it out",shortLabel:"Process",icon:"⚙",ref:"waiting",
-      note:"<b>Waiting</b> — this will show your program's real work.",
-      insight:"<strong>The exact steps come from your code.</strong> TraceLab does not use a fake loop/update story.",
-      variable:'<span class="var"><b>state</b> = waiting</span>',
-      source:"No execution yet."
-    },
-    {
-      label:"Make a choice",shortLabel:"Decide",icon:"◆",ref:"waiting",
-      note:"<b>Waiting</b> — decision steps appear only when your code has them.",
-      insight:"<strong>Nothing is being invented.</strong> This position will be replaced by a real step from your program.",
-      variable:'<span class="var"><b>flow</b> = waiting</span>',
-      source:"No execution yet."
-    },
-    {
-      label:"Show result",shortLabel:"Result",icon:"✓",ref:"waiting",
-      note:"<b>Waiting</b> — the program result appears after execution.",
-      insight:"<strong>Run your code.</strong> The result shown here will come from the current execution.",
-      variable:'<span class="var"><b>status</b> = waiting</span>',
-      source:"No result yet."
-    }
-  ];
-  step = 0;
-  render();
-}
+    track.className =
+      "track" +
+      (index < step ? " done" : "") +
+      (index === step ? " now" : "");
 
-/* =========================================================
-   INPUT DETECTION / UI
-========================================================= */
-
-function detectInputRequest(){
-  const language = $("#language").value;
-  const code = $("#code").value;
-
-  if(language === "python"){
-    const m = code.match(/\binput\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/);
-    if(m) return {needsInput:true,prompt:m[2] || "Enter the requested value."};
-    if(/\binput\s*\(/.test(code)) return {needsInput:true,prompt:"Enter the requested value."};
-  }
-
-  if(language === "javascript"){
-    const m = code.match(/\bprompt\s*\(\s*(["'`])([\s\S]*?)\1\s*\)/);
-    if(m) return {needsInput:true,prompt:m[2] || "Enter the requested value."};
-    if(/\bprompt\s*\(/.test(code)) return {needsInput:true,prompt:"Enter the requested value."};
-  }
-
-  const patterns = {
-    c:[/\bscanf\s*\(/, /\bfgets\s*\(/, /\bgetchar\s*\(/],
-    cpp:[/\bcin\s*>>/, /\bgetline\s*\(/],
-    java:[/\bScanner\b/, /System\.in/, /\.nextInt\s*\(/, /\.nextLine\s*\(/],
-    go:[/fmt\.(Scan|Scanln|Scanf)\s*\(/],
-    kotlin:[/\breadLine\s*\(/, /\bScanner\b/],
-    swift:[/\breadLine\s*\(/],
-    ruby:[/\bgets\b/],
-    php:[/STDIN/, /fgets\s*\(\s*STDIN/],
-    perl:[/<STDIN>/, /\bSTDIN\b/],
-    bash:[/\bread\b/]
-  };
-
-  if((patterns[language] || []).some(re=>re.test(code))){
-    return {needsInput:true,prompt:`${languageLabels[language]} is asking for input.`};
-  }
-
-  return {needsInput:false,prompt:""};
-}
-
-function updateInputUI(){
-  const request = detectInputRequest();
-
-  if(request.needsInput){
-    $("#stdinWrap").classList.add("needs-input");
-    $("#stdinLabel").textContent = "User input here";
-    $("#stdin").placeholder = "Enter the requested value here...";
-    $("#inputPrompt").textContent = request.prompt;
-  }else{
-    $("#stdinWrap").classList.remove("needs-input");
-    $("#stdinLabel").textContent = "Enter the input here";
-    $("#stdin").placeholder = "Enter the input here...";
-    $("#inputPrompt").textContent = "";
-  }
-}
-
-/* =========================================================
-   WEB PREVIEW + LINK
-========================================================= */
-
-function buildFullDoc(language,code){
-  if(language === "html"){
-    if(/<\s*html[\s>]/i.test(code)) return code;
-    return `<!doctype html><html><head><meta charset="utf-8"><title>TraceLab Preview</title></head><body>${code}</body></html>`;
-  }
-
-  if(language === "css"){
-    return `<!doctype html><html><head><meta charset="utf-8"><title>TraceLab Preview</title><style>${code}</style></head><body><h1>TraceLab</h1><p>This paragraph shows your CSS.</p><button>Sample button</button></body></html>`;
-  }
-
-  return "";
-}
-
-function revokePreviewUrl(){
-  if(previewUrl){
-    URL.revokeObjectURL(previewUrl);
-    previewUrl = null;
-  }
-}
-
-function renderPreview(language,code){
-  const html = buildFullDoc(language,code);
-  if(!html) return;
-
-  revokePreviewUrl();
-
-  const blob = new Blob([html],{type:"text/html"});
-  previewUrl = URL.createObjectURL(blob);
-
-  $("#previewWrap").style.display = "block";
-  $("#previewFrame").src = previewUrl;
-
-  $("#previewNote").innerHTML =
-    `<a class="preview-link" href="${previewUrl}" target="_blank" rel="noopener">Visit / Open preview ↗</a>` +
-    `<span class="preview-url">${escapeHtml(previewUrl)}</span>`;
-
-  $("#openBrowser").style.display = "inline-flex";
-  $("#openBrowser").textContent = "↗ Open preview";
-}
-
-function hidePreview(){
-  $("#previewWrap").style.display = "none";
-  $("#previewFrame").src = "about:blank";
-  revokePreviewUrl();
-}
-
-function updateWebUI(){
-  const language = $("#language").value;
-  const isWeb = language === "html" || language === "css";
-
-  if(isWeb){
-    renderPreview(language,$("#code").value);
-  }else{
-    hidePreview();
-    $("#openBrowser").style.display = "none";
-  }
-
-  const labels = {
-    html:"HTML renders in the browser",
-    css:"CSS renders in the browser",
-    python:"Python runs locally in your browser",
-    javascript:"JavaScript runs locally in your browser"
-  };
-
-  $("#modeStatus").textContent =
-    labels[language] ||
-    "Live server execution via TraceLab backend";
-
-  updateInputUI();
-}
-
-/* =========================================================
-   PYODIDE
-   Use one known stable CDN build and never load two versions.
-========================================================= */
-
-function getPyodide(){
-  if(pyodidePromise) return pyodidePromise;
-
-  pyodidePromise = (async ()=>{
-    if(typeof window.loadPyodide !== "function"){
-      throw new Error(
-        "Python runtime could not load from cdn.jsdelivr.net. " +
-        "Refresh the page and make sure your browser allows the Pyodide CDN."
-      );
-    }
-
-    return await window.loadPyodide({
-      indexURL: PYODIDE_INDEX
-    });
-  })();
-
-  return pyodidePromise;
-}
-
-/* =========================================================
-   PYTHON EXECUTION
-========================================================= */
-
-async function runPythonCode(code,stdinText){
-  try{
-    const py = await getPyodide();
-
-    let stdout = "";
-    let stderr = "";
-
-    py.setStdout({
-      batched:text=>{ stdout += String(text); }
-    });
-
-    py.setStderr({
-      batched:text=>{ stderr += String(text); }
-    });
-
-    const inputs = String(stdinText || "").split(/\r?\n/);
-    let inputIndex = 0;
-
-    py.setStdin({
-      stdin:()=>{
-        if(inputIndex >= inputs.length) return undefined;
-        return String(inputs[inputIndex++]);
-      },
-      isatty:false
-    });
-
-    const traceSource = JSON.stringify(code);
-
-    const wrapper = `
-import builtins
-import sys
-import traceback
-
-__tl_events = []
-__tl_error = ""
-__tl_source = ${traceSource}
-
-_original_input = builtins.input
-
-def _tl_input(prompt=""):
-    value = sys.stdin.readline()
-    if value == "":
-        raise EOFError("No more input was provided.")
-    return value.rstrip("\\r\\n")
-
-builtins.input = _tl_input
-
-def _tl_trace(frame, event, arg):
-    if event == "line" and frame.f_code.co_filename == "<tracelab-user>":
-        __tl_events.append(frame.f_lineno)
-    return _tl_trace
-
-try:
-    sys.settrace(_tl_trace)
-    exec(compile(__tl_source, "<tracelab-user>", "exec"), {"__name__":"__main__"})
-except Exception:
-    __tl_error = traceback.format_exc()
-finally:
-    sys.settrace(None)
-    builtins.input = _original_input
-`;
-
-    await py.runPythonAsync(wrapper);
-
-    const eventProxy = py.globals.get("__tl_events");
-    const errorProxy = py.globals.get("__tl_error");
-
-    const runtimeTrace = eventProxy ? eventProxy.toJs() : [];
-    const error = errorProxy ? String(errorProxy) : "";
-
-    if(eventProxy) eventProxy.destroy();
-    if(errorProxy) errorProxy.destroy();
-
-    return {
-      output:stdout,
-      stderr,
-      error,
-      runtimeTrace
-    };
-  }catch(error){
-    return {
-      output:"",
-      stderr:"",
-      error:error?.message || String(error),
-      runtimeTrace:[]
-    };
-  }
-}
-
-/* =========================================================
-   JAVASCRIPT EXECUTION
-========================================================= */
-
-function runJavaScriptCode(code,stdinText){
-  return new Promise(resolve=>{
-    const logs = [];
-    let finished = false;
-    const inputLines = String(stdinText || "").split(/\r?\n/);
-    let inputIndex = 0;
-
-    const iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.sandbox = "allow-scripts";
-
-    function finish(){
-      if(finished) return;
-      finished = true;
-      window.removeEventListener("message",onMessage);
-      iframe.remove();
-      resolve(logs.length ? logs : ["(No output — add console.log(...) to see output.)"]);
-    }
-
-    function onMessage(event){
-      if(event.source !== iframe.contentWindow) return;
-      const data = event.data;
-      if(!data || data.__tracelab !== true) return;
-
-      if(data.type === "done"){
-        finish();
-        return;
-      }
-
-      const prefix =
-        data.type === "error" ? "✕ " :
-        data.type === "warn" ? "⚠ " : "";
-
-      logs.push(prefix + (data.args || []).join(" "));
-    }
-
-    window.addEventListener("message",onMessage);
-
-    const safeCode = code.replace(/<\/script/gi,"<\\/script");
-
-    iframe.srcdoc = `
-<!doctype html>
-<html>
-<body>
-<script>
-const __inputs = ${JSON.stringify(inputLines)};
-let __inputIndex = 0;
-
-function __send(type,args){
-  parent.postMessage({
-    __tracelab:true,
-    type,
-    args:args.map(value=>{
-      try{
-        return typeof value === "object" && value !== null
-          ? JSON.stringify(value)
-          : String(value);
-      }catch(e){
-        return String(value);
-      }
-    })
-  },"*");
-}
-
-console.log = (...args)=>__send("log",args);
-console.warn = (...args)=>__send("warn",args);
-console.error = (...args)=>__send("error",args);
-
-window.prompt = (_message)=>{
-  if(__inputIndex >= __inputs.length){
-    throw new Error("Input required. Enter the value in the TraceLab input box.");
-  }
-  return String(__inputs[__inputIndex++]);
-};
-
-try{
-${safeCode}
-__send("done",[]);
-}catch(error){
-__send("error",[error?.stack || error?.message || String(error)]);
-__send("done",[]);
-}
-<\/script>
-</body>
-</html>`;
-
-    document.body.appendChild(iframe);
-
-    setTimeout(finish,5000);
-  });
-}
-
-/* =========================================================
-   REMOTE EXECUTION
-========================================================= */
-
-async function runRemoteCode(language,code,stdin){
-  const controller = new AbortController();
-  const timeout = setTimeout(()=>controller.abort(),20000);
-
-  try{
-    const response = await fetch(TRACELAB_EXECUTOR_URL,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Accept":"application/json"
-      },
-      body:JSON.stringify({
-        language,
-        code,
-        stdin
-      }),
-      signal:controller.signal
-    });
-
-    const text = await response.text();
-    let data = {};
-
-    try{
-      data = JSON.parse(text);
-    }catch(_){
-      data = {error:text};
-    }
-
-    if(!response.ok){
-      return {
-        ok:false,
-        output:
-          `✕ Backend execution failed\n` +
-          (data.error || data.message || `HTTP ${response.status}`)
-      };
-    }
-
-    return {
-      ok:data.ok === true,
-      output:String(data.output ?? data.stdout ?? data.stderr ?? data.error ?? "(No output)") ,
-      runtime:data.runtime || language,
-      executionTime:data.executionTime ?? null
-    };
-
-  }catch(error){
-    return {
-      ok:false,
-      output:
-        error?.name === "AbortError"
-          ? "✕ Execution timed out. Try a shorter program."
-          : `✕ Could not reach TraceLab backend.\n${error?.message || String(error)}`
-    };
-  }finally{
-    clearTimeout(timeout);
-  }
-}
-
-/* =========================================================
-   BACKEND HEALTH
-========================================================= */
-
-async function checkBackend(){
-  const el = $("#serverStatus");
-
-  try{
-    const response = await fetch(`${TRACELAB_BACKEND}/api/health?t=${Date.now()}`,{
-      headers:{Accept:"application/json"},
-      cache:"no-store"
-    });
-
-    const data = await response.json();
-
-    if(!response.ok || !data.ok) throw new Error("Health check failed");
-
-    el.textContent = data.executorConfigured
-      ? "● Backend online · compiler ready"
-      : "● Backend online · API key missing";
-
-    el.className = data.executorConfigured
-      ? "server-pill online"
-      : "server-pill warning";
-
-  }catch(error){
-    el.textContent = "● Backend offline";
-    el.className = "server-pill offline";
-  }
-}
-
-/* =========================================================
-   LOGIC EXPLAINER
-========================================================= */
-
-function explainLogic(){
-  const lines = $("#code").value.split("\n");
-  const hits = [];
-
-  lines.forEach((line,index)=>{
-    const t = line.trim();
-    if(/^(def |function |class |for |while |if |else if|elif |switch |try |public static|int main|func main|fun main)/.test(t)){
-      hits.push([index,t]);
-    }
   });
 
-  const first = hits[0] || [0,lines.find(x=>x.trim()) || "Program entry"];
-  let kind = "starting point";
-
-  if(/^(for |while )/.test(first[1])) kind = "loop";
-  else if(/^(if |else if|elif |switch )/.test(first[1])) kind = "decision";
-  else if(/^(def |function |class |func |fun )/.test(first[1])) kind = "function";
-
-  $("#logicSummary").innerHTML =
-    `<strong>Main path found.</strong> ` +
-    `The first important ${kind} in your current code is on line ${first[0]+1}. ` +
-    `TraceLab uses your current editor content when building the flow.`;
-
-  $("#logicCode").textContent =
-    lines.slice(
-      Math.max(0,first[0]-1),
-      Math.min(lines.length,first[0]+7)
-    )
-    .map((line,index)=>
-      String(Math.max(0,first[0]-1)+index+1).padStart(3," ") + "  " + line
-    )
-    .join("\n");
-
-  $("#focus").textContent = "✓ Main logic explained";
 }
 
-/* =========================================================
-   RUN
-========================================================= */
 
-$("#run").onclick = async ()=>{
-  stop();
+/* ---------- PLAY FLOW ---------- */
 
-  const runId = ++executionId;
-  const language = $("#language").value;
-  const code = $("#code").value;
-  const stdin = $("#stdin").value;
+function stop(){
 
-  if(!code.trim()){
-    $("#output").textContent = "✕ Your code is empty.";
-    setStatus("● Nothing to run","error");
-    return;
+  if(timer){
+    clearInterval(timer);
+    timer = null;
   }
 
-  const inputRequest = detectInputRequest();
+  $("#play").textContent = "▶ Play flow";
 
-  if(inputRequest.needsInput && !stdin.trim()){
-    updateInputUI();
-    $("#stdinWrap").classList.add("needs-input");
-    $("#output").textContent =
-      inputRequest.prompt +
-      "\n\nEnter the requested value in the highlighted input box, then press Run again.";
-    setStatus("● Input required","error");
-    $("#stdin").focus();
-    return;
-  }
+  $("#play").classList.remove("playing");
 
-  $("#run").disabled = true;
-  setStatus("● Running your program…","running");
+}
 
-  try{
-    let output = "";
-    let runtimeTrace = [];
-    let success = true;
 
-    if(language === "html" || language === "css"){
-      renderPreview(language,code);
-      output = "Rendered below in the live preview.";
-    }
-    else if(language === "javascript"){
-      hidePreview();
-      const logs = await runJavaScriptCode(code,stdin);
-      output = logs.join("\n");
-      success = !logs.some(line=>line.startsWith("✕"));
-    }
-    else if(language === "python"){
-      hidePreview();
-      const result = await runPythonCode(code,stdin);
-      output = result.output || "";
-      if(result.error){
-        output = result.error;
-        success = false;
-      }else if(result.stderr){
-        output += (output ? "\n" : "") + result.stderr;
-        success = false;
-      }
-      runtimeTrace = result.runtimeTrace;
-    }
-    else{
-      hidePreview();
-      const result = await runRemoteCode(language,code,stdin);
-      output = result.output;
-      success = result.ok;
+function play(){
 
-      if(result.runtime){
-        const timing = result.executionTime != null ? ` · ${result.executionTime} ms` : "";
-        $("#modeStatus").textContent =
-          `${result.runtime} executed on backend${timing}`;
-      }
-    }
-
-    if(runId !== executionId) return;
-
-    $("#output").textContent =
-      output ||
-      (success ? "(No output — the program finished without printing a result.)" : "Execution failed.");
-
-    currentFlow = buildFlow(
-      code,
-      language,
-      runtimeTrace,
-      output,
-      success
-    );
-
-    step = 0;
-    render();
-
-    setStatus(
-      success ?
-        (language === "html" || language === "css" ? "● Preview ready" : "● Executed live")
-        : "● Execution failed",
-      success ? "ready" : "error"
-    );
-
-    playFlow();
-
-  }catch(error){
-    if(runId !== executionId) return;
-
-    $("#output").textContent =
-      `✕ Unexpected error\n${error?.message || String(error)}`;
-
-    currentFlow = buildFlow(code,language,[],"",false);
-    step = 0;
-    render();
-    setStatus("● Error","error");
-    console.error(error);
-
-  }finally{
-    if(runId === executionId){
-      $("#run").disabled = false;
-    }
-  }
-};
-
-/* =========================================================
-   PLAY FLOW
-========================================================= */
-
-function playFlow(){
-  if(!currentFlow.length) return;
-
-  if(flowTimer){
+  if(timer){
     stop();
     return;
   }
 
   $("#play").textContent = "❚❚ Pause";
+
   $("#play").classList.add("playing");
 
-  flowTimer = setInterval(()=>{
-    step = (step + 1) % currentFlow.length;
+  timer = setInterval(()=>{
+
+    step = step >= steps.length - 1
+      ? 0
+      : step + 1;
+
     render();
-  },Number($("#speed").value));
+
+  }, Number($("#speed").value));
+
 }
 
-$("#play").onclick = playFlow;
 
-$("#next").onclick = ()=>{
-  stop();
-  if(!currentFlow.length) return;
-  step = (step + 1) % currentFlow.length;
-  render();
-};
+/* ---------- AUTO DETECT ---------- */
 
-$("#prev").onclick = ()=>{
-  stop();
-  if(!currentFlow.length) return;
-  step = (step - 1 + currentFlow.length) % currentFlow.length;
-  render();
-};
+function detectLanguage(){
 
-/* =========================================================
-   RESET
-========================================================= */
-
-$("#reset").onclick = ()=>{
-  executionId++;
-  stop();
-  step = 0;
-  putCode();
-  initializeReady();
-  updateWebUI();
-  explainLogic();
-  $("#output").textContent = "Analyze your code to see its execution flow.";
-  setStatus("● Ready");
-};
-
-/* =========================================================
-   LANGUAGE CHANGE
-========================================================= */
-
-$("#language").onchange = ()=>{
-  executionId++;
-  stop();
-  step = 0;
-  putCode();
-  initializeReady();
-  updateWebUI();
-  explainLogic();
-  $("#output").textContent = "Language changed. Press Analyze & visualize to run it.";
-  setStatus("● Ready");
-};
-
-/* =========================================================
-   CODE EDIT
-========================================================= */
-
-$("#code").oninput = ()=>{
-  numberLines();
-  updateInputUI();
-  explainLogic();
-  stop();
-  initializeReady();
-
-  const language = $("#language").value;
-  if(language === "html" || language === "css"){
-    renderPreview(language,$("#code").value);
-  }
-};
-
-$("#stdin").oninput = ()=>{
-  updateInputUI();
-};
-
-/* =========================================================
-   AUTO DETECT
-========================================================= */
-
-$("#detect").onclick = ()=>{
-  const source = $("#code").value.toLowerCase();
+  const code =
+    $("#code").value.toLowerCase();
 
   const markers = {
-    html:["<!doctype html","<html","<body","<div"],
-    css:["font-family:","background:","border-radius:","padding:"],
-    python:["def ","print(","input(","import "],
-    javascript:["console.log","prompt(","const ","let "],
-    typescript:["interface ",": number",": string","number[]"],
-    c:["#include <stdio","printf(","scanf("],
-    cpp:["#include <iostream>","std::","cout","cin"],
-    java:["public static void main","system.out","scanner","class main"],
-    go:["package main","fmt."],
-    kotlin:["fun main","readline","println"],
-    swift:["func ","readline()","print("],
-    ruby:["puts ","gets","do |"],
-    php:["<?php","echo ","stdin"],
-    perl:["<stdin>","my $"],
-    bash:["#!/bin","echo ","read "],
-    sql:["select ","create table"]
+
+    html:[
+      "<!doctype html",
+      "<html",
+      "<body",
+      "<div",
+      "<p>"
+    ],
+
+    css:[
+      "font-family:",
+      "background:",
+      "margin:",
+      "padding:",
+      "border-radius:"
+    ],
+
+    python:[
+      "def ",
+      "print(",
+      "import ",
+      "for ",
+      "while "
+    ],
+
+    javascript:[
+      "console.log",
+      "const ",
+      "let ",
+      "=>"
+    ],
+
+    typescript:[
+      "interface ",
+      ": number",
+      ": string",
+      "number[]"
+    ],
+
+    cpp:[
+      "#include <iostream>",
+      "std::",
+      "cout"
+    ],
+
+    c:[
+      "#include <stdio",
+      "printf("
+    ],
+
+    java:[
+      "public static",
+      "system.out",
+      "class "
+    ],
+
+    go:[
+      "package main",
+      "fmt.",
+      "func main"
+    ],
+
+    kotlin:[
+      "fun main",
+      "println("
+    ],
+
+    swift:[
+      "import foundation",
+      "func ",
+      "print("
+    ],
+
+    ruby:[
+      "puts ",
+      "do |",
+      "end"
+    ],
+
+    php:[
+      "<?php",
+      "echo ",
+      "$"
+    ],
+
+    perl:[
+      "use strict",
+      "my $",
+      "print "
+    ],
+
+    bash:[
+      "#!/bin",
+      "echo ",
+      "$(("
+    ],
+
+    sql:[
+      "select ",
+      "create table",
+      "insert into"
+    ]
+
   };
+
 
   let best = "python";
   let score = 0;
 
-  for(const [language,words] of Object.entries(markers)){
-    const current = words.reduce((n,word)=>n + (source.includes(word) ? 1 : 0),0);
+  Object.entries(markers).forEach(([name,words])=>{
+
+    let current = 0;
+
+    words.forEach(word=>{
+
+      if(code.includes(word)){
+        current++;
+      }
+
+    });
+
     if(current > score){
+
       score = current;
-      best = language;
+      best = name;
+
     }
-  }
+
+  });
+
 
   if(score === 0){
-    setStatus("● Could not detect","error");
-    $("#output").textContent = "Auto-detect needs more recognizable code.";
+
+    $("#status").textContent =
+      "● Could not detect";
+
+    $("#output").textContent =
+      "Auto-detect could not find a clear language signature.";
+
     return;
+
   }
+
 
   $("#language").value = best;
 
-  if(codes[best]){
-    $("#file").textContent = codes[best][0];
+  putCode();
+
+  const label =
+    $("#language").options[
+      $("#language").selectedIndex
+    ].text;
+
+  $("#detect").textContent =
+    "✓ " + label;
+
+  $("#status").textContent =
+    "✦ Detected " + label;
+
+  $("#output").textContent =
+    "✦ " + label +
+    " detected.\n\n" +
+    "Your code was not changed.";
+
+  updateWebUI();
+
+}
+
+
+/* ---------- HTML / CSS PREVIEW ---------- */
+
+function buildFullDoc(language,code){
+
+  if(language === "html"){
+
+    if(/<\s*html[\s>]/i.test(code)){
+      return code;
+    }
+
+    return `
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TraceLab Preview</title>
+</head>
+<body>
+${code}
+</body>
+</html>`;
+
   }
 
-  updateInputUI();
-  updateWebUI();
-  initializeReady();
+
+  if(language === "css"){
+
+    return `
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TraceLab CSS Preview</title>
+<style>
+${code}
+</style>
+</head>
+<body>
+<h1>TraceLab CSS Preview</h1>
+<p>This page demonstrates your CSS.</p>
+<button>Sample Button</button>
+</body>
+</html>`;
+
+  }
+
+
+  if(language === "javascript"){
+
+    return `
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TraceLab JavaScript</title>
+</head>
+<body>
+<p style="font-family:sans-serif;color:#667">
+JavaScript output is shown in TraceLab.
+</p>
+<script>
+${code}
+<\/script>
+</body>
+</html>`;
+
+  }
+
+
+  return code;
+
+}
+
+
+/* ---------- PYTHON ---------- */
+
+let pyodidePromise = null;
+
+
+function getPyodide(){
+
+  if(pyodidePromise){
+    return pyodidePromise;
+  }
+
+  pyodidePromise = new Promise((resolve,reject)=>{
+
+    const version = "0.26.4";
+
+    const base =
+      "https://cdn.jsdelivr.net/pyodide/v" +
+      version +
+      "/full/";
+
+    if(window.loadPyodide){
+
+      window.loadPyodide({
+        indexURL:base
+      })
+      .then(resolve)
+      .catch(reject);
+
+      return;
+
+    }
+
+
+    const script =
+      document.createElement("script");
+
+    script.src =
+      base + "pyodide.js";
+
+    script.onload = ()=>{
+
+      window.loadPyodide({
+        indexURL:base
+      })
+      .then(resolve)
+      .catch(reject);
+
+    };
+
+    script.onerror = ()=>{
+
+      reject(
+        new Error(
+          "Could not load the Python runtime."
+        )
+      );
+
+    };
+
+    document.head.appendChild(script);
+
+  });
+
+  return pyodidePromise;
+
+}
+
+
+async function runPythonCode(code){
+
+  const logs = [];
+
+  try{
+
+    $("#status").textContent =
+      "● Loading Python runtime…";
+
+    const py =
+      await getPyodide();
+
+    py.setStdout({
+      batched:text=>{
+        logs.push(String(text));
+      }
+    });
+
+    py.setStderr({
+      batched:text=>{
+        logs.push("✕ " + String(text));
+      }
+    });
+
+    await py.runPythonAsync(code);
+
+  }catch(error){
+
+    const message =
+      String(
+        error && error.message
+          ? error.message
+          : error
+      );
+
+    logs.push(
+      "✕ " +
+      message
+        .split("\n")
+        .filter(Boolean)
+        .slice(-1)[0]
+    );
+
+  }
+
+  if(!logs.length){
+
+    logs.push(
+      "(No output — add print(...) to your Python code.)"
+    );
+
+  }
+
+  return logs;
+
+}
+
+
+/* ---------- JAVASCRIPT ---------- */
+
+function runJavaScriptCode(code){
+
+  return new Promise(resolve=>{
+
+    const logs = [];
+
+    let finished = false;
+
+    const iframe =
+      document.createElement("iframe");
+
+    iframe.style.display = "none";
+
+    iframe.sandbox =
+      "allow-scripts";
+
+
+    const source = `
+<!doctype html>
+<html>
+<body>
+<script>
+
+const send = (type,args) => {
+
+  parent.postMessage(
+    {
+      __tracelab:true,
+      type:type,
+      args:args.map(value=>{
+
+        try{
+
+          return typeof value === "object"
+            ? JSON.stringify(value)
+            : String(value);
+
+        }catch(error){
+
+          return String(value);
+
+        }
+
+      })
+    },
+    "*"
+  );
+
+};
+
+console.log = (...args) =>
+  send("log",args);
+
+console.warn = (...args) =>
+  send("warn",args);
+
+console.error = (...args) =>
+  send("error",args);
+
+try{
+
+${code}
+
+send("done",[]);
+
+}catch(error){
+
+send("error",[
+  error && error.message
+    ? error.message
+    : String(error)
+]);
+
+send("done",[]);
+
+}
+
+<\/script>
+</body>
+</html>
+`;
+
+
+    function finish(result){
+
+      if(finished) return;
+
+      finished = true;
+
+      window.removeEventListener(
+        "message",
+        handler
+      );
+
+      if(iframe.parentNode){
+        iframe.remove();
+      }
+
+      resolve(result);
+
+    }
+
+
+    function handler(event){
+
+      if(
+        !event.data ||
+        !event.data.__tracelab
+      ){
+        return;
+      }
+
+
+      if(event.data.type === "done"){
+
+        finish(
+          logs.length
+            ? logs
+            : [
+              "(No output — add console.log(...) to your code.)"
+            ]
+        );
+
+        return;
+
+      }
+
+
+      const prefix =
+        event.data.type === "error"
+          ? "✕ "
+          : event.data.type === "warn"
+            ? "⚠ "
+            : "";
+
+      logs.push(
+        prefix +
+        event.data.args.join(" ")
+      );
+
+    }
+
+
+    window.addEventListener(
+      "message",
+      handler
+    );
+
+
+    iframe.srcdoc = source;
+
+    document.body.appendChild(
+      iframe
+    );
+
+
+    setTimeout(()=>{
+
+      finish(
+        logs.length
+          ? logs
+          : [
+            "(No output after 2 seconds — check for an infinite loop.)"
+          ]
+      );
+
+    },2000);
+
+  });
+
+}
+
+
+/* ---------- PREVIEW ---------- */
+
+function renderPreview(language,code){
+
+  $("#previewWrap").style.display =
+    "block";
+
+  $("#previewFrame").srcdoc =
+    buildFullDoc(language,code);
+
+}
+
+
+function hidePreview(){
+
+  $("#previewWrap").style.display =
+    "none";
+
+  $("#previewFrame").srcdoc =
+    "about:blank";
+
+}
+
+
+/* ---------- WEB UI ---------- */
+
+function updateWebUI(){
+
+  const language =
+    $("#language").value;
+
+  const web =
+    language === "html" ||
+    language === "css" ||
+    language === "javascript";
+
+  $("#openBrowser").style.display =
+    web ? "inline-block" : "none";
+
+  if(language !== "html" &&
+     language !== "css"){
+
+    hidePreview();
+
+  }
+
+  updateModeStatus();
+
+}
+
+
+function updateModeStatus(){
+
+  const language =
+    $("#language").value;
+
+  const labels = {
+
+    html:
+      "HTML renders in the browser",
+
+    css:
+      "CSS renders in the browser",
+
+    python:
+      "Python runs locally in your browser",
+
+    javascript:
+      "JavaScript runs locally in your browser"
+
+  };
+
+  $("#modeStatus").textContent =
+    labels[language] ||
+    "Live execution via TraceLab backend";
+
+}
+
+
+/* =========================================================
+   IMPORTANT BACKEND CONFIGURATION
+   ========================================================= */
+
+const TRACE_BACKEND =
+  "https://tracelab-free.onrender.com";
+
+
+/* ---------- BACKEND HEALTH ---------- */
+
+async function checkBackend(){
+
+  const status =
+    $("#serverStatus");
+
+
+  /*
+   If the page is opened directly from
+   Render, use the same Render origin.
+  */
+
+  const backend =
+    location.hostname.endsWith("onrender.com")
+      ? location.origin
+      : TRACE_BACKEND;
+
+
+  try{
+
+    const response =
+      await fetch(
+        backend + "/api/health",
+        {
+          method:"GET",
+          headers:{
+            "Accept":"application/json"
+          },
+          cache:"no-store"
+        }
+      );
+
+
+    const data =
+      await response
+        .json()
+        .catch(()=>({}));
+
+
+    if(!response.ok){
+
+      throw new Error(
+        "HTTP " + response.status
+      );
+
+    }
+
+
+    if(data.ok){
+
+      if(data.executorConfigured){
+
+        status.textContent =
+          "● Backend online";
+
+        status.className =
+          "server-pill online";
+
+      }else{
+
+        status.textContent =
+          "● Backend online · API key needed";
+
+        status.className =
+          "server-pill warning";
+
+      }
+
+    }else{
+
+      throw new Error(
+        data.error || "Backend unavailable"
+      );
+
+    }
+
+
+  }catch(error){
+
+    status.textContent =
+      "● Backend unavailable";
+
+    status.className =
+      "server-pill offline";
+
+  }
+
+}
+
+
+/* ---------- REMOTE EXECUTION ---------- */
+
+async function runRemoteCode(
+  language,
+  code,
+  label
+){
+
+  const backend =
+    location.hostname.endsWith("onrender.com")
+      ? location.origin
+      : TRACE_BACKEND;
+
+
+  try{
+
+    const response =
+      await fetch(
+        backend + "/api/execute",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json",
+
+            "Accept":
+              "application/json"
+          },
+
+          body:JSON.stringify({
+
+            language:language,
+
+            code:code,
+
+            stdin:""
+
+          })
+
+        }
+      );
+
+
+    let data = {};
+
+    try{
+
+      data =
+        await response.json();
+
+    }catch(error){
+
+      data = {};
+
+    }
+
+
+    if(!response.ok){
+
+      return {
+
+        ok:false,
+
+        output:
+          "✕ " +
+          label +
+          " execution failed\n\n" +
+          (
+            data.error ||
+            data.message ||
+            "HTTP " + response.status
+          )
+
+      };
+
+    }
+
+
+    return {
+
+      ok:Boolean(data.ok),
+
+      output:
+        String(
+          data.output ||
+          "(No output returned.)"
+        )
+
+    };
+
+
+  }catch(error){
+
+    return {
+
+      ok:false,
+
+      output:
+        "✕ Could not reach TraceLab backend.\n\n" +
+        String(
+          error && error.message
+            ? error.message
+            : error
+        ) +
+        "\n\n" +
+        "Make sure the Render Web Service is deployed."
+
+    };
+
+  }
+
+}
+
+
+/* ---------- EXPLAIN MAIN LOGIC ---------- */
+
+function explainLogic(){
+
+  const lines =
+    $("#code").value.split("\n");
+
+
+  const hits = [];
+
+
+  lines.forEach((line,index)=>{
+
+    const text =
+      line.trim();
+
+
+    if(
+      /^(def |function |class |for |while |if |else if|elif |switch |try |public static|int main|fun main|func main)/i
+        .test(text)
+    ){
+
+      hits.push([
+        index,
+        text
+      ]);
+
+    }
+
+  });
+
+
+  const first =
+    hits[0] ||
+    [
+      0,
+      lines.find(line=>line.trim()) ||
+      "Program entry"
+    ];
+
+
+  let kind =
+    "entry point";
+
+
+  if(/for |while /i.test(first[1])){
+    kind = "loop";
+  }
+  else if(/if |switch |elif /i.test(first[1])){
+    kind = "decision";
+  }
+  else if(/def |function |class |func /i.test(first[1])){
+    kind = "function";
+  }
+
+
+  $("#logicSummary").innerHTML =
+
+    "<strong>Main path found.</strong> " +
+
+    "This " +
+    lines.length +
+    "-line program has " +
+
+    hits.length +
+
+    " important control-flow block" +
+
+    (hits.length === 1 ? "" : "s") +
+
+    ". Start at the " +
+
+    kind +
+
+    " on line " +
+
+    (first[0] + 1) +
+
+    ".";
+
+
+  const start =
+    Math.max(
+      0,
+      first[0] - 1
+    );
+
+
+  const end =
+    Math.min(
+      lines.length,
+      first[0] + 7
+    );
+
+
+  const selected =
+    lines
+      .slice(start,end)
+      .map(
+        (line,index)=>
+          String(start + index + 1)
+            .padStart(3," ") +
+          "  " +
+          line
+      )
+      .join("\n");
+
+
+  $("#logicCode").textContent =
+    selected;
+
+
+  $("#focus").textContent =
+    "✓ Main logic explained";
+
+}
+
+
+/* =========================================================
+   RUN BUTTON
+   ========================================================= */
+
+async function runProgram(){
+
+  stop();
+
+  step = 0;
+
+  render();
+
   explainLogic();
 
-  const label = languageLabels[best];
-  $("#detect").textContent = `✓ ${label}`;
-  $("#output").textContent =
-    `${label} detected.\nYour current code was kept unchanged.\nPress Analyze & visualize to execute it.`;
-  setStatus(`✦ Detected ${label}`);
-};
 
-/* =========================================================
-   OPEN PREVIEW
-========================================================= */
+  const language =
+    $("#language").value;
 
-$("#openBrowser").onclick = ()=>{
-  if(!previewUrl){
-    const language = $("#language").value;
-    if(language === "html" || language === "css"){
-      renderPreview(language,$("#code").value);
+  const code =
+    $("#code").value;
+
+  const label =
+    $("#language").options[
+      $("#language").selectedIndex
+    ].text;
+
+
+  if(!code.trim()){
+
+    $("#status").textContent =
+      "● No code";
+
+    $("#output").textContent =
+      "Please enter some code first.";
+
+    return;
+
+  }
+
+
+  $("#run").disabled = true;
+
+
+  try{
+
+
+    /* ---------- JAVASCRIPT ---------- */
+
+    if(language === "javascript"){
+
+      $("#status").textContent =
+        "● Running JavaScript…";
+
+      hidePreview();
+
+      const logs =
+        await runJavaScriptCode(code);
+
+      $("#output").textContent =
+        logs.join("\n");
+
+      $("#status").textContent =
+        logs.some(
+          line =>
+            String(line).startsWith("✕")
+        )
+          ? "● Execution failed"
+          : "● Executed live";
+
     }
+
+
+    /* ---------- PYTHON ---------- */
+
+    else if(language === "python"){
+
+      $("#status").textContent =
+        "● Starting Python…";
+
+      hidePreview();
+
+      const logs =
+        await runPythonCode(code);
+
+      $("#output").textContent =
+        logs.join("\n");
+
+      $("#status").textContent =
+        logs.some(
+          line =>
+            String(line).startsWith("✕")
+        )
+          ? "● Python execution failed"
+          : "● Executed live";
+
+    }
+
+
+    /* ---------- HTML / CSS ---------- */
+
+    else if(
+      language === "html" ||
+      language === "css"
+    ){
+
+      renderPreview(
+        language,
+        code
+      );
+
+      $("#output").textContent =
+        "✓ Preview rendered successfully.\n\n" +
+        "Use Open in browser to open the preview in a new tab.";
+
+      $("#status").textContent =
+        "● Preview ready";
+
+    }
+
+
+    /* ---------- SERVER LANGUAGES ---------- */
+
+    else{
+
+      hidePreview();
+
+      $("#status").textContent =
+        "● Compiling and running " +
+        label +
+        "…";
+
+
+      const result =
+        await runRemoteCode(
+          language,
+          code,
+          label
+        );
+
+
+      $("#output").textContent =
+        result.output;
+
+
+      $("#status").textContent =
+        result.ok
+          ? "● Executed live"
+          : "● Execution failed";
+
+    }
+
+
+  }catch(error){
+
+    $("#output").textContent =
+      "✕ Unexpected error\n\n" +
+      String(
+        error && error.message
+          ? error.message
+          : error
+      );
+
+    $("#status").textContent =
+      "● Error";
+
   }
 
-  if(previewUrl){
-    window.open(previewUrl,"_blank","noopener,noreferrer");
+
+  $("#run").disabled = false;
+
+
+  play();
+
+}
+
+
+/* ---------- OPEN PREVIEW ---------- */
+
+function openBrowser(){
+
+  const language =
+    $("#language").value;
+
+  const code =
+    $("#code").value;
+
+
+  const html =
+    buildFullDoc(
+      language,
+      code
+    );
+
+
+  const blob =
+    new Blob(
+      [html],
+      {type:"text/html"}
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  window.open(
+    url,
+    "_blank"
+  );
+
+}
+
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+
+
+$("#run").addEventListener(
+  "click",
+  runProgram
+);
+
+
+$("#prev").addEventListener(
+  "click",
+  ()=>{
+
+    stop();
+
+    step =
+      step <= 0
+        ? steps.length - 1
+        : step - 1;
+
+    render();
+
   }
-};
+);
 
-/* =========================================================
-   MAIN LOGIC BUTTON
-========================================================= */
 
-$("#focus").onclick = explainLogic;
+$("#next").addEventListener(
+  "click",
+  ()=>{
 
-/* =========================================================
-   MOBILE MENU
-========================================================= */
+    stop();
 
-$("#menuBtn").onclick = ()=>{
-  const open = $("#siteNav").classList.toggle("open");
-  $("#menuBtn").setAttribute("aria-expanded",String(open));
-};
+    step =
+      step >= steps.length - 1
+        ? 0
+        : step + 1;
 
-$("#siteNav").querySelectorAll("a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    $("#siteNav").classList.remove("open");
-    $("#menuBtn").setAttribute("aria-expanded","false");
+    render();
+
+  }
+);
+
+
+$("#play").addEventListener(
+  "click",
+  play
+);
+
+
+$("#reset").addEventListener(
+  "click",
+  ()=>{
+
+    stop();
+
+    step = 0;
+
+    putCode();
+
+    render();
+
+    hidePreview();
+
+    $("#status").textContent =
+      "● Ready";
+
+    $("#output").textContent =
+      "Analyze your code to see its execution flow.";
+
+    $("#detect").textContent =
+      "✦ Auto-detect";
+
+    explainLogic();
+
+  }
+);
+
+
+$("#detect").addEventListener(
+  "click",
+  detectLanguage
+);
+
+
+$("#focus").addEventListener(
+  "click",
+  explainLogic
+);
+
+
+$("#openBrowser").addEventListener(
+  "click",
+  openBrowser
+);
+
+
+$("#language").addEventListener(
+  "change",
+  ()=>{
+
+    stop();
+
+    step = 0;
+
+    putCode();
+
+    render();
+
+    updateWebUI();
+
+    $("#status").textContent =
+      "● Ready";
+
+    $("#output").textContent =
+      "Language changed. Click Analyze & visualize.";
+
+    $("#detect").textContent =
+      "✦ Auto-detect";
+
+  }
+);
+
+
+$("#code").addEventListener(
+  "input",
+  ()=>{
+
+    numberLines();
+
+    $("#detect").textContent =
+      "✦ Auto-detect";
+
+    $("#focus").textContent =
+      "⌘ Explain main logic";
+
+  }
+);
+
+
+$("#code").addEventListener(
+  "scroll",
+  syncLineNumbers
+);
+
+
+/* ---------- TAB KEY IN EDITOR ---------- */
+
+$("#code").addEventListener(
+  "keydown",
+  event=>{
+
+    if(event.key === "Tab"){
+
+      event.preventDefault();
+
+      const textarea =
+        event.target;
+
+      const start =
+        textarea.selectionStart;
+
+      const end =
+        textarea.selectionEnd;
+
+
+      textarea.value =
+        textarea.value.substring(0,start) +
+        "    " +
+        textarea.value.substring(end);
+
+
+      textarea.selectionStart =
+        textarea.selectionEnd =
+          start + 4;
+
+
+      numberLines();
+
+    }
+
+  }
+);
+
+
+/* ---------- CTRL + ENTER ---------- */
+
+document.addEventListener(
+  "keydown",
+  event=>{
+
+    if(
+      (event.ctrlKey || event.metaKey) &&
+      event.key === "Enter"
+    ){
+
+      event.preventDefault();
+
+      runProgram();
+
+    }
+
+  }
+);
+
+
+/* ---------- MOBILE MENU ---------- */
+
+$("#menuBtn").addEventListener(
+  "click",
+  ()=>{
+
+    $("#siteNav").classList.toggle(
+      "open"
+    );
+
+  }
+);
+
+
+$("#siteNav")
+  .querySelectorAll("a")
+  .forEach(link=>{
+
+    link.addEventListener(
+      "click",
+      ()=>{
+        $("#siteNav")
+          .classList.remove("open");
+      }
+    );
+
   });
-});
 
-/* =========================================================
-   KEYBOARD
-========================================================= */
 
-document.addEventListener("keydown",event=>{
-  if((event.ctrlKey || event.metaKey) && event.key === "Enter"){
-    event.preventDefault();
-    $("#run").click();
-  }
-});
+/* ---------- INITIALIZE ---------- */
 
-window.addEventListener("beforeunload",revokePreviewUrl);
+$("#year").textContent =
+  new Date().getFullYear();
 
-/* =========================================================
-   STARTUP
-========================================================= */
 
-$("#year").textContent = new Date().getFullYear();
 putCode();
-initializeReady();
+
+render();
+
 explainLogic();
+
 updateWebUI();
+
 checkBackend();
-setInterval(checkBackend,30000);
+
+
+/* Check backend every 30 seconds */
+
+setInterval(
+  checkBackend,
+  30000
+);
+
 </script>
-</body></html>
+
+</body>
+</html>
