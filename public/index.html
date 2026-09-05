@@ -1,4143 +1,4190 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>TraceLab | Learn Code by Watching It Run</title>
-<meta name="description" content="TraceLab is an interactive code playground with real execution and visual code flow.">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-<style>
-:root{
-  --ink:#18223b;
-  --muted:#6e7890;
-  --line:#e5e9f1;
-  --blue:#5277f5;
-  --mint:#35cba4;
-  --bg:#f7f8fc;
-  --pale:#eef2ff;
-  --white:#fff;
-  --danger:#d84b4b;
-}
-
-*{box-sizing:border-box}
-
-html{scroll-behavior:smooth}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--ink);
-  font-family:Manrope,Arial,sans-serif;
-}
-
-button,select,textarea{font:inherit}
-
-button{
-  border:0;
-  cursor:pointer;
-}
-
-button:disabled{cursor:wait}
-
-.top{
-  height:72px;
-  background:#fff;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 clamp(20px,6vw,88px);
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  font-size:20px;
-  font-weight:800;
-  letter-spacing:-1px;
-}
-
-.mark{
-  width:32px;
-  height:32px;
-  border-radius:10px;
-  background:var(--blue);
-  color:#fff;
-  display:grid;
-  place-items:center;
-  font:500 13px "DM Mono";
-  box-shadow:0 7px 16px #5277f54d;
-}
-
-.nav{
-  display:flex;
-  gap:25px;
-  align-items:center;
-  font-size:12px;
-  font-weight:700;
-  color:#737d90;
-}
-
-.nav a{
-  color:inherit;
-  text-decoration:none;
-}
-
-.nav a:hover{color:var(--ink)}
-
-.top-actions{
-  display:flex;
-  align-items:center;
-  gap:12px;
-}
-
-.cta{
-  background:var(--ink);
-  color:#fff;
-  text-decoration:none;
-  font-size:12px;
-  font-weight:800;
-  padding:10px 15px;
-  border-radius:8px;
-}
-
-.menu-btn{
-  display:none;
-  background:transparent;
-  color:var(--ink);
-  font-size:20px;
-}
-
-main{
-  max-width:1440px;
-  margin:auto;
-  padding:42px clamp(18px,6vw,88px) 65px;
-}
-
-.hero{padding-top:5px}
-
-.eyebrow{
-  color:#657ed8;
-  text-transform:uppercase;
-  letter-spacing:1.2px;
-  font-weight:800;
-  font-size:10px;
-}
-
-h1{
-  font-size:clamp(30px,3vw,42px);
-  letter-spacing:-2px;
-  margin:8px 0;
-  line-height:1.15;
-}
-
-h1 span{color:var(--blue)}
-
-.sub{
-  margin:0;
-  color:var(--muted);
-  font-size:14px;
-  line-height:1.6;
-}
-
-.workspace{
-  margin-top:30px;
-  display:grid;
-  grid-template-columns:minmax(350px,.95fr) minmax(430px,1.35fr);
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:18px;
-  overflow:hidden;
-  box-shadow:0 18px 50px #1a29420d;
-}
-
-.editor{
-  min-height:620px;
-  border-right:1px solid var(--line);
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-}
-
-.bar{
-  min-height:58px;
-  padding:0 16px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  border-bottom:1px solid var(--line);
-  gap:10px;
-}
-
-.bar-actions{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  min-width:0;
-}
-
-.file{
-  font:12px "DM Mono";
-  color:#4d5870;
-  white-space:nowrap;
-}
-
-.file i{
-  display:inline-block;
-  width:10px;
-  height:10px;
-  background:#f3c158;
-  border-radius:3px;
-  margin-right:8px;
-}
-
-.lang{
-  border:1px solid #dfe4ef;
-  background:#fff;
-  color:#4e5a72;
-  border-radius:7px;
-  padding:7px 8px;
-  font-size:11px;
-  font-weight:800;
-  outline:none;
-  max-width:145px;
-}
-
-.lang:focus{
-  border-color:var(--blue);
-  box-shadow:0 0 0 3px #5277f51a;
-}
-
-.detect{
-  border:1px solid #dce3ff;
-  background:#f6f7ff;
-  color:#526de5;
-  border-radius:7px;
-  padding:7px 9px;
-  font-size:10px;
-  font-weight:800;
-  white-space:nowrap;
-}
-
-.detect:hover{background:#e9edff}
-
-.codearea{
-  position:relative;
-  flex:1;
-  min-height:360px;
-  display:grid;
-  grid-template-columns:55px minmax(0,1fr);
-  background:#fcfcfe;
-  overflow:hidden;
-}
-
-.nums{
-  margin:0;
-  padding:16px 10px 16px 0;
-  text-align:right;
-  color:#a9b1c0;
-  font:13px/27px "DM Mono",monospace;
-  user-select:none;
-  overflow:hidden;
-  white-space:pre;
-  border-right:1px solid #edf0f5;
-  background:#f8f9fc;
-}
-
-#code{
-  width:100%;
-  height:100%;
-  min-height:360px;
-  padding:16px 18px;
-  border:0;
-  outline:0;
-  resize:none;
-  background:#fcfcfe;
-  color:#263550;
-  font:13px/27px "DM Mono",monospace;
-  tab-size:4;
-  overflow:auto;
-}
-
-#code::selection{background:#dfe6ff}
-
-.runbar{
-  padding:13px 16px;
-  display:flex;
-  align-items:center;
-  gap:9px;
-  border-top:1px solid var(--line);
-  background:#fff;
-  flex-wrap:wrap;
-}
-
-.run{
-  background:var(--blue);
-  color:#fff;
-  padding:10px 16px;
-  border-radius:8px;
-  font-size:12px;
-  font-weight:800;
-  box-shadow:0 5px 13px #5277f542;
-}
-
-.run:hover{background:#456bea}
-
-.run:disabled{opacity:.65}
-
-.reset{
-  background:#f1f3f8;
-  color:#536079;
-  padding:10px 13px;
-  border-radius:8px;
-  font-size:12px;
-  font-weight:800;
-}
-
-.saved{
-  margin-left:auto;
-  color:#8993a7;
-  font-size:10px;
-  white-space:nowrap;
-}
-
-.server-pill{
-  font-size:10px;
-  font-weight:800;
-  white-space:nowrap;
-}
-
-.server-pill.online{color:#229a78}
-.server-pill.warning{color:#bd8524}
-.server-pill.offline{color:#c14d4d}
-
-.console{
-  min-height:145px;
-  padding:14px 18px;
-  background:#fbfcff;
-  border-top:1px solid var(--line);
-}
-
-.chead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  color:#929baa;
-  text-transform:uppercase;
-  letter-spacing:1px;
-  font-size:10px;
-  font-weight:800;
-  margin-bottom:10px;
-}
-
-.ok{color:#28a87f}
-
-.console pre{
-  margin:0;
-  color:#53617a;
-  font:12px/21px "DM Mono",monospace;
-  white-space:pre-wrap;
-  overflow:auto;
-  max-height:150px;
-}
-
-.preview{
-  display:none;
-  padding:14px 18px;
-  border-top:1px solid var(--line);
-  background:#fbfcff;
-}
-
-.preview iframe{
-  width:100%;
-  height:240px;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#fff;
-}
-
-.visual{min-width:0}
-
-.title{
-  font-size:13px;
-  font-weight:800;
-}
-
-.badge{
-  padding:5px 9px;
-  border-radius:6px;
-  background:var(--pale);
-  color:#5570e9;
-  font-size:10px;
-  font-weight:800;
-}
-
-.stage{
-  height:330px;
-  position:relative;
-  overflow:hidden;
-  border-bottom:1px solid var(--line);
-  background-color:#fff;
-  background-image:radial-gradient(#d8deea 1px,transparent 1px);
-  background-size:19px 19px;
-}
-
-.line{
-  position:absolute;
-  left:9%;
-  right:9%;
-  top:156px;
-  height:2px;
-  background:#cdd6eb;
-}
-
-.pulse{
-  position:absolute;
-  left:11%;
-  top:151px;
-  width:12px;
-  height:12px;
-  border-radius:50%;
-  background:var(--blue);
-  box-shadow:0 0 0 7px #5277f523;
-  z-index:3;
-  transition:left .45s ease;
-}
-
-.node{
-  position:absolute;
-  top:125px;
-  transform:translateX(-50%);
-  z-index:2;
-  width:64px;
-  height:64px;
-  border:2px solid #dce1ec;
-  border-radius:18px;
-  display:grid;
-  place-items:center;
-  background:#fff;
-  transition:.35s;
-}
-
-.node small{
-  position:absolute;
-  top:74px;
-  white-space:nowrap;
-  color:#6e7890;
-  font-size:10px;
-  font-weight:800;
-}
-
-.node span{font-size:20px}
-
-.n1{left:11%}
-.n2{left:30%}
-.n3{left:50%}
-.n4{left:70%}
-.n5{left:89%}
-
-.node.active{
-  border-color:var(--blue);
-  background:#edf1ff;
-  transform:translateX(-50%) translateY(-8px) scale(1.08);
-  box-shadow:0 10px 25px #5277f538;
-}
-
-.node.done{
-  background:#edfff9;
-  border-color:#8adeca;
-}
-
-.node.done:after{
-  content:"✓";
-  position:absolute;
-  right:-7px;
-  bottom:-7px;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  display:grid;
-  place-items:center;
-  background:var(--mint);
-  color:#fff;
-  font-size:11px;
-}
-
-.note{
-  position:absolute;
-  bottom:18px;
-  left:25px;
-  right:25px;
-  text-align:center;
-  color:#68738a;
-  font-size:12px;
-}
-
-.note b{color:var(--ink)}
-
-.timeline{padding:20px 25px}
-
-.toptime{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:18px;
-}
-
-.toptime strong{font-size:13px}
-
-.toptime span{
-  color:#8792a8;
-  font:11px "DM Mono";
-}
-
-.tracks{
-  display:flex;
-  gap:9px;
-}
-
-.track{
-  height:6px;
-  flex:1;
-  border-radius:8px;
-  background:#edf0f5;
-  transition:.2s;
-}
-
-.track.done{background:#78dfc5}
-
-.track.now{
-  background:var(--blue);
-  box-shadow:0 0 0 4px #5277f51c;
-}
-
-.labels{
-  display:flex;
-  justify-content:space-between;
-  margin-top:7px;
-  color:#9ba4b4;
-  font-size:9px;
-  font-weight:700;
-}
-
-.controls{
-  margin-top:18px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.circle{
-  width:34px;
-  height:34px;
-  margin-right:6px;
-  background:#f1f3f8;
-  color:#536079;
-  border-radius:8px;
-  font-weight:800;
-}
-
-.play{
-  padding:9px 13px;
-  border-radius:8px;
-  background:var(--ink);
-  color:#fff;
-  font-size:11px;
-  font-weight:800;
-}
-
-.playing{
-  background:var(--blue)!important;
-}
-
-.speed{
-  border:0;
-  background:transparent;
-  color:#6d7790;
-  font-size:11px;
-  font-weight:700;
-  outline:0;
-}
-
-.lower{
-  display:grid;
-  grid-template-columns:1fr 1fr 1.25fr;
-  gap:18px;
-  margin-top:18px;
-}
-
-.card{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:20px 22px;
-}
-
-.tiny{
-  font-size:10px;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  color:#9099aa;
-  font-weight:800;
-  margin-bottom:12px;
-}
-
-.card p{
-  color:#68738a;
-  font-size:13px;
-  line-height:1.65;
-  margin:0;
-}
-
-.variables{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.var{
-  padding:8px 11px;
-  border-radius:7px;
-  background:#f4f6fb;
-  color:#53617b;
-  font:12px "DM Mono";
-}
-
-.var b{color:#293650}
-
-.focus{
-  background:var(--pale);
-  color:#4e69de;
-  padding:8px 10px;
-  border-radius:7px;
-  font-size:11px;
-  font-weight:800;
-}
-
-.logic-top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.logic-code{
-  margin:10px 0 0;
-  background:#fbfcff;
-  border-left:3px solid var(--blue);
-  padding:8px 10px;
-  color:#48556d;
-  font:11px/1.55 "DM Mono";
-  white-space:pre-wrap;
-  max-height:100px;
-  overflow:auto;
-}
-
-.languages{
-  margin-top:17px;
-  display:flex;
-  align-items:center;
-  gap:7px;
-  flex-wrap:wrap;
-}
-
-.chip{
-  padding:5px 8px;
-  border-radius:7px;
-  background:#f4f6fb;
-  color:#53617b;
-  font:10px "DM Mono";
-}
-
-.hint{
-  text-align:center;
-  color:#929bac;
-  font-size:12px;
-  margin-top:20px;
-}
-
-.hint b{color:#5570e9}
-
-.steps,
-.capabilities,
-.faq{
-  max-width:1440px;
-  margin:auto;
-  padding:65px clamp(18px,6vw,88px);
-}
-
-.section-head{
-  max-width:540px;
-  margin:0 auto 30px;
-  text-align:center;
-}
-
-.section-head h2{
-  font-size:clamp(22px,2.4vw,28px);
-  letter-spacing:-1px;
-  margin:0 0 8px;
-}
-
-.section-head p{
-  color:var(--muted);
-  font-size:14px;
-  margin:0;
-}
-
-.step-grid,
-.cap-grid,
-.faq-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px;
-}
-
-.step,
-.cap-card,
-.faq-item{
-  background:#fff;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:24px;
-}
-
-.step .num{
-  display:inline-grid;
-  place-items:center;
-  width:30px;
-  height:30px;
-  border-radius:8px;
-  background:var(--pale);
-  color:var(--blue);
-  font-weight:800;
-  font-size:12px;
-}
-
-.step h3,
-.cap-card h3,
-.faq-item h3{
-  font-size:15px;
-  margin:14px 0 8px;
-}
-
-.step p,
-.cap-card p,
-.faq-item p{
-  color:#68738a;
-  font-size:13px;
-  line-height:1.65;
-  margin:0;
-}
-
-.cap-grid{grid-template-columns:repeat(4,1fr)}
-
-.cap-card .badge{display:inline-block}
-
-.site-footer{
-  border-top:1px solid var(--line);
-  background:#fff;
-  padding:35px clamp(18px,6vw,88px);
-}
-
-.foot-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.foot-links{
-  display:flex;
-  gap:20px;
-}
-
-.foot-links a{
-  color:#7b8598;
-  text-decoration:none;
-  font-size:11px;
-  font-weight:700;
-}
-
-.foot-note{
-  max-width:700px;
-  color:#8993a7;
-  font-size:11px;
-  line-height:1.7;
-  margin:18px 0 0;
-}
-
-@media(max-width:1050px){
-  .workspace{grid-template-columns:1fr}
-
-  .editor{
-    border-right:0;
-    border-bottom:1px solid var(--line);
-  }
-
-  .lower{grid-template-columns:1fr}
-
-  .cap-grid{grid-template-columns:repeat(2,1fr)}
-}
-
-@media(max-width:760px){
-  .nav,
-  .top-actions .cta{display:none}
-
-  .menu-btn{display:block}
-
-  .nav.open{
-    display:flex;
-    position:absolute;
-    top:72px;
-    left:0;
-    right:0;
-    padding:18px 22px;
-    background:#fff;
-    border-bottom:1px solid var(--line);
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .bar{
-    align-items:flex-start;
-    padding-top:12px;
-    padding-bottom:12px;
-    flex-wrap:wrap;
-  }
-
-  .bar-actions{
-    width:100%;
-    justify-content:flex-end;
-  }
-
-  .codearea,
-  #code{min-height:340px}
-
-  .stage{height:290px}
-
-  .node{
-    width:55px;
-    height:55px;
-  }
-
-  .node small{top:65px}
-
-  .line{top:143px}
-
-  .pulse{top:138px}
-
-  .step-grid,
-  .cap-grid,
-  .faq-grid{grid-template-columns:1fr}
-
-  .foot-top{
-    flex-direction:column;
-    align-items:flex-start;
-    gap:18px;
-  }
-
-  .foot-links{flex-wrap:wrap}
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>TraceLab — Interactive Code Visualizer</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --border: #e4e8f0;
+      --text: #172033;
+      --muted: #697386;
+      --primary: #5b5ce2;
+      --primary-dark: #4748c9;
+      --success: #20a464;
+      --danger: #df4f4f;
+      --shadow: 0 12px 35px rgba(24, 32, 56, 0.08);
+    }
+
+    body {
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    button,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    /* HEADER */
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav {
+      max-width: 1250px;
+      margin: auto;
+      min-height: 70px;
+      padding: 0 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: -.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .nav-links a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    /* HERO */
+
+    .hero {
+      max-width: 1250px;
+      margin: auto;
+      padding: 70px 22px 45px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: clamp(38px, 6vw, 68px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      color: var(--primary);
+    }
+
+    .hero p {
+      max-width: 720px;
+      margin: auto;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    /* WORKSPACE */
+
+    .workspace {
+      max-width: 1250px;
+      margin: auto;
+      padding: 0 22px 60px;
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 750;
+    }
+
+    .filename {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* EDITOR */
+
+    .editor-toolbar {
+      padding: 12px 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    select,
+    .small-btn {
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 9px;
+      padding: 8px 11px;
+      color: var(--text);
+    }
+
+    .small-btn:hover {
+      border-color: var(--primary);
+    }
+
+    .editor-area {
+      display: grid;
+      grid-template-columns: 50px 1fr;
+      min-height: 390px;
+      background: #fbfcff;
+    }
+
+    .line-numbers {
+      padding: 18px 10px;
+      background: #f2f4f9;
+      color: #9aa3b2;
+      text-align: right;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      line-height: 1.7;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    #code {
+      width: 100%;
+      min-height: 390px;
+      resize: vertical;
+      border: 0;
+      outline: 0;
+      padding: 18px;
+      background: transparent;
+      color: #202638;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      tab-size: 2;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      padding: 15px 16px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .primary-btn {
+      border: 0;
+      background: var(--primary);
+      color: white;
+      padding: 11px 17px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .primary-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .primary-btn:disabled {
+      opacity: .65;
+      cursor: wait;
+    }
+
+    .secondary-btn {
+      border: 1px solid var(--border);
+      background: white;
+      padding: 11px 17px;
+      border-radius: 10px;
+      font-weight: 650;
+    }
+
+    .status {
+      padding: 0 16px 14px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* OUTPUT */
+
+    .output-title {
+      padding: 12px 16px 0;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    #output {
+      margin: 10px 16px 16px;
+      min-height: 100px;
+      max-height: 230px;
+      overflow: auto;
+      padding: 14px;
+      border-radius: 10px;
+      background: #111827;
+      color: #d8dee9;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+    }
+
+    #preview {
+      display: none;
+      margin: 0 16px 16px;
+      width: calc(100% - 32px);
+      min-height: 180px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: white;
+    }
+
+    /* FLOW */
+
+    .flow-body {
+      padding: 20px;
+    }
+
+    .flow-visual {
+      min-height: 390px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      background: #fafbff;
+    }
+
+    .flow-algorithm {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 20px;
+      background: #ececff;
+      color: var(--primary-dark);
+      font-size: 12px;
+      font-weight: 750;
+      margin-bottom: 18px;
+    }
+
+    .flow-track {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .flow-node {
+      position: relative;
+      min-height: 72px;
+      padding: 12px 7px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+      transition: .25s;
+    }
+
+    .flow-node.active {
+      border-color: var(--primary);
+      background: #eeeeff;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(91,92,226,.15);
+    }
+
+    .flow-node.done {
+      border-color: #9edbbd;
+      background: #effbf5;
+    }
+
+    .flow-node small {
+      display: block;
+      color: var(--muted);
+      font-weight: 500;
+      margin-top: 5px;
+    }
+
+    .pulse {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      margin: 0 auto 7px;
+      opacity: 0;
+    }
+
+    .flow-node.active .pulse {
+      opacity: 1;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      50% {
+        transform: scale(1.7);
+        opacity: .4;
+      }
+    }
+
+    .timeline {
+      height: 8px;
+      background: #e9ecf4;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    #timelineFill {
+      width: 0%;
+      height: 100%;
+      background: var(--primary);
+      transition: width .3s;
+    }
+
+    .trace-info {
+      padding: 15px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+    }
+
+    #stepTitle {
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    #stepDescription {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .trace-meta {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .flow-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      border: 1px solid var(--border);
+      background: white;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+
+    .control-btn:hover {
+      border-color: var(--primary);
+    }
+
+    .speed {
+      margin-left: auto;
+    }
+
+    /* DSA VISUALIZATION */
+
+    .dsa-box {
+      margin-top: 18px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+      min-height: 75px;
+    }
+
+    .dsa-title {
+      font-size: 12px;
+      font-weight: 750;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .array-view {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+
+    .array-item {
+      min-width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #d8ddeb;
+      border-radius: 8px;
+      background: #f7f8fc;
+      font-family: Consolas, monospace;
+      font-weight: 700;
+      position: relative;
+    }
+
+    .array-item.active {
+      border-color: var(--primary);
+      background: #eeeeff;
+      transform: translateY(-3px);
+    }
+
+    .array-item.found {
+      border-color: var(--success);
+      background: #eaf9f1;
+    }
+
+    .array-index {
+      position: absolute;
+      top: -17px;
+      font-size: 9px;
+      color: #8a93a4;
+    }
+
+    .stack-view {
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 5px;
+      width: 100px;
+    }
+
+    .stack-item {
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      text-align: center;
+      font-family: Consolas, monospace;
+      background: #f7f8fc;
+    }
+
+    .queue-view {
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+    }
+
+    .queue-item {
+      min-width: 55px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      text-align: center;
+      font-family: Consolas, monospace;
+      background: #f7f8fc;
+    }
+
+    /* LOWER CARDS */
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .info-card {
+      padding: 20px;
+      min-height: 190px;
+    }
+
+    .info-card h3 {
+      font-size: 15px;
+      margin-bottom: 15px;
+    }
+
+    .info-card p {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    #variables {
+      font-family: Consolas, monospace;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+
+    .logic-pill {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 6px 9px;
+      background: #eeeeff;
+      color: var(--primary-dark);
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    /* SUPPORTED */
+
+    .supported {
+      max-width: 1250px;
+      margin: auto;
+      padding: 10px 22px 60px;
+    }
+
+    .supported h2,
+    .section h2 {
+      text-align: center;
+      margin-bottom: 22px;
+      font-size: 28px;
+    }
+
+    .chips {
+      display: flex;
+      justify-content: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 30px;
+      padding: 8px 13px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* SECTIONS */
+
+    .section {
+      max-width: 1000px;
+      margin: auto;
+      padding: 60px 22px;
+    }
+
+    .section p {
+      color: var(--muted);
+      text-align: center;
+      max-width: 720px;
+      margin: auto;
+    }
+
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-top: 25px;
+    }
+
+    .how-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 20px;
+    }
+
+    .how-card strong {
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    .how-card span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    footer {
+      padding: 35px 20px;
+      text-align: center;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 900px) {
+      .workspace-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .lower-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .how-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 45px;
+      }
+
+      .flow-track {
+        grid-template-columns: 1fr;
+      }
+
+      .speed {
+        margin-left: 0;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-<header class="top">
+  <!-- HEADER -->
 
-  <div class="brand">
-    <div class="mark">&gt;_</div>
-    TraceLab
-  </div>
+  <header>
+    <div class="nav">
+      <div class="brand">TraceLab</div>
 
-  <nav class="nav" id="siteNav">
-    <a href="#playground">Playground</a>
-    <a href="#how-it-works">How it works</a>
-    <a href="#capabilities">What runs live</a>
-    <a href="#faq">FAQ</a>
-  </nav>
-
-  <div class="top-actions">
-    <a class="cta" href="#playground">Start coding</a>
-    <button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
-  </div>
-
-</header>
-
-<main>
-
-<section class="hero">
-  <div class="eyebrow">Interactive code playground</div>
-
-  <h1>
-    Don't just run code.
-    <span>Watch it think.</span>
-  </h1>
-
-  <p class="sub">
-    Write, run, and understand code with real output and a visual execution flow.
-  </p>
-</section>
-
-<section class="workspace" id="playground">
-
-<div class="editor">
-
-  <div class="bar">
-
-    <div class="file">
-      <i></i>
-      <span id="file">main.py</span>
+      <nav class="nav-links">
+        <a href="#workspace">Playground</a>
+        <a href="#how">How it works</a>
+        <a href="#capabilities">Capabilities</a>
+        <a href="#faq">FAQ</a>
+      </nav>
     </div>
+  </header>
 
-    <div class="bar-actions">
 
-      <button class="detect" id="detect">
-        ✦ Auto-detect
-      </button>
+  <!-- HERO -->
 
-      <button class="detect" id="openBrowser" style="display:none">
-        ↗ Open in browser
-      </button>
+  <section class="hero">
+    <h1>Understand Code<br><span>As It Runs</span></h1>
 
-      <select class="lang" id="language" aria-label="Programming language">
-
-        <optgroup label="Web">
-          <option value="html">HTML</option>
-          <option value="css">CSS</option>
-        </optgroup>
-
-        <optgroup label="Popular">
-          <option value="python" selected>Python 3</option>
-          <option value="javascript">JavaScript</option>
-          <option value="typescript">TypeScript</option>
-          <option value="c">C</option>
-          <option value="cpp">C++</option>
-          <option value="java">Java</option>
-          <option value="go">Go</option>
-        </optgroup>
-
-        <optgroup label="Modern & Mobile">
-          <option value="kotlin">Kotlin</option>
-          <option value="swift">Swift</option>
-        </optgroup>
-
-        <optgroup label="Scripting & Data">
-          <option value="ruby">Ruby</option>
-          <option value="php">PHP</option>
-          <option value="perl">Perl</option>
-          <option value="bash">Bash</option>
-          <option value="sql">SQL</option>
-        </optgroup>
-
-      </select>
-
-    </div>
-  </div>
-
-  <div class="codearea">
-
-    <pre class="nums" id="nums">1</pre>
-
-    <textarea
-      id="code"
-      spellcheck="false"
-      autocomplete="off"
-      autocorrect="off"
-      autocapitalize="off"
-      aria-label="Code editor"
-    ></textarea>
-
-  </div>
-
-  <div class="runbar">
-
-    <button class="run" id="run">
-      ▶ Analyze & visualize
-    </button>
-
-    <button class="reset" id="reset">
-      ↻ Reset
-    </button>
-
-    <span class="saved" id="modeStatus">
-      Python runs locally in your browser
-    </span>
-
-    <span class="server-pill" id="serverStatus">
-      ● Checking backend…
-    </span>
-
-  </div>
-
-  <div class="console">
-
-    <div class="chead">
-      <span>Output</span>
-      <span class="ok" id="status">● Ready</span>
-    </div>
-
-    <pre id="output">Analyze your code to see its execution flow.</pre>
-
-  </div>
-
-  <div class="preview" id="previewWrap">
-
-    <div class="chead">
-      <span>Live preview</span>
-      <span>Sandboxed preview</span>
-    </div>
-
-    <iframe
-      id="previewFrame"
-      title="Live preview"
-      sandbox="allow-scripts"
-    ></iframe>
-
-  </div>
-
-</div>
-
-<div class="visual">
-
-  <div class="bar">
-    <span class="title">Program flow</span>
-    <span class="badge" id="badge">Step 1 of 1</span>
-  </div>
-
-  <div class="stage">
-
-    <div class="line"></div>
-
-    <div class="pulse" id="pulse"></div>
-
-    <div class="node n1 active">
-      <small>Start</small>
-      <span>⚡</span>
-    </div>
-
-    <div class="node n2">
-      <small>Analyze</small>
-      <span>🔍</span>
-    </div>
-
-    <div class="node n3">
-      <small>Process</small>
-      <span>↻</span>
-    </div>
-
-    <div class="node n4">
-      <small>Update</small>
-      <span>＋</span>
-    </div>
-
-    <div class="node n5">
-      <small>Output</small>
-      <span>⌁</span>
-    </div>
-
-    <p class="note" id="note">
-      <b>Start</b> — analyze your code to generate its actual flow.
+    <p>
+      TraceLab is an interactive code playground that helps you understand
+      program execution through visual steps, variables, algorithms and output.
     </p>
+  </section>
 
-  </div>
 
-  <div class="timeline">
+  <!-- WORKSPACE -->
 
-    <div class="toptime">
-      <strong id="stepname">Analyze your program</strong>
-      <span id="lineref">waiting</span>
+  <main class="workspace" id="workspace">
+
+    <div class="workspace-grid">
+
+      <!-- LEFT EDITOR -->
+
+      <section class="card">
+
+        <div class="card-header">
+          <div>
+            <div class="card-title">Code Editor</div>
+            <div class="filename" id="filename">main.cpp</div>
+          </div>
+        </div>
+
+        <div class="editor-toolbar">
+
+          <button class="small-btn" id="autoDetect">
+            Auto-detect
+          </button>
+
+          <select id="language">
+            <option value="html">HTML</option>
+            <option value="css">CSS</option>
+            <option value="python">Python 3</option>
+            <option value="javascript">JavaScript</option>
+            <option value="typescript">TypeScript</option>
+            <option value="c">C</option>
+            <option value="cpp" selected>C++</option>
+            <option value="java">Java</option>
+            <option value="go">Go</option>
+            <option value="kotlin">Kotlin</option>
+            <option value="swift">Swift</option>
+            <option value="ruby">Ruby</option>
+            <option value="php">PHP</option>
+            <option value="perl">Perl</option>
+            <option value="bash">Bash</option>
+            <option value="sql">SQL</option>
+          </select>
+
+        </div>
+
+        <div class="editor-area">
+
+          <div class="line-numbers" id="lineNumbers">
+            1
+          </div>
+
+          <textarea
+            id="code"
+            spellcheck="false"
+            placeholder="Write your code here..."
+          >#include &lt;iostream&gt;
+using namespace std;
+
+int main() {
+    int sum = 0;
+
+    for (int i = 1; i &lt;= 5; i++) {
+        sum += i;
+    }
+
+    cout &lt;&lt; sum;
+    return 0;
+}</textarea>
+
+        </div>
+
+        <div class="action-row">
+
+          <button class="primary-btn" id="run">
+            ▶ Analyze & visualize
+          </button>
+
+          <button class="secondary-btn" id="reset">
+            ↻ Reset
+          </button>
+
+        </div>
+
+        <div class="status" id="status">
+          ● Ready
+        </div>
+
+        <div class="output-title">
+          Program output
+        </div>
+
+        <pre id="output">● Ready</pre>
+
+        <iframe id="preview"></iframe>
+
+      </section>
+
+
+      <!-- RIGHT FLOW -->
+
+      <section class="card">
+
+        <div class="card-header">
+          <div>
+            <div class="card-title">Program flow</div>
+            <div class="filename" id="stepCounter">
+              Step 1 of 5
+            </div>
+          </div>
+        </div>
+
+        <div class="flow-body">
+
+          <div class="flow-visual">
+
+            <div class="flow-algorithm" id="algorithmName">
+              Generic Program
+            </div>
+
+            <div class="flow-track" id="flowTrack">
+
+              <div class="flow-node active">
+                <div class="pulse"></div>
+                Start
+                <small>Begin</small>
+              </div>
+
+              <div class="flow-node">
+                <div class="pulse"></div>
+                Analyze
+                <small>Inspect</small>
+              </div>
+
+              <div class="flow-node">
+                <div class="pulse"></div>
+                Process
+                <small>Execute</small>
+              </div>
+
+              <div class="flow-node">
+                <div class="pulse"></div>
+                Update
+                <small>State</small>
+              </div>
+
+              <div class="flow-node">
+                <div class="pulse"></div>
+                Output
+                <small>Result</small>
+              </div>
+
+            </div>
+
+
+            <div class="timeline">
+              <div id="timelineFill"></div>
+            </div>
+
+
+            <div class="trace-info">
+
+              <div id="stepTitle">
+                Start program
+              </div>
+
+              <div id="stepDescription">
+                TraceLab begins analyzing your program.
+              </div>
+
+              <div class="trace-meta">
+                <span id="lineRef">Line: —</span>
+                <span id="stepType">Type: start</span>
+              </div>
+
+            </div>
+
+
+            <!-- DYNAMIC DSA VIEW -->
+
+            <div class="dsa-box" id="dsaBox">
+
+              <div class="dsa-title">
+                Data structure / algorithm state
+              </div>
+
+              <div id="dsaView">
+                No algorithm-specific data detected.
+              </div>
+
+            </div>
+
+
+            <div class="flow-controls">
+
+              <button class="control-btn" id="prev">
+                ← Previous
+              </button>
+
+              <button class="control-btn" id="play">
+                ▶ Play
+              </button>
+
+              <button class="control-btn" id="next">
+                Next →
+              </button>
+
+              <select class="control-btn speed" id="speed">
+                <option value="1200">Slow</option>
+                <option value="700" selected>Normal</option>
+                <option value="350">Fast</option>
+              </select>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
     </div>
 
-    <div class="tracks">
-      <i class="track now"></i>
-      <i class="track"></i>
-      <i class="track"></i>
-      <i class="track"></i>
-      <i class="track"></i>
-    </div>
 
-    <div class="labels">
-      <span id="label1">Start</span>
-      <span id="label2">Analyze</span>
-      <span id="label3">Process</span>
-      <span id="label4">Update</span>
-      <span id="label5">Output</span>
-    </div>
+    <!-- LOWER CARDS -->
 
-    <div class="controls">
+    <div class="lower-grid">
 
-      <div>
+      <section class="card info-card">
 
-        <button class="circle" id="prev" aria-label="Previous step">
-          ←
-        </button>
+        <h3>What's happening now</h3>
 
-        <button class="circle" id="next" aria-label="Next step">
-          →
-        </button>
+        <div class="logic-pill" id="currentType">
+          Program Start
+        </div>
 
-        <button class="play" id="play">
-          ▶ Play flow
-        </button>
+        <p id="happening">
+          Execution begins. The code is being inspected.
+        </p>
 
-      </div>
+      </section>
 
-      <select class="speed" id="speed">
 
-        <option value="1400">1× speed</option>
-        <option value="800">1.5× speed</option>
-        <option value="500">2× speed</option>
+      <section class="card info-card">
 
-      </select>
+        <h3>Live variables</h3>
 
-    </div>
+        <div id="variables">
+program = started
+        </div>
 
-  </div>
+      </section>
 
-</div>
 
-</section>
+      <section class="card info-card">
 
-<section class="lower">
+        <h3>Main logic finder</h3>
 
-  <div class="card">
+        <div class="logic-pill" id="logicName">
+          Generic Program
+        </div>
 
-    <div class="tiny">
-      What's happening now
-    </div>
+        <p id="logicDescription">
+          TraceLab will inspect your code and identify recognizable
+          algorithm patterns.
+        </p>
 
-    <p id="insight">
-      <strong>Execution begins.</strong>
-      Analyze your program to generate a code-specific flow.
-    </p>
-
-  </div>
-
-  <div class="card">
-
-    <div class="tiny">
-      Live variables
-    </div>
-
-    <div class="variables" id="vars"></div>
-
-  </div>
-
-  <div class="card">
-
-    <div class="logic-top">
-
-      <div class="tiny" style="margin:0">
-        Main logic finder
-      </div>
-
-      <button class="focus" id="focus">
-        ⌘ Explain main logic
-      </button>
+      </section>
 
     </div>
 
-    <p id="logicSummary">
-      TraceLab finds loops, decisions, sorting, searching, and data structures.
-    </p>
+  </main>
 
-    <pre class="logic-code" id="logicCode">
-Run this view on any pasted code.
-    </pre>
 
-  </div>
+  <!-- SUPPORTED LANGUAGES -->
 
-</section>
+  <section class="supported" id="capabilities">
 
-<div class="languages">
+    <h2>Supported Languages</h2>
 
-  <span class="tiny" style="margin:0 4px 0 0">
-    16 supported
-  </span>
+    <div class="chips">
 
-  <span class="chip">HTML / CSS</span>
-  <span class="chip">Python</span>
-  <span class="chip">JavaScript</span>
-  <span class="chip">TypeScript</span>
-  <span class="chip">C / C++</span>
-  <span class="chip">Java / Go</span>
-  <span class="chip">Kotlin / Swift</span>
-  <span class="chip">Ruby / PHP</span>
-  <span class="chip">Perl / Bash</span>
-  <span class="chip">SQL</span>
+      <div class="chip">HTML</div>
+      <div class="chip">CSS</div>
+      <div class="chip">Python 3</div>
+      <div class="chip">JavaScript</div>
+      <div class="chip">TypeScript</div>
+      <div class="chip">C</div>
+      <div class="chip">C++</div>
+      <div class="chip">Java</div>
+      <div class="chip">Go</div>
+      <div class="chip">Kotlin</div>
+      <div class="chip">Swift</div>
+      <div class="chip">Ruby</div>
+      <div class="chip">PHP</div>
+      <div class="chip">Perl</div>
+      <div class="chip">Bash</div>
+      <div class="chip">SQL</div>
 
-</div>
+    </div>
 
-<p class="hint">
-  Use <b>Analyze & visualize</b> to run your code and watch the execution flow.
-</p>
+  </section>
 
-</main>
 
-<section class="steps" id="how-it-works">
+  <!-- HOW IT WORKS -->
 
-  <div class="section-head">
+  <section class="section" id="how">
+
     <h2>How it works</h2>
-    <p>
-      Three steps between a blank editor and a traced program.
-    </p>
-  </div>
-
-  <div class="step-grid">
-
-    <div class="step">
-      <span class="num">1</span>
-      <h3>Write or paste code</h3>
-      <p>
-        Start with the built-in example or paste your own code.
-        Line numbers make it easy to follow the execution.
-      </p>
-    </div>
-
-    <div class="step">
-      <span class="num">2</span>
-      <h3>Choose a language</h3>
-      <p>
-        Choose from the supported languages or use Auto-detect.
-      </p>
-    </div>
-
-    <div class="step">
-      <span class="num">3</span>
-      <h3>Analyze and run</h3>
-      <p>
-        TraceLab executes supported code and creates a
-        code-specific visual execution flow.
-      </p>
-    </div>
-
-  </div>
-
-</section>
-
-<section class="capabilities" id="capabilities">
-
-  <div class="section-head">
-
-    <h2>What actually runs</h2>
 
     <p>
-      TraceLab uses browser execution for some languages and
-      the hosted backend for compiled languages.
+      Enter a program, choose a language and TraceLab analyzes the code,
+      executes it when supported, and builds an interactive execution flow.
     </p>
 
-  </div>
+    <div class="how-grid">
 
-  <div class="cap-grid">
+      <div class="how-card">
+        <strong>1. Write code</strong>
+        <span>
+          Enter your C++, Python, JavaScript or other supported program.
+        </span>
+      </div>
 
-    <div class="cap-card">
-      <span class="badge">Live</span>
-      <h3>Python</h3>
-      <p>
-        Python runs locally in the browser using Pyodide.
-      </p>
+      <div class="how-card">
+        <strong>2. Analyze</strong>
+        <span>
+          TraceLab detects recognizable algorithms and program structures.
+        </span>
+      </div>
+
+      <div class="how-card">
+        <strong>3. Visualize</strong>
+        <span>
+          Move through execution steps and inspect algorithm state.
+        </span>
+      </div>
+
     </div>
 
-    <div class="cap-card">
-      <span class="badge">Live</span>
-      <h3>JavaScript</h3>
-      <p>
-        JavaScript executes inside a sandboxed browser frame.
-      </p>
-    </div>
-
-    <div class="cap-card">
-      <span class="badge">Live</span>
-      <h3>HTML & CSS</h3>
-      <p>
-        HTML and CSS render directly inside the live preview.
-      </p>
-    </div>
-
-    <div class="cap-card">
-      <span class="badge">Live</span>
-      <h3>Hosted runtimes</h3>
-      <p>
-        C, C++, Java, Go, Kotlin, Swift, Ruby, PHP, Perl,
-        Bash, SQL and TypeScript use the TraceLab backend.
-      </p>
-    </div>
-
-  </div>
-
-</section>
-
-<section class="faq" id="faq">
-
-  <div class="section-head">
-    <h2>Frequently asked</h2>
-  </div>
-
-  <div class="faq-grid">
-
-    <div class="faq-item">
-      <h3>Is this real execution?</h3>
-      <p>
-        Yes. Browser languages run in the browser and the
-        hosted languages are sent to the TraceLab execution backend.
-      </p>
-    </div>
-
-    <div class="faq-item">
-      <h3>Where does my code run?</h3>
-      <p>
-        Server languages are sent to the TraceLab backend only
-        when you press the Analyze button.
-      </p>
-    </div>
-
-    <div class="faq-item">
-      <h3>Can multiple people use it?</h3>
-      <p>
-        Yes. Each execution request is handled independently.
-        The backend does not use one shared code state for all visitors.
-      </p>
-    </div>
-
-    <div class="faq-item">
-      <h3>Why can the first request be slow?</h3>
-      <p>
-        The free Render service can sleep when unused.
-        The first request after sleeping may therefore take longer.
-      </p>
-    </div>
-
-  </div>
-
-</section>
-
-<footer class="site-footer">
-
-  <div class="foot-top">
-
-    <div class="brand">
-      <div class="mark">&gt;_</div>
-      TraceLab
-    </div>
-
-    <nav class="foot-links">
-      <a href="#playground">Playground</a>
-      <a href="#how-it-works">How it works</a>
-      <a href="#capabilities">What runs live</a>
-      <a href="#faq">FAQ</a>
-    </nav>
-
-  </div>
-
-  <p class="foot-note">
-    TraceLab is an interactive code playground for learning
-    programming through real execution and visual flow.
-    © <span id="year"></span> TraceLab.
-  </p>
-
-</footer>
-
-<script>
-
-/* =========================================================
-   TRACE LAB - DYNAMIC DSA VISUALIZATION ENGINE
-========================================================= */
-
-const $ = selector => document.querySelector(selector);
-
-
-/* =========================================================
-   SAMPLE CODE
-========================================================= */
-
-const codes = {
-
-html:[
-"index.html",
-[
-"<!doctype html>",
-"<html>",
-"<head>",
-"  <title>TraceLab</title>",
-"</head>",
-"<body>",
-"  <h1>Hello, world!</h1>",
-"  <p>Welcome to TraceLab.</p>",
-"</body>",
-"</html>"
-]],
-
-css:[
-"style.css",
-[
-"body {",
-"  font-family: sans-serif;",
-"  background: #f4f6fb;",
-"}",
-"",
-"h1 {",
-"  color: #5277f5;",
-"}"
-]],
-
-python:[
-"main.py",
-[
-"numbers = [3, 7, 2, 9]",
-"total = 0",
-"",
-"for number in numbers:",
-"    total += number",
-"",
-"print(total)"
-]],
-
-javascript:[
-"main.js",
-[
-"const numbers = [3, 7, 2, 9];",
-"let total = 0;",
-"",
-"for (const number of numbers) {",
-"  total += number;",
-"}",
-"",
-"console.log(total);"
-]],
-
-typescript:[
-"main.ts",
-[
-"const numbers: number[] = [3, 7, 2, 9];",
-"const total = numbers.reduce((sum, n) => sum + n, 0);",
-"console.log(total);"
-]],
-
-c:[
-"main.c",
-[
-"#include <stdio.h>",
-"",
-"int main(void) {",
-"    int numbers[] = {3, 7, 2, 9};",
-"    int total = 0;",
-"    for (int i = 0; i < 4; i++) {",
-"        total += numbers[i];",
-"    }",
-"    printf(\"%d\\n\", total);",
-"    return 0;",
-"}"
-]],
-
-cpp:[
-"main.cpp",
-[
-"#include <iostream>",
-"",
-"int main() {",
-"    int numbers[] = {3, 7, 2, 9};",
-"    int total = 0;",
-"",
-"    for (int number : numbers) {",
-"        total += number;",
-"    }",
-"",
-"    std::cout << total << \"\\n\";",
-"    return 0;",
-"}"
-]],
-
-java:[
-"Main.java",
-[
-"class Main {",
-"  public static void main(String[] args) {",
-"    int[] numbers = {3, 7, 2, 9};",
-"    int total = 0;",
-"",
-"    for (int number : numbers) {",
-"      total += number;",
-"    }",
-"",
-"    System.out.println(total);",
-"  }",
-"}"
-]],
-
-go:[
-"main.go",
-[
-"package main",
-"",
-"import \"fmt\"",
-"",
-"func main() {",
-"  numbers := []int{3, 7, 2, 9}",
-"  total := 0",
-"",
-"  for _, number := range numbers {",
-"    total += number",
-"  }",
-"",
-"  fmt.Println(total)",
-"}"
-]],
-
-kotlin:[
-"Main.kt",
-[
-"fun main() {",
-"  val numbers = intArrayOf(3, 7, 2, 9)",
-"  var total = 0",
-"",
-"  for (number in numbers) {",
-"    total += number",
-"  }",
-"",
-"  println(total)",
-"}"
-]],
-
-swift:[
-"main.swift",
-[
-"let numbers = [3, 7, 2, 9]",
-"var total = 0",
-"",
-"for number in numbers {",
-"    total += number",
-"}",
-"",
-"print(total)"
-]],
-
-ruby:[
-"main.rb",
-[
-"numbers = [3, 7, 2, 9]",
-"total = 0",
-"",
-"numbers.each do |number|",
-"  total += number",
-"end",
-"",
-"puts total"
-]],
-
-php:[
-"main.php",
-[
-"<?php",
-"$numbers = [3, 7, 2, 9];",
-"$total = 0;",
-"",
-"foreach ($numbers as $number) {",
-"    $total += $number;",
-"}",
-"",
-"echo $total, PHP_EOL;"
-]],
-
-perl:[
-"main.pl",
-[
-"my @numbers = (3, 7, 2, 9);",
-"my $total = 0;",
-"",
-"for my $number (@numbers) {",
-"    $total += $number;",
-"}",
-"",
-"print \"$total\\n\";"
-]],
-
-bash:[
-"main.sh",
-[
-"total=0",
-"",
-"for number in 3 7 2 9; do",
-"  total=$((total + number))",
-"done",
-"",
-"echo \"$total\""
-]],
-
-sql:[
-"main.sql",
-[
-"SELECT 3 + 7 + 2 + 9 AS total;"
-]]
-
-};
-
-
-/* =========================================================
-   DYNAMIC FLOW STATE
-========================================================= */
-
-let steps = [];
-let step = 0;
-let timer = null;
-
-
-/* =========================================================
-   DEFAULT FLOW
-========================================================= */
-
-function makeDefaultFlow(code){
-
-  const lines = code.split("\n");
-
-  const firstLine =
-    lines.findIndex(line => line.trim()) + 1;
-
-  return [
-
-    [
-      "Start program",
-      "line " + Math.max(1,firstLine),
-      "<b>Start</b> — TraceLab begins analyzing your program.",
-      "<strong>Execution begins.</strong> The code is being inspected.",
-      '<span class="var"><b>program</b> = started</span>'
-    ],
-
-    [
-      "Analyze instructions",
-      "lines " + lines.length,
-      "<b>Analyze</b> — TraceLab identifies the important instructions.",
-      "<strong>Code structure detected.</strong> Loops, conditions and operations are inspected.",
-      '<span class="var"><b>lines</b> = ' + lines.length + '</span>'
-    ],
-
-    [
-      "Execute logic",
-      "program flow",
-      "<b>Process</b> — the program follows its main logic.",
-      "<strong>Main logic executing.</strong> The detected instructions are followed.",
-      '<span class="var"><b>state</b> = processing</span>'
-    ],
-
-    [
-      "Update state",
-      "runtime",
-      "<b>Update</b> — program values change as instructions execute.",
-      "<strong>Variables update.</strong> Values move through the program.",
-      '<span class="var"><b>state</b> = updated</span>'
-    ],
-
-    [
-      "Show result",
-      "output",
-      "<b>Output</b> — execution reaches its result.",
-      "<strong>Execution finished.</strong> The final result is available below.",
-      '<span class="var"><b>status</b> = complete</span>'
-    ]
-
-  ];
-}
-
-
-/* =========================================================
-   ARRAY EXTRACTION
-========================================================= */
-
-function extractArray(code){
-
-  let match =
-    code.match(
-      /(?:arr|array|numbers|data)\s*[\=\:]\s*(?:\w+\s*)?\[([^\]]+)\]/i
-    );
-
-  if(!match){
-
-    match =
-      code.match(
-        /\{([0-9,\s-]+)\}/
-      );
-
-  }
-
-  if(!match) return null;
-
-  const values =
-    match[1]
-      .split(",")
-      .map(x=>x.trim())
-      .map(Number)
-      .filter(x=>Number.isFinite(x));
-
-  return values.length ? values : null;
-
-}
-
-
-/* =========================================================
-   BUBBLE SORT DETECTION
-========================================================= */
-
-function detectBubbleSort(code){
-
-  const c = code.toLowerCase();
-
-  return (
-    (
-      c.includes("bubble") ||
-      (
-        c.includes("swap") &&
-        (c.includes("arr[j]") ||
-         c.includes("array[j]") ||
-         c.includes("numbers[j]"))
-      )
-    ) &&
-    (
-      c.includes("arr[j] > arr[j+1]") ||
-      c.includes("arr[j+1] < arr[j]") ||
-      c.includes("swap")
-    )
-  );
-}
-
-
-/* =========================================================
-   BUBBLE SORT FLOW
-========================================================= */
-
-function createBubbleSortFlow(code){
-
-  let arr =
-    extractArray(code);
-
-  if(!arr){
-    arr = [5,1,4,2,8];
-  }
-
-  const original =
-    [...arr];
-
-  const result = [];
-
-  result.push([
-    "Start Bubble Sort",
-    "array setup",
-    "<b>Start</b> — Bubble Sort receives the array.",
-    "<strong>Bubble Sort detected.</strong> The algorithm repeatedly compares adjacent values.",
-    '<span class="var"><b>array</b> = [' + arr.join(", ") + ']</span>'
-  ]);
-
-  result.push([
-    "Check adjacent values",
-    "outer loop",
-    "<b>Loop</b> — compare neighboring elements.",
-    "<strong>Adjacent comparison.</strong> The larger value should move toward the right.",
-    '<span class="var"><b>array</b> = [' + arr.join(", ") + ']</span>'
-  ]);
-
-  let comparisons = 0;
-  let swaps = 0;
-
-  for(let i=0;i<arr.length-1;i++){
-
-    for(let j=0;j<arr.length-i-1;j++){
-
-      comparisons++;
-
-      const a = arr[j];
-      const b = arr[j+1];
-
-      result.push([
-        "Compare " + a + " and " + b,
-        "compare " + (comparisons),
-        "<b>Compare</b> — inspect adjacent values " + a + " and " + b + ".",
-        "<strong>Decision:</strong> " +
-        a +
-        (a > b ? " is greater than " : " is not greater than ") +
-        b +
-        ".",
-        '<span class="var"><b>left</b> = ' + a +
-        '</span><span class="var"><b>right</b> = ' + b +
-        '</span>'
-      ]);
-
-      if(a > b){
-
-        arr[j] = b;
-        arr[j+1] = a;
-
-        swaps++;
-
-        result.push([
-          "Swap " + a + " and " + b,
-          "swap " + swaps,
-          "<b>Swap</b> — the larger value moves one position right.",
-          "<strong>Array changed.</strong> The two adjacent elements exchange positions.",
-          '<span class="var"><b>array</b> = [' +
-          arr.join(", ") +
-          ']</span>'
-        ]);
+  </section>
 
+
+  <!-- FAQ -->
+
+  <section class="section" id="faq">
+
+    <h2>FAQ</h2>
+
+    <p>
+      TraceLab uses browser execution for selected languages and the
+      TraceLab backend for hosted languages such as C, C++, Java and Go.
+    </p>
+
+  </section>
+
+
+  <footer>
+    TraceLab — Interactive Code Visualization
+  </footer>
+
+
+  <!-- JAVASCRIPT -->
+
+  <script>
+
+    /* ============================================================
+       TRACE BACKEND
+       ============================================================ */
+
+    const TRACE_BACKEND =
+      "https://tracelab-free.onrender.com";
+
+
+    /* ============================================================
+       DOM HELPERS
+       ============================================================ */
+
+    const $ = id => document.getElementById(id);
+
+    const codeEl = $("code");
+    const languageEl = $("language");
+    const outputEl = $("output");
+    const statusEl = $("status");
+    const runBtn = $("run");
+    const resetBtn = $("reset");
+
+    const lineNumbersEl = $("lineNumbers");
+
+    const flowNodes =
+      Array.from(document.querySelectorAll(".flow-node"));
+
+
+    /* ============================================================
+       STATE
+       ============================================================ */
+
+    let steps = [];
+
+    let currentStep = 0;
+
+    let playTimer = null;
+
+    let detectedAlgorithm = "Generic Program";
+
+    let detectedData = [];
+
+    let detectedTarget = null;
+
+    let detectedStack = [];
+
+    let detectedQueue = [];
+
+
+    /* ============================================================
+       DEFAULT SAMPLE
+       ============================================================ */
+
+    const DEFAULT_CODE = `#include <iostream>
+using namespace std;
+
+int main() {
+    int sum = 0;
+
+    for (int i = 1; i <= 5; i++) {
+        sum += i;
+    }
+
+    cout << sum;
+    return 0;
+}`;
+
+
+    /* ============================================================
+       LINE NUMBERS
+       ============================================================ */
+
+    function updateLineNumbers() {
+
+      const count =
+        codeEl.value.split("\n").length;
+
+      let text = "";
+
+      for (let i = 1; i <= count; i++) {
+        text += i + "\n";
       }
 
+      lineNumbersEl.textContent = text;
     }
 
-    result.push([
-      "Finish pass " + (i+1),
-      "pass " + (i+1),
-      "<b>Pass complete</b> — the largest remaining value is now near the end.",
-      "<strong>Sorted suffix grows.</strong> Bubble Sort has completed one pass.",
-      '<span class="var"><b>array</b> = [' +
-      arr.join(", ") +
-      ']</span>'
-    ]);
 
-  }
+    codeEl.addEventListener("input", updateLineNumbers);
 
-  result.push([
-    "Bubble Sort complete",
-    "output",
-    "<b>Output</b> — the array is sorted.",
-    "<strong>Bubble Sort finished.</strong> Every required comparison and swap has been processed.",
-    '<span class="var"><b>sorted</b> = [' +
-    arr.join(", ") +
-    ']</span>'
-  ]);
-
-  return result;
-}
+    codeEl.addEventListener("scroll", () => {
+      lineNumbersEl.scrollTop = codeEl.scrollTop;
+    });
 
 
-/* =========================================================
-   SELECTION SORT DETECTION
-========================================================= */
-
-function detectSelectionSort(code){
-
-  const c = code.toLowerCase();
-
-  return (
-    c.includes("selection sort") ||
-    (
-      c.includes("min") &&
-      c.includes("swap") &&
-      c.includes("arr")
-    )
-  );
-}
+    updateLineNumbers();
 
 
-function createSelectionSortFlow(code){
+    /* ============================================================
+       FILENAME
+       ============================================================ */
 
-  let arr =
-    extractArray(code) || [64,25,12,22,11];
+    function updateFilename() {
 
-  const result = [];
+      const language =
+        languageEl.value;
 
-  result.push([
-    "Start Selection Sort",
-    "array setup",
-    "<b>Start</b> — Selection Sort receives the array.",
-    "<strong>Selection Sort detected.</strong> The smallest remaining value is selected.",
-    '<span class="var"><b>array</b> = [' + arr.join(", ") + ']</span>'
-  ]);
+      const names = {
+        html: "index.html",
+        css: "style.css",
+        python: "main.py",
+        javascript: "main.js",
+        typescript: "main.ts",
+        c: "main.c",
+        cpp: "main.cpp",
+        java: "Main.java",
+        go: "main.go",
+        kotlin: "Main.kt",
+        swift: "main.swift",
+        ruby: "main.rb",
+        php: "index.php",
+        perl: "main.pl",
+        bash: "script.sh",
+        sql: "query.sql"
+      };
 
-  for(let i=0;i<arr.length-1;i++){
-
-    let minIndex = i;
-
-    result.push([
-      "Select minimum",
-      "index " + i,
-      "<b>Select</b> — search for the smallest remaining value.",
-      "<strong>Minimum search.</strong> The unsorted portion is inspected.",
-      '<span class="var"><b>min</b> = ' + arr[minIndex] + '</span>'
-    ]);
-
-    for(let j=i+1;j<arr.length;j++){
-
-      result.push([
-        "Compare " + arr[j] + " with minimum",
-        "compare",
-        "<b>Compare</b> — check the current value against the minimum.",
-        "<strong>Minimum candidate updated</strong> when a smaller value is found.",
-        '<span class="var"><b>current</b> = ' + arr[j] +
-        '</span><span class="var"><b>min</b> = ' +
-        arr[minIndex] + '</span>'
-      ]);
-
-      if(arr[j] < arr[minIndex]){
-        minIndex = j;
-      }
-
+      $("filename").textContent =
+        names[language] || "main.txt";
     }
 
-    if(minIndex !== i){
 
-      const temp = arr[i];
-      arr[i] = arr[minIndex];
-      arr[minIndex] = temp;
-
-      result.push([
-        "Place minimum",
-        "swap",
-        "<b>Swap</b> — place the smallest value at the current position.",
-        "<strong>Array updated.</strong> The selected minimum joins the sorted section.",
-        '<span class="var"><b>array</b> = [' +
-        arr.join(", ") +
-        ']</span>'
-      ]);
-
-    }
-
-  }
-
-  result.push([
-    "Selection Sort complete",
-    "output",
-    "<b>Output</b> — the array is sorted.",
-    "<strong>Selection Sort finished.</strong>",
-    '<span class="var"><b>sorted</b> = [' +
-    arr.join(", ") +
-    ']</span>'
-  ]);
-
-  return result;
-}
-
-
-/* =========================================================
-   INSERTION SORT
-========================================================= */
-
-function detectInsertionSort(code){
-
-  const c = code.toLowerCase();
-
-  return (
-    c.includes("insertion sort") ||
-    (
-      c.includes("key") &&
-      c.includes("arr[j]") &&
-      c.includes("arr[j+1]")
-    )
-  );
-}
-
-
-function createInsertionSortFlow(code){
-
-  let arr =
-    extractArray(code) || [12,11,13,5,6];
-
-  const result = [];
-
-  result.push([
-    "Start Insertion Sort",
-    "array setup",
-    "<b>Start</b> — Insertion Sort begins with the array.",
-    "<strong>Insertion Sort detected.</strong> Values are inserted into the sorted portion.",
-    '<span class="var"><b>array</b> = [' +
-    arr.join(", ") +
-    ']</span>'
-  ]);
-
-  for(let i=1;i<arr.length;i++){
-
-    const key = arr[i];
-    let j = i-1;
-
-    result.push([
-      "Choose key " + key,
-      "i = " + i,
-      "<b>Choose</b> — the next value becomes the key.",
-      "<strong>Key selected.</strong> Compare it with the sorted portion.",
-      '<span class="var"><b>key</b> = ' + key + '</span>'
-    ]);
-
-    while(j>=0 && arr[j]>key){
-
-      result.push([
-        "Shift " + arr[j],
-        "j = " + j,
-        "<b>Shift</b> — move the larger value one position right.",
-        "<strong>Array shifts.</strong> Space is created for the key.",
-        '<span class="var"><b>moving</b> = ' +
-        arr[j] + '</span>'
-      ]);
-
-      arr[j+1] = arr[j];
-      j--;
-
-    }
-
-    arr[j+1] = key;
-
-    result.push([
-      "Insert key",
-      "position " + (j+1),
-      "<b>Insert</b> — place the key into its correct position.",
-      "<strong>Sorted portion grows.</strong>",
-      '<span class="var"><b>array</b> = [' +
-      arr.join(", ") +
-      ']</span>'
-    ]);
-
-  }
-
-  result.push([
-    "Insertion Sort complete",
-    "output",
-    "<b>Output</b> — the array is sorted.",
-    "<strong>Insertion Sort finished.</strong>",
-    '<span class="var"><b>sorted</b> = [' +
-    arr.join(", ") +
-    ']</span>'
-  ]);
-
-  return result;
-}
-
-
-/* =========================================================
-   LINEAR SEARCH
-========================================================= */
-
-function detectLinearSearch(code){
-
-  const c = code.toLowerCase();
-
-  return (
-    c.includes("linear search") ||
-    (
-      (c.includes("target") || c.includes("key")) &&
-      c.includes("for") &&
-      !c.includes("mid")
-    )
-  );
-}
-
-
-function createLinearSearchFlow(code){
-
-  const arr =
-    extractArray(code) || [10,20,30,40,50];
-
-  const targetMatch =
-    code.match(
-      /(?:target|key)\s*=\s*(-?\d+)/i
+    languageEl.addEventListener(
+      "change",
+      updateFilename
     );
 
-  const target =
-    targetMatch
-      ? Number(targetMatch[1])
-      : arr[Math.floor(arr.length/2)];
+    updateFilename();
 
-  const result = [];
 
-  result.push([
-    "Start Linear Search",
-    "array setup",
-    "<b>Start</b> — Linear Search scans the array from left to right.",
-    "<strong>Linear Search detected.</strong>",
-    '<span class="var"><b>array</b> = [' +
-    arr.join(", ") + ']</span><span class="var"><b>target</b> = ' +
-    target + '</span>'
-  ]);
+    /* ============================================================
+       BACKEND HEALTH CHECK
+       ============================================================ */
 
-  for(let i=0;i<arr.length;i++){
+    async function checkBackend() {
 
-    const found =
-      arr[i] === target;
+      statusEl.textContent =
+        "● Checking backend…";
 
-    result.push([
-      "Check index " + i,
-      "index " + i,
-      "<b>Check</b> — compare " + arr[i] + " with target " + target + ".",
-      found
-        ? "<strong>Match found!</strong> The target is at index " + i + "."
-        : "<strong>No match.</strong> Continue to the next element.",
-      '<span class="var"><b>current</b> = ' +
-      arr[i] + '</span><span class="var"><b>target</b> = ' +
-      target + '</span>'
-    ]);
+      const controller =
+        new AbortController();
 
-    if(found) break;
+      const timeout =
+        setTimeout(() => {
+          controller.abort();
+        }, 10000);
 
-  }
+      try {
 
-  if(!result.some(x=>x[0].includes("Match found"))){
+        const response =
+          await fetch(
+            TRACE_BACKEND + "/api/health",
+            {
+              method: "GET",
+              signal: controller.signal,
+              cache: "no-store"
+            }
+          );
 
-    result.push([
-      "Search complete",
-      "output",
-      "<b>Output</b> — the target was not found.",
-      "<strong>Search finished.</strong> No matching element exists in the scanned array.",
-      '<span class="var"><b>found</b> = false</span>'
-    ]);
+        clearTimeout(timeout);
 
-  }else{
-
-    result.push([
-      "Search complete",
-      "output",
-      "<b>Output</b> — the target was found.",
-      "<strong>Search finished.</strong>",
-      '<span class="var"><b>found</b> = true</span>'
-    ]);
-
-  }
-
-  return result;
-}
-
-
-/* =========================================================
-   BINARY SEARCH
-========================================================= */
-
-function detectBinarySearch(code){
-
-  const c = code.toLowerCase();
-
-  return (
-    c.includes("binary search") ||
-    (
-      c.includes("mid") &&
-      (c.includes("low") || c.includes("high")) &&
-      c.includes("target")
-    )
-  );
-}
-
-
-function createBinarySearchFlow(code){
-
-  const arr =
-    extractArray(code) || [10,20,30,40,50,60,70];
-
-  const sorted =
-    [...arr].sort((a,b)=>a-b);
-
-  const targetMatch =
-    code.match(
-      /target\s*=\s*(-?\d+)/i
-    );
-
-  const target =
-    targetMatch
-      ? Number(targetMatch[1])
-      : sorted[Math.floor(sorted.length/2)];
-
-  let low = 0;
-  let high = sorted.length - 1;
-
-  const result = [];
-
-  result.push([
-    "Start Binary Search",
-    "array setup",
-    "<b>Start</b> — Binary Search works on a sorted array.",
-    "<strong>Binary Search detected.</strong> The search range will repeatedly be divided.",
-    '<span class="var"><b>target</b> = ' +
-    target + '</span><span class="var"><b>array</b> = [' +
-    sorted.join(", ") + ']</span>'
-  ]);
-
-  while(low<=high){
-
-    const mid =
-      Math.floor((low+high)/2);
-
-    result.push([
-      "Check middle value " + sorted[mid],
-      "mid = " + mid,
-      "<b>Mid</b> — inspect the middle element.",
-      "<strong>Binary decision.</strong> Compare the middle value with the target.",
-      '<span class="var"><b>low</b> = ' + low +
-      '</span><span class="var"><b>mid</b> = ' + mid +
-      '</span><span class="var"><b>high</b> = ' + high +
-      '</span><span class="var"><b>value</b> = ' +
-      sorted[mid] + '</span>'
-    ]);
-
-    if(sorted[mid] === target){
-
-      result.push([
-        "Target found",
-        "index " + mid,
-        "<b>Found</b> — the middle value matches the target.",
-        "<strong>Target found!</strong> Binary Search finishes immediately.",
-        '<span class="var"><b>index</b> = ' +
-        mid + '</span><span class="var"><b>value</b> = ' +
-        target + '</span>'
-      ]);
-
-      return result;
-    }
-
-    if(sorted[mid] < target){
-
-      low = mid + 1;
-
-      result.push([
-        "Search right half",
-        "low = " + low,
-        "<b>Move right</b> — the target is larger than the middle value.",
-        "<strong>Discard left half.</strong> Continue searching the right side.",
-        '<span class="var"><b>low</b> = ' +
-        low + '</span><span class="var"><b>high</b> = ' +
-        high + '</span>'
-      ]);
-
-    }else{
-
-      high = mid - 1;
-
-      result.push([
-        "Search left half",
-        "high = " + high,
-        "<b>Move left</b> — the target is smaller than the middle value.",
-        "<strong>Discard right half.</strong> Continue searching the left side.",
-        '<span class="var"><b>low</b> = ' +
-        low + '</span><span class="var"><b>high</b> = ' +
-        high + '</span>'
-      ]);
-
-    }
-
-  }
-
-  result.push([
-    "Target not found",
-    "output",
-    "<b>Output</b> — the search range is empty.",
-    "<strong>Binary Search finished.</strong> The target does not exist in the array.",
-    '<span class="var"><b>found</b> = false</span>'
-  ]);
-
-  return result;
-}
-
-
-/* =========================================================
-   STACK
-========================================================= */
-
-function detectStack(code){
-
-  const c = code.toLowerCase();
-
-  return (
-    c.includes("stack") ||
-    c.includes(".push(") ||
-    c.includes(".pop(") ||
-    c.includes("push(") ||
-    c.includes("pop(")
-  );
-}
-
-
-function createStackFlow(code){
-
-  const result = [];
-
-  const operations =
-    [...code.matchAll(
-      /(?:push|append)\s*\(\s*(-?\d+)\s*\)|(?:pop)\s*\(\s*\)/gi
-    )];
-
-  const stack = [];
-
-  result.push([
-    "Create Stack",
-    "setup",
-    "<b>Start</b> — an empty stack is created.",
-    "<strong>Stack detected.</strong> Stack follows Last-In, First-Out (LIFO).",
-    '<span class="var"><b>stack</b> = []</span>'
-  ]);
-
-  operations.forEach(match=>{
-
-    const text =
-      match[0].toLowerCase();
-
-    if(text.includes("pop")){
-
-      const value =
-        stack.length
-          ? stack.pop()
-          : null;
-
-      result.push([
-        "Pop element",
-        "pop()",
-        "<b>Pop</b> — remove the top element from the stack.",
-        value === null
-          ? "<strong>Stack is empty.</strong> Nothing can be removed."
-          : "<strong>" + value + " removed.</strong> The top element leaves the stack.",
-        '<span class="var"><b>stack</b> = [' +
-        stack.join(", ") + ']</span>'
-      ]);
-
-    }else{
-
-      const value =
-        Number(match[1]);
-
-      stack.push(value);
-
-      result.push([
-        "Push " + value,
-        "push()",
-        "<b>Push</b> — place " + value + " on top of the stack.",
-        "<strong>Element added.</strong> The newest element becomes TOP.",
-        '<span class="var"><b>stack</b> = [' +
-        stack.join(", ") + ']</span>'
-      ]);
-
-    }
-
-  });
-
-  result.push([
-    "Stack complete",
-    "output",
-    "<b>Output</b> — stack operations finished.",
-    "<strong>Stack trace complete.</strong>",
-    '<span class="var"><b>top</b> = ' +
-    (stack.length ? stack[stack.length-1] : "empty") +
-    '</span>'
-  ]);
-
-  return result;
-}
-
-
-/* =========================================================
-   QUEUE
-========================================================= */
-
-function detectQueue(code){
-
-  const c = code.toLowerCase();
-
-  return (
-    c.includes("queue") ||
-    c.includes("enqueue") ||
-    c.includes("dequeue") ||
-    c.includes(".shift(")
-  );
-}
-
-
-function createQueueFlow(code){
-
-  const result = [];
-
-  const queue = [];
-
-  const operations =
-    [...code.matchAll(
-      /(?:enqueue|push|append)\s*\(\s*(-?\d+)\s*\)|(?:dequeue|shift)\s*\(\s*\)/gi
-    )];
-
-  result.push([
-    "Create Queue",
-    "setup",
-    "<b>Start</b> — an empty queue is created.",
-    "<strong>Queue detected.</strong> Queue follows First-In, First-Out (FIFO).",
-    '<span class="var"><b>queue</b> = []</span>'
-  ]);
-
-  operations.forEach(match=>{
-
-    const text =
-      match[0].toLowerCase();
-
-    if(
-      text.includes("dequeue") ||
-      text.includes("shift")
-    ){
-
-      const value =
-        queue.length
-          ? queue.shift()
-          : null;
-
-      result.push([
-        "Dequeue",
-        "remove front",
-        "<b>Dequeue</b> — remove the first element.",
-        value === null
-          ? "<strong>Queue is empty.</strong>"
-          : "<strong>" + value + " removed.</strong>",
-        '<span class="var"><b>queue</b> = [' +
-        queue.join(", ") + ']</span>'
-      ]);
-
-    }else{
-
-      const value =
-        Number(match[1]);
-
-      queue.push(value);
-
-      result.push([
-        "Enqueue " + value,
-        "add rear",
-        "<b>Enqueue</b> — add " + value + " to the rear.",
-        "<strong>Element added.</strong> The new value joins the back of the queue.",
-        '<span class="var"><b>queue</b> = [' +
-        queue.join(", ") + ']</span>'
-      ]);
-
-    }
-
-  });
-
-  result.push([
-    "Queue complete",
-    "output",
-    "<b>Output</b> — queue operations finished.",
-    "<strong>Queue trace complete.</strong>",
-    '<span class="var"><b>front</b> = ' +
-    (queue.length ? queue[0] : "empty") +
-    '</span>'
-  ]);
-
-  return result;
-}
-
-
-/* =========================================================
-   ALGORITHM DETECTOR
-========================================================= */
-
-function generateFlow(code){
-
-  const c =
-    code.toLowerCase();
-
-  if(detectBubbleSort(code)){
-    return {
-      name:"Bubble Sort",
-      steps:createBubbleSortFlow(code)
-    };
-  }
-
-  if(detectSelectionSort(code)){
-    return {
-      name:"Selection Sort",
-      steps:createSelectionSortFlow(code)
-    };
-  }
-
-  if(detectInsertionSort(code)){
-    return {
-      name:"Insertion Sort",
-      steps:createInsertionSortFlow(code)
-    };
-  }
-
-  if(detectBinarySearch(code)){
-    return {
-      name:"Binary Search",
-      steps:createBinarySearchFlow(code)
-    };
-  }
-
-  if(detectLinearSearch(code)){
-    return {
-      name:"Linear Search",
-      steps:createLinearSearchFlow(code)
-    };
-  }
-
-  if(detectStack(code)){
-    return {
-      name:"Stack",
-      steps:createStackFlow(code)
-    };
-  }
-
-  if(detectQueue(code)){
-    return {
-      name:"Queue",
-      steps:createQueueFlow(code)
-    };
-  }
-
-  return {
-    name:"Program Flow",
-    steps:makeDefaultFlow(code)
-  };
-}
-
-
-/* =========================================================
-   FLOW LABELS
-========================================================= */
-
-function updateFlowLabels(){
-
-  const labels =
-    steps.map(s=>s[0]);
-
-  const five =
-    [
-      labels[0] || "Start",
-      labels[Math.floor(labels.length*.25)] || "Analyze",
-      labels[Math.floor(labels.length*.5)] || "Process",
-      labels[Math.floor(labels.length*.75)] || "Update",
-      labels[labels.length-1] || "Output"
-    ];
-
-  $("#label1").textContent = shortenLabel(five[0]);
-  $("#label2").textContent = shortenLabel(five[1]);
-  $("#label3").textContent = shortenLabel(five[2]);
-  $("#label4").textContent = shortenLabel(five[3]);
-  $("#label5").textContent = shortenLabel(five[4]);
-
-}
-
-
-function shortenLabel(text){
-
-  if(!text) return "";
-
-  if(text.length <= 13) return text;
-
-  return text.substring(0,12) + "…";
-
-}
-
-
-/* =========================================================
-   RENDER FLOW
-========================================================= */
-
-function render(){
-
-  if(!steps.length) return;
-
-  const data =
-    steps[step];
-
-  $("#badge").textContent =
-    "Step " +
-    (step+1) +
-    " of " +
-    steps.length;
-
-  $("#stepname").textContent =
-    data[0];
-
-  $("#lineref").textContent =
-    data[1];
-
-  $("#note").innerHTML =
-    data[2];
-
-  $("#insight").innerHTML =
-    data[3];
-
-  $("#vars").innerHTML =
-    data[4];
-
-  const positions =
-    [11,30,50,70,89];
-
-  const progress =
-    steps.length <= 1
-      ? 0
-      : step/(steps.length-1);
-
-  $("#pulse").style.left =
-    (11 + progress*78) + "%";
-
-  nodes.forEach((node,index)=>{
-
-    const nodeStep =
-      Math.floor(
-        (index/(nodes.length-1)) *
-        Math.max(0,steps.length-1)
-      );
-
-    node.className =
-      "node n" +
-      (index+1) +
-      (step > nodeStep ? " done" : "") +
-      (step === nodeStep ? " active" : "");
-
-  });
-
-  tracks.forEach((track,index)=>{
-
-    const trackStep =
-      Math.floor(
-        (index/(tracks.length-1)) *
-        Math.max(0,steps.length-1)
-      );
-
-    track.className =
-      "track" +
-      (step > trackStep ? " done" : "") +
-      (step === trackStep ? " now" : "");
-
-  });
-
-}
-
-
-/* =========================================================
-   PLAY FLOW
-========================================================= */
-
-function stop(){
-
-  if(timer){
-    clearInterval(timer);
-    timer = null;
-  }
-
-  $("#play").textContent =
-    "▶ Play flow";
-
-  $("#play").classList.remove(
-    "playing"
-  );
-
-}
-
-
-function play(){
-
-  if(timer){
-    stop();
-    return;
-  }
-
-  if(!steps.length) return;
-
-  $("#play").textContent =
-    "❚❚ Pause";
-
-  $("#play").classList.add(
-    "playing"
-  );
-
-  timer =
-    setInterval(()=>{
-
-      if(step >= steps.length-1){
-
-        stop();
-
-        return;
-
-      }
-
-      step++;
-
-      render();
-
-    },Number($("#speed").value));
-
-}
-
-
-/* =========================================================
-   LINE NUMBERS
-========================================================= */
-
-function numberLines(){
-
-  const code =
-    $("#code");
-
-  const nums =
-    $("#nums");
-
-  if(!code || !nums) return;
-
-  const count =
-    Math.max(
-      1,
-      code.value.split("\n").length
-    );
-
-  nums.textContent =
-    Array.from(
-      {length:count},
-      (_,i)=>i+1
-    ).join("\n");
-
-}
-
-
-function syncLineNumbers(){
-
-  $("#nums").scrollTop =
-    $("#code").scrollTop;
-
-}
-
-
-/* =========================================================
-   LOAD SAMPLE
-========================================================= */
-
-function putCode(){
-
-  const key =
-    $("#language").value;
-
-  const sample =
-    codes[key];
-
-  if(!sample) return;
-
-  $("#file").textContent =
-    sample[0];
-
-  $("#code").value =
-    sample[1].join("\n");
-
-  numberLines();
-
-  $("#code").scrollTop = 0;
-  $("#nums").scrollTop = 0;
-
-}
-
-
-/* =========================================================
-   AUTO DETECT LANGUAGE
-========================================================= */
-
-function detectLanguage(){
-
-  const code =
-    $("#code").value.toLowerCase();
-
-  const markers = {
-
-    html:[
-      "<!doctype html",
-      "<html",
-      "<body"
-    ],
-
-    css:[
-      "font-family:",
-      "background:",
-      "padding:",
-      "border-radius:"
-    ],
-
-    python:[
-      "def ",
-      "print(",
-      "import ",
-      "for ",
-      "while "
-    ],
-
-    javascript:[
-      "console.log",
-      "const ",
-      "let ",
-      "=>"
-    ],
-
-    typescript:[
-      "interface ",
-      ": number",
-      ": string",
-      "number[]"
-    ],
-
-    cpp:[
-      "#include <iostream>",
-      "std::",
-      "cout"
-    ],
-
-    c:[
-      "#include <stdio",
-      "printf("
-    ],
-
-    java:[
-      "public static",
-      "system.out",
-      "class "
-    ],
-
-    go:[
-      "package main",
-      "fmt.",
-      "func main"
-    ],
-
-    kotlin:[
-      "fun main",
-      "println("
-    ],
-
-    swift:[
-      "import foundation",
-      "func ",
-      "print("
-    ],
-
-    ruby:[
-      "puts ",
-      "do |",
-      "end"
-    ],
-
-    php:[
-      "<?php",
-      "echo ",
-      "$"
-    ],
-
-    perl:[
-      "use strict",
-      "my $",
-      "print "
-    ],
-
-    bash:[
-      "#!/bin",
-      "echo ",
-      "$(("
-    ],
-
-    sql:[
-      "select ",
-      "create table",
-      "insert into"
-    ]
-
-  };
-
-  let best = "python";
-  let score = 0;
-
-  Object.entries(markers).forEach(
-    ([name,words])=>{
-
-      let current = 0;
-
-      words.forEach(word=>{
-
-        if(code.includes(word)){
-          current++;
+        if (!response.ok) {
+          throw new Error(
+            "Backend returned HTTP " +
+            response.status
+          );
         }
+
+        const data =
+          await response.json();
+
+        if (data && data.ok !== false) {
+
+          statusEl.textContent =
+            "● Backend online";
+
+        } else {
+
+          statusEl.textContent =
+            "● Backend reachable";
+
+        }
+
+      } catch (error) {
+
+        clearTimeout(timeout);
+
+        statusEl.textContent =
+          "● Browser ready — backend may be sleeping";
+
+      }
+    }
+
+
+    checkBackend();
+
+
+    /* ============================================================
+       LANGUAGE AUTO DETECTION
+       ============================================================ */
+
+    function detectLanguage(code) {
+
+      const text =
+        code.toLowerCase();
+
+      if (
+        text.includes("<html") ||
+        text.includes("<!doctype")
+      ) {
+        return "html";
+      }
+
+      if (
+        text.includes("console.log") ||
+        text.includes("const ") ||
+        text.includes("let ") ||
+        text.includes("=>")
+      ) {
+        return "javascript";
+      }
+
+      if (
+        text.includes("def ") ||
+        text.includes("import ") ||
+        text.includes("print(")
+      ) {
+        return "python";
+      }
+
+      if (
+        text.includes("#include") &&
+        (
+          text.includes("iostream") ||
+          text.includes("std::")
+        )
+      ) {
+        return "cpp";
+      }
+
+      if (
+        text.includes("#include") &&
+        text.includes("stdio")
+      ) {
+        return "c";
+      }
+
+      if (
+        text.includes("public static void main") ||
+        text.includes("system.out")
+      ) {
+        return "java";
+      }
+
+      if (
+        text.includes("package main") ||
+        text.includes("fmt.println")
+      ) {
+        return "go";
+      }
+
+      if (
+        text.includes("select ") ||
+        text.includes("insert into ") ||
+        text.includes("update ")
+      ) {
+        return "sql";
+      }
+
+      return null;
+    }
+
+
+    $("autoDetect").addEventListener(
+      "click",
+      () => {
+
+        const detected =
+          detectLanguage(codeEl.value);
+
+        if (detected) {
+
+          languageEl.value =
+            detected;
+
+          updateFilename();
+
+          statusEl.textContent =
+            "● Detected " +
+            detected.toUpperCase();
+
+        } else {
+
+          statusEl.textContent =
+            "● Language could not be detected";
+
+        }
+
+      }
+    );
+
+
+    /* ============================================================
+       ARRAY EXTRACTION
+       ============================================================ */
+
+    function extractArray(code) {
+
+      let match;
+
+      /*
+        Python / JavaScript style:
+        arr = [5, 2, 8, 1]
+      */
+
+      match =
+        code.match(
+          /(?:arr|array|numbers|data|values|nums)\s*=\s*\[([^\]]+)\]/i
+        );
+
+      if (match) {
+
+        const values =
+          match[1]
+            .split(",")
+            .map(x => x.trim())
+            .filter(x => /^-?\d+(\.\d+)?$/.test(x))
+            .map(Number);
+
+        if (values.length) {
+          return values;
+        }
+      }
+
+
+      /*
+        C/C++:
+        int arr[] = {5,2,8,1};
+      */
+
+      match =
+        code.match(
+          /(?:arr|array|numbers|data|values|nums)\s*\[\s*\]\s*=\s*\{([^}]+)\}/i
+        );
+
+      if (match) {
+
+        const values =
+          match[1]
+            .split(",")
+            .map(x => x.trim())
+            .filter(x => /^-?\d+(\.\d+)?$/.test(x))
+            .map(Number);
+
+        if (values.length) {
+          return values;
+        }
+      }
+
+
+      /*
+        Generic numeric initializer:
+        { 5, 2, 8, 1 }
+      */
+
+      match =
+        code.match(
+          /\{\s*(-?\d+(?:\s*,\s*-?\d+)+)\s*\}/
+        );
+
+      if (match) {
+
+        const values =
+          match[1]
+            .split(",")
+            .map(Number);
+
+        if (values.length) {
+          return values;
+        }
+      }
+
+      return [];
+    }
+
+
+    /* ============================================================
+       TARGET EXTRACTION
+       ============================================================ */
+
+    function extractTarget(code) {
+
+      const patterns = [
+
+        /target\s*=\s*(-?\d+)/i,
+
+        /search(?:For|Value|Key)?\s*=\s*(-?\d+)/i,
+
+        /key\s*=\s*(-?\d+)/i,
+
+        /find\s*=\s*(-?\d+)/i
+
+      ];
+
+      for (const pattern of patterns) {
+
+        const match =
+          code.match(pattern);
+
+        if (match) {
+          return Number(match[1]);
+        }
+      }
+
+      return null;
+    }
+
+
+    /* ============================================================
+       ALGORITHM DETECTION
+       ============================================================ */
+
+    function detectAlgorithm(code) {
+
+      const text =
+        code.toLowerCase();
+
+      /*
+        BUBBLE SORT
+      */
+
+      if (
+        (
+          text.includes("bubble") ||
+          (
+            text.includes("j + 1") &&
+            (
+              text.includes("swap") ||
+              text.includes("temp")
+            )
+          )
+        ) &&
+        (
+          text.includes("arr") ||
+          text.includes("array") ||
+          detectedData.length > 0
+        )
+      ) {
+        return "Bubble Sort";
+      }
+
+
+      /*
+        SELECTION SORT
+      */
+
+      if (
+        text.includes("selection sort") ||
+        (
+          text.includes("minindex") &&
+          text.includes("swap")
+        )
+      ) {
+        return "Selection Sort";
+      }
+
+
+      /*
+        INSERTION SORT
+      */
+
+      if (
+        text.includes("insertion sort") ||
+        (
+          text.includes("key") &&
+          text.includes("j >=") &&
+          text.includes("arr[j + 1]")
+        )
+      ) {
+        return "Insertion Sort";
+      }
+
+
+      /*
+        BINARY SEARCH
+      */
+
+      if (
+        text.includes("binary search") ||
+        (
+          text.includes("mid") &&
+          text.includes("low") &&
+          text.includes("high") &&
+          (
+            text.includes("target") ||
+            text.includes("key")
+          )
+        )
+      ) {
+        return "Binary Search";
+      }
+
+
+      /*
+        LINEAR SEARCH
+      */
+
+      if (
+        text.includes("linear search") ||
+        (
+          (
+            text.includes("target") ||
+            text.includes("key")
+          ) &&
+          (
+            text.includes("for") ||
+            text.includes("while")
+          ) &&
+          (
+            text.includes("arr") ||
+            text.includes("array")
+          )
+        )
+      ) {
+        return "Linear Search";
+      }
+
+
+      /*
+        STACK
+      */
+
+      if (
+        text.includes("stack") ||
+        (
+          text.includes("push") &&
+          text.includes("pop")
+        )
+      ) {
+        return "Stack";
+      }
+
+
+      /*
+        QUEUE
+      */
+
+      if (
+        text.includes("queue") ||
+        (
+          text.includes("enqueue") ||
+          text.includes("dequeue")
+        )
+      ) {
+        return "Queue";
+      }
+
+
+      /*
+        LINKED LIST
+      */
+
+      if (
+        text.includes("linked list") ||
+        (
+          text.includes("next") &&
+          text.includes("node")
+        )
+      ) {
+        return "Linked List";
+      }
+
+
+      /*
+        BINARY TREE
+      */
+
+      if (
+        text.includes("binary tree") ||
+        text.includes("treenode") ||
+        (
+          text.includes("left") &&
+          text.includes("right") &&
+          text.includes("node")
+        )
+      ) {
+        return "Binary Tree";
+      }
+
+
+      /*
+        BFS
+      */
+
+      if (
+        text.includes("bfs") ||
+        text.includes("breadth first")
+      ) {
+        return "BFS";
+      }
+
+
+      /*
+        DFS
+      */
+
+      if (
+        text.includes("dfs") ||
+        text.includes("depth first")
+      ) {
+        return "DFS";
+      }
+
+
+      return "Generic Program";
+    }
+
+
+    /* ============================================================
+       BUBBLE SORT TRACE
+       ============================================================ */
+
+    function createBubbleSortSteps(arr) {
+
+      const trace = [];
+
+      let a =
+        [...arr];
+
+      trace.push({
+        title: "Start Bubble Sort",
+        description:
+          "The array is ready. Bubble Sort compares adjacent values.",
+        line: 1,
+        type: "start",
+        array: [...a]
+      });
+
+      for (
+        let i = 0;
+        i < a.length - 1;
+        i++
+      ) {
+
+        trace.push({
+          title: "Start pass " + (i + 1),
+          description:
+            "A new pass begins through the unsorted portion.",
+          line: null,
+          type: "loop",
+          array: [...a]
+        });
+
+        for (
+          let j = 0;
+          j < a.length - i - 1;
+          j++
+        ) {
+
+          trace.push({
+            title:
+              "Compare " +
+              a[j] +
+              " and " +
+              a[j + 1],
+
+            description:
+              "Bubble Sort compares adjacent elements.",
+
+            line: null,
+
+            type: "compare",
+
+            array: [...a],
+
+            active: [j, j + 1]
+          });
+
+
+          if (a[j] > a[j + 1]) {
+
+            const temp =
+              a[j];
+
+            a[j] =
+              a[j + 1];
+
+            a[j + 1] =
+              temp;
+
+            trace.push({
+              title:
+                "Swap " +
+                a[j + 1] +
+                " and " +
+                a[j],
+
+              description:
+                "The larger value moves toward the end of the array.",
+
+              line: null,
+
+              type: "swap",
+
+              array: [...a],
+
+              active: [j, j + 1]
+            });
+
+          } else {
+
+            trace.push({
+              title:
+                "No swap needed",
+
+              description:
+                "The adjacent values are already in the correct order.",
+
+              line: null,
+
+              type: "compare",
+
+              array: [...a],
+
+              active: [j, j + 1]
+            });
+
+          }
+        }
+      }
+
+      trace.push({
+        title: "Sorting complete",
+        description:
+          "Bubble Sort has finished. The array is sorted.",
+        line: null,
+        type: "output",
+        array: [...a]
+      });
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       SELECTION SORT TRACE
+       ============================================================ */
+
+    function createSelectionSortSteps(arr) {
+
+      const trace = [];
+
+      let a =
+        [...arr];
+
+      for (
+        let i = 0;
+        i < a.length - 1;
+        i++
+      ) {
+
+        let min =
+          i;
+
+        trace.push({
+          title:
+            "Select position " + i,
+
+          description:
+            "Search for the smallest remaining value.",
+
+          type: "loop",
+
+          array: [...a],
+
+          active: [i]
+        });
+
+
+        for (
+          let j = i + 1;
+          j < a.length;
+          j++
+        ) {
+
+          trace.push({
+            title:
+              "Compare " +
+              a[min] +
+              " and " +
+              a[j],
+
+            description:
+              "Selection Sort searches for the minimum value.",
+
+            type: "compare",
+
+            array: [...a],
+
+            active: [min, j]
+          });
+
+          if (a[j] < a[min]) {
+            min = j;
+          }
+        }
+
+
+        if (min !== i) {
+
+          [
+            a[i],
+            a[min]
+          ] = [
+            a[min],
+            a[i]
+          ];
+
+          trace.push({
+            title:
+              "Move minimum to position " + i,
+
+            description:
+              "The smallest remaining value is placed at its final position.",
+
+            type: "swap",
+
+            array: [...a],
+
+            active: [i, min]
+          });
+
+        }
+      }
+
+
+      trace.push({
+        title: "Sorting complete",
+        description:
+          "Selection Sort has finished.",
+        type: "output",
+        array: [...a]
+      });
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       INSERTION SORT TRACE
+       ============================================================ */
+
+    function createInsertionSortSteps(arr) {
+
+      const trace = [];
+
+      let a =
+        [...arr];
+
+      trace.push({
+        title: "Start Insertion Sort",
+        description:
+          "The first element is treated as a sorted portion.",
+        type: "start",
+        array: [...a]
+      });
+
+
+      for (
+        let i = 1;
+        i < a.length;
+        i++
+      ) {
+
+        const key =
+          a[i];
+
+        let j =
+          i - 1;
+
+
+        trace.push({
+          title:
+            "Select " + key,
+
+          description:
+            "Take the next value and find its correct position.",
+
+          type: "process",
+
+          array: [...a],
+
+          active: [i]
+        });
+
+
+        while (
+          j >= 0 &&
+          a[j] > key
+        ) {
+
+          trace.push({
+            title:
+              "Shift " + a[j],
+
+            description:
+              "A larger value moves one position to the right.",
+
+            type: "update",
+
+            array: [...a],
+
+            active: [j, j + 1]
+          });
+
+          a[j + 1] =
+            a[j];
+
+          j--;
+        }
+
+
+        a[j + 1] =
+          key;
+
+
+        trace.push({
+          title:
+            "Insert " + key,
+
+          description:
+            "The selected value is inserted into its correct position.",
+
+          type: "update",
+
+          array: [...a],
+
+          active: [j + 1]
+        });
+      }
+
+
+      trace.push({
+        title: "Sorting complete",
+        description:
+          "Insertion Sort has finished.",
+        type: "output",
+        array: [...a]
+      });
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       BINARY SEARCH TRACE
+       ============================================================ */
+
+    function createBinarySearchSteps(arr, target) {
+
+      const trace = [];
+
+      const a =
+        [...arr].sort(
+          (x, y) => x - y
+        );
+
+      if (target === null) {
+        target = a.length
+          ? a[Math.floor(a.length / 2)]
+          : null;
+      }
+
+      let low = 0;
+
+      let high =
+        a.length - 1;
+
+
+      trace.push({
+        title: "Start Binary Search",
+        description:
+          "Binary Search works on a sorted array.",
+        type: "start",
+        array: [...a],
+        low,
+        high
+      });
+
+
+      while (low <= high) {
+
+        const mid =
+          Math.floor(
+            (low + high) / 2
+          );
+
+        trace.push({
+          title:
+            "Check middle = " +
+            a[mid],
+
+          description:
+            "Compare the target with the middle element.",
+
+          type: "compare",
+
+          array: [...a],
+
+          active: [mid],
+
+          low,
+          mid,
+          high,
+          target
+        });
+
+
+        if (a[mid] === target) {
+
+          trace.push({
+            title:
+              "Target found",
+
+            description:
+              target +
+              " was found at index " +
+              mid +
+              ".",
+
+            type: "found",
+
+            array: [...a],
+
+            active: [mid],
+
+            low,
+            mid,
+            high,
+            target
+          });
+
+          return trace;
+        }
+
+
+        if (a[mid] < target) {
+
+          low =
+            mid + 1;
+
+          trace.push({
+            title:
+              "Move low to " + low,
+
+            description:
+              "The target is larger, so the left half is discarded.",
+
+            type: "update",
+
+            array: [...a],
+
+            active: [mid],
+
+            low,
+            high,
+            target
+          });
+
+        } else {
+
+          high =
+            mid - 1;
+
+          trace.push({
+            title:
+              "Move high to " + high,
+
+            description:
+              "The target is smaller, so the right half is discarded.",
+
+            type: "update",
+
+            array: [...a],
+
+            active: [mid],
+
+            low,
+            high,
+            target
+          });
+        }
+      }
+
+
+      trace.push({
+        title:
+          "Target not found",
+
+        description:
+          "The search range became empty.",
+
+        type: "output",
+
+        array: [...a],
+
+        target
+      });
+
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       LINEAR SEARCH TRACE
+       ============================================================ */
+
+    function createLinearSearchSteps(arr, target) {
+
+      const trace = [];
+
+      const a =
+        [...arr];
+
+      if (target === null) {
+        target =
+          a.length
+            ? a[a.length - 1]
+            : null;
+      }
+
+
+      trace.push({
+        title: "Start Linear Search",
+        description:
+          "Linear Search checks each element from left to right.",
+        type: "start",
+        array: [...a],
+        target
+      });
+
+
+      for (
+        let i = 0;
+        i < a.length;
+        i++
+      ) {
+
+        trace.push({
+          title:
+            "Check index " + i,
+
+          description:
+            "Compare the current element with the target.",
+
+          type: "compare",
+
+          array: [...a],
+
+          active: [i],
+
+          target
+        });
+
+
+        if (a[i] === target) {
+
+          trace.push({
+            title:
+              "Target found at index " + i,
+
+            description:
+              "The current value matches the target.",
+
+            type: "found",
+
+            array: [...a],
+
+            active: [i],
+
+            target
+          });
+
+          return trace;
+        }
+      }
+
+
+      trace.push({
+        title:
+          "Target not found",
+
+        description:
+          "Every element was checked without finding the target.",
+
+        type: "output",
+
+        array: [...a],
+
+        target
+      });
+
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       STACK TRACE
+       ============================================================ */
+
+    function createStackSteps(code) {
+
+      const trace = [];
+
+      let stack = [];
+
+      const numbers =
+        extractArray(code);
+
+
+      trace.push({
+        title: "Create Stack",
+        description:
+          "An empty stack is created. Stack follows LIFO.",
+        type: "start",
+        stack: []
+      });
+
+
+      if (numbers.length) {
+
+        numbers.forEach(value => {
+
+          stack.push(value);
+
+          trace.push({
+            title:
+              "Push " + value,
+
+            description:
+              value +
+              " is added to the top of the stack.",
+
+            type: "push",
+
+            stack: [...stack]
+          });
+
+        });
+
+
+        const popped =
+          stack.pop();
+
+        trace.push({
+          title:
+            "Pop " + popped,
+
+          description:
+            "The top element is removed from the stack.",
+
+          type: "pop",
+
+          stack: [...stack]
+        });
+
+      } else {
+
+        trace.push({
+          title: "Push operation",
+          description:
+            "The stack is ready for push/pop operations.",
+          type: "process",
+          stack: []
+        });
+
+      }
+
+
+      trace.push({
+        title: "Stack complete",
+        description:
+          "The stack operations have finished.",
+        type: "output",
+        stack: [...stack]
+      });
+
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       QUEUE TRACE
+       ============================================================ */
+
+    function createQueueSteps(code) {
+
+      const trace = [];
+
+      let queue = [];
+
+      const numbers =
+        extractArray(code);
+
+
+      trace.push({
+        title: "Create Queue",
+        description:
+          "An empty queue is created. Queue follows FIFO.",
+        type: "start",
+        queue: []
+      });
+
+
+      if (numbers.length) {
+
+        numbers.forEach(value => {
+
+          queue.push(value);
+
+          trace.push({
+            title:
+              "Enqueue " + value,
+
+            description:
+              value +
+              " is added to the back of the queue.",
+
+            type: "enqueue",
+
+            queue: [...queue]
+          });
+
+        });
+
+
+        const removed =
+          queue.shift();
+
+        trace.push({
+          title:
+            "Dequeue " + removed,
+
+          description:
+            "The first element is removed from the queue.",
+
+          type: "dequeue",
+
+          queue: [...queue]
+        });
+
+      }
+
+
+      trace.push({
+        title: "Queue complete",
+        description:
+          "The queue operations have finished.",
+        type: "output",
+        queue: [...queue]
+      });
+
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       LINKED LIST TRACE
+       ============================================================ */
+
+    function createLinkedListSteps(code) {
+
+      const trace = [];
+
+      const values =
+        extractArray(code);
+
+      const data =
+        values.length
+          ? values
+          : [10, 20, 30];
+
+
+      const list = [];
+
+
+      trace.push({
+        title: "Create Linked List",
+        description:
+          "The list starts with no nodes.",
+        type: "start",
+        list: []
+      });
+
+
+      data.forEach(value => {
+
+        list.push(value);
+
+        trace.push({
+          title:
+            "Create node " + value,
+
+          description:
+            "A new node is added to the linked list.",
+
+          type: "process",
+
+          list: [...list],
+
+          active:
+            [list.length - 1]
+        });
 
       });
 
-      if(current > score){
 
-        score = current;
-        best = name;
+      trace.push({
+        title: "Traverse list",
+        description:
+          "The list is traversed from the head node.",
+        type: "output",
+        list: [...list]
+      });
 
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       BINARY TREE TRACE
+       ============================================================ */
+
+    function createTreeSteps(code) {
+
+      const trace = [];
+
+      const values =
+        extractArray(code);
+
+      const data =
+        values.length
+          ? values.slice(0, 7)
+          : [50, 30, 70, 20, 40, 60, 80];
+
+
+      trace.push({
+        title: "Create Binary Tree",
+        description:
+          "The first value becomes the root.",
+        type: "start",
+        tree: [data[0]]
+      });
+
+
+      const inserted = [data[0]];
+
+
+      for (
+        let i = 1;
+        i < data.length;
+        i++
+      ) {
+
+        inserted.push(
+          data[i]
+        );
+
+        trace.push({
+          title:
+            "Insert " + data[i],
+
+          description:
+            "Compare the value with tree nodes and place it in the correct position.",
+
+          type: "process",
+
+          tree: [...inserted],
+
+          active: [i]
+        });
       }
 
-    }
-  );
 
-  if(score === 0){
-
-    $("#status").textContent =
-      "● Could not detect";
-
-    $("#output").textContent =
-      "Auto-detect could not find a clear language signature.";
-
-    return;
-
-  }
-
-  $("#language").value =
-    best;
-
-  putCode();
-
-  const label =
-    $("#language").options[
-      $("#language").selectedIndex
-    ].text;
-
-  $("#detect").textContent =
-    "✓ " + label;
-
-  $("#status").textContent =
-    "✦ Detected " + label;
-
-  $("#output").textContent =
-    "✦ " + label +
-    " detected.\n\n" +
-    "Your code was not changed.";
-
-  updateWebUI();
-
-}
+      trace.push({
+        title: "Tree traversal",
+        description:
+          "The binary tree is ready for traversal.",
+        type: "output",
+        tree: [...inserted]
+      });
 
 
-/* =========================================================
-   HTML / CSS / JAVASCRIPT PREVIEW
-========================================================= */
-
-function buildFullDoc(language,code){
-
-  if(language === "html"){
-
-    if(/<\s*html[\s>]/i.test(code)){
-      return code;
+      return trace;
     }
 
-    return `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>TraceLab Preview</title>
-</head>
-<body>
-${code}
-</body>
-</html>`;
 
-  }
+    /* ============================================================
+       BFS / DFS TRACE
+       ============================================================ */
 
-  if(language === "css"){
+    function createGraphSteps(code, algorithm) {
 
-    return `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>TraceLab CSS Preview</title>
-<style>
-${code}
-</style>
-</head>
-<body>
-<h1>TraceLab CSS Preview</h1>
-<p>This page demonstrates your CSS.</p>
-<button>Sample Button</button>
-</body>
-</html>`;
+      const trace = [];
 
-  }
-
-  if(language === "javascript"){
-
-    return `
-<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>TraceLab JavaScript</title>
-</head>
-<body>
-<p style="font-family:sans-serif;color:#667">
-JavaScript output is shown in TraceLab.
-</p>
-<script>
-${code}
-<\/script>
-</body>
-</html>`;
-
-  }
-
-  return code;
-
-}
+      const nodes =
+        ["A", "B", "C", "D", "E"];
 
 
-/* =========================================================
-   PYTHON
-========================================================= */
+      trace.push({
+        title:
+          "Start " + algorithm,
 
-let pyodidePromise = null;
+        description:
+          algorithm +
+          " traversal begins from the starting node.",
 
-function getPyodide(){
+        type: "start",
 
-  if(pyodidePromise){
-    return pyodidePromise;
-  }
+        graph: []
+      });
 
-  pyodidePromise =
-    new Promise((resolve,reject)=>{
 
-      const version =
-        "0.26.4";
+      nodes.forEach((node, index) => {
 
-      const base =
-        "https://cdn.jsdelivr.net/pyodide/v" +
-        version +
-        "/full/";
+        trace.push({
+          title:
+            "Visit node " + node,
 
-      if(window.loadPyodide){
+          description:
+            algorithm +
+            " visits the next reachable node.",
 
-        window.loadPyodide({
-          indexURL:base
-        })
-        .then(resolve)
-        .catch(reject);
+          type: "process",
+
+          graph:
+            nodes.slice(0, index + 1),
+
+          active: [index]
+        });
+
+      });
+
+
+      trace.push({
+        title:
+          algorithm + " complete",
+
+        description:
+          "Graph traversal has finished.",
+
+        type: "output",
+
+        graph: [...nodes]
+      });
+
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       GENERIC TRACE
+       ============================================================ */
+
+    function createGenericSteps(code) {
+
+      const lines =
+        code
+          .split("\n")
+          .map((line, index) => ({
+            text: line.trim(),
+            line: index + 1
+          }))
+          .filter(x => x.text.length);
+
+
+      const trace = [];
+
+
+      trace.push({
+        title: "Start program",
+        description:
+          "TraceLab begins analyzing your program.",
+        line: 1,
+        type: "start"
+      });
+
+
+      trace.push({
+        title: "Analyze code",
+        description:
+          "The program structure and operations are inspected.",
+        line: lines[0]?.line || null,
+        type: "analyze"
+      });
+
+
+      const important =
+        lines.filter(x =>
+          /for|while|if|else|switch|case|push|pop|insert|delete|print|cout|printf|console\.log|return/i
+            .test(x.text)
+        );
+
+
+      const selected =
+        important.length
+          ? important.slice(0, 5)
+          : lines.slice(0, 5);
+
+
+      selected.forEach((item, index) => {
+
+        trace.push({
+          title:
+            "Execute statement",
+
+          description:
+            item.text,
+
+          line:
+            item.line,
+
+          type:
+            /for|while/i.test(item.text)
+              ? "loop"
+              : "process"
+        });
+
+      });
+
+
+      trace.push({
+        title: "Show result",
+        description:
+          "The program has reached its output stage.",
+        line: lines[lines.length - 1]?.line || null,
+        type: "output"
+      });
+
+
+      return trace;
+    }
+
+
+    /* ============================================================
+       BUILD TRACE
+       ============================================================ */
+
+    function buildTrace(code) {
+
+      detectedData =
+        extractArray(code);
+
+      detectedTarget =
+        extractTarget(code);
+
+      detectedAlgorithm =
+        detectAlgorithm(code);
+
+
+      switch (detectedAlgorithm) {
+
+        case "Bubble Sort":
+          return createBubbleSortSteps(
+            detectedData.length
+              ? detectedData
+              : [5, 2, 8, 1, 4]
+          );
+
+
+        case "Selection Sort":
+          return createSelectionSortSteps(
+            detectedData.length
+              ? detectedData
+              : [5, 2, 8, 1, 4]
+          );
+
+
+        case "Insertion Sort":
+          return createInsertionSortSteps(
+            detectedData.length
+              ? detectedData
+              : [5, 2, 8, 1, 4]
+          );
+
+
+        case "Binary Search":
+          return createBinarySearchSteps(
+            detectedData.length
+              ? detectedData
+              : [1, 3, 5, 7, 9, 11, 13],
+            detectedTarget
+          );
+
+
+        case "Linear Search":
+          return createLinearSearchSteps(
+            detectedData.length
+              ? detectedData
+              : [4, 8, 2, 9, 6],
+            detectedTarget
+          );
+
+
+        case "Stack":
+          return createStackSteps(code);
+
+
+        case "Queue":
+          return createQueueSteps(code);
+
+
+        case "Linked List":
+          return createLinkedListSteps(code);
+
+
+        case "Binary Tree":
+          return createTreeSteps(code);
+
+
+        case "BFS":
+        case "DFS":
+          return createGraphSteps(
+            code,
+            detectedAlgorithm
+          );
+
+
+        default:
+          return createGenericSteps(code);
+      }
+    }
+
+
+    /* ============================================================
+       FLOW NODE STAGE
+       ============================================================ */
+
+    function getStage(step) {
+
+      const type =
+        step?.type || "process";
+
+      if (type === "start") {
+        return 0;
+      }
+
+      if (
+        type === "analyze"
+      ) {
+        return 1;
+      }
+
+      if (
+        type === "loop" ||
+        type === "compare" ||
+        type === "process" ||
+        type === "push" ||
+        type === "enqueue"
+      ) {
+        return 2;
+      }
+
+      if (
+        type === "swap" ||
+        type === "update" ||
+        type === "pop" ||
+        type === "dequeue"
+      ) {
+        return 3;
+      }
+
+      if (
+        type === "found" ||
+        type === "output"
+      ) {
+        return 4;
+      }
+
+      return 2;
+    }
+
+
+    /* ============================================================
+       DSA VISUALIZATION
+       ============================================================ */
+
+    function renderDSA(step) {
+
+      const view =
+        $("dsaView");
+
+      if (!step) {
+        view.textContent =
+          "No data.";
+        return;
+      }
+
+
+      /*
+        ARRAY
+      */
+
+      if (step.array) {
+
+        let html =
+          '<div class="array-view">';
+
+        step.array.forEach(
+          (value, index) => {
+
+            const active =
+              step.active &&
+              step.active.includes(index);
+
+            const found =
+              step.type === "found" &&
+              active;
+
+            html += `
+              <div class="array-item
+                ${active ? "active" : ""}
+                ${found ? "found" : ""}
+              ">
+                <span class="array-index">
+                  ${index}
+                </span>
+                ${value}
+              </div>
+            `;
+          }
+        );
+
+        html += "</div>";
+
+        if (
+          step.low !== undefined
+        ) {
+
+          html += `
+            <div style="
+              margin-top:12px;
+              font-size:11px;
+              color:#697386;
+            ">
+              low = ${step.low}
+              &nbsp;&nbsp;
+              mid = ${step.mid ?? "—"}
+              &nbsp;&nbsp;
+              high = ${step.high}
+              ${
+                step.target !== undefined
+                  ? `&nbsp;&nbsp; target = ${step.target}`
+                  : ""
+              }
+            </div>
+          `;
+        }
+
+        view.innerHTML =
+          html;
 
         return;
-
       }
 
-      const script =
-        document.createElement("script");
 
-      script.src =
-        base + "pyodide.js";
+      /*
+        STACK
+      */
 
-      script.onload = ()=>{
+      if (step.stack) {
 
-        window.loadPyodide({
-          indexURL:base
-        })
-        .then(resolve)
-        .catch(reject);
+        let html =
+          '<div class="stack-view">';
 
-      };
+        step.stack.forEach(
+          value => {
 
-      script.onerror = ()=>{
+            html += `
+              <div class="stack-item">
+                ${value}
+              </div>
+            `;
 
-        reject(
-          new Error(
-            "Could not load the Python runtime."
+          }
+        );
+
+        html += "</div>";
+
+        html += `
+          <div style="
+            margin-top:8px;
+            font-size:11px;
+            color:#697386;
+          ">
+            TOP ↑
+          </div>
+        `;
+
+        view.innerHTML =
+          html;
+
+        return;
+      }
+
+
+      /*
+        QUEUE
+      */
+
+      if (step.queue) {
+
+        let html =
+          '<div class="queue-view">';
+
+        step.queue.forEach(
+          value => {
+
+            html += `
+              <div class="queue-item">
+                ${value}
+              </div>
+            `;
+
+          }
+        );
+
+        html += "</div>";
+
+        html += `
+          <div style="
+            margin-top:8px;
+            font-size:11px;
+            color:#697386;
+          ">
+            FRONT → QUEUE → REAR
+          </div>
+        `;
+
+        view.innerHTML =
+          html;
+
+        return;
+      }
+
+
+      /*
+        LINKED LIST
+      */
+
+      if (step.list) {
+
+        let html =
+          '<div class="array-view">';
+
+        step.list.forEach(
+          (value, index) => {
+
+            html += `
+              <div class="array-item">
+                ${value}
+              </div>
+              ${
+                index < step.list.length - 1
+                  ? "<span>→</span>"
+                  : "<span>→ NULL</span>"
+              }
+            `;
+
+          }
+        );
+
+        html += "</div>";
+
+        view.innerHTML =
+          html;
+
+        return;
+      }
+
+
+      /*
+        TREE
+      */
+
+      if (step.tree) {
+
+        let html =
+          '<div class="array-view">';
+
+        step.tree.forEach(
+          value => {
+
+            html += `
+              <div class="array-item">
+                ${value}
+              </div>
+            `;
+
+          }
+        );
+
+        html += "</div>";
+
+        view.innerHTML =
+          html;
+
+        return;
+      }
+
+
+      /*
+        GRAPH
+      */
+
+      if (step.graph) {
+
+        let html =
+          '<div class="array-view">';
+
+        step.graph.forEach(
+          node => {
+
+            html += `
+              <div class="array-item">
+                ${node}
+              </div>
+            `;
+
+          }
+        );
+
+        html += "</div>";
+
+        view.innerHTML =
+          html;
+
+        return;
+      }
+
+
+      view.textContent =
+        "No algorithm-specific data detected.";
+    }
+
+
+    /* ============================================================
+       RENDER TRACE STEP
+       ============================================================ */
+
+    function renderStep(index) {
+
+      if (!steps.length) {
+        return;
+      }
+
+
+      currentStep =
+        Math.max(
+          0,
+          Math.min(
+            index,
+            steps.length - 1
           )
         );
 
+
+      const step =
+        steps[currentStep];
+
+
+      /*
+        COUNTER
+      */
+
+      $("stepCounter").textContent =
+        `Step ${currentStep + 1} of ${steps.length}`;
+
+
+      /*
+        FLOW NODES
+      */
+
+      const stage =
+        getStage(step);
+
+
+      flowNodes.forEach(
+        (node, index) => {
+
+          node.classList.remove(
+            "active",
+            "done"
+          );
+
+          if (index < stage) {
+            node.classList.add("done");
+          }
+
+          if (index === stage) {
+            node.classList.add("active");
+          }
+
+        }
+      );
+
+
+      /*
+        TIMELINE
+      */
+
+      const percent =
+        steps.length === 1
+          ? 100
+          : (
+              currentStep /
+              (steps.length - 1)
+            ) * 100;
+
+      $("timelineFill").style.width =
+        percent + "%";
+
+
+      /*
+        STEP TEXT
+      */
+
+      $("stepTitle").textContent =
+        step.title || "Execution step";
+
+      $("stepDescription").textContent =
+        step.description ||
+        "Executing program logic.";
+
+      $("lineRef").textContent =
+        "Line: " +
+        (step.line ?? "—");
+
+      $("stepType").textContent =
+        "Type: " +
+        (step.type || "process");
+
+
+      /*
+        LOWER CARD
+      */
+
+      $("currentType").textContent =
+        step.type || "process";
+
+      $("happening").textContent =
+        step.description ||
+        step.title ||
+        "Executing program.";
+
+
+      /*
+        VARIABLES
+      */
+
+      let variableText =
+        `algorithm = ${detectedAlgorithm}\n`;
+
+      if (
+        detectedData.length
+      ) {
+        variableText +=
+          `data = [${detectedData.join(", ")}]\n`;
+      }
+
+      if (
+        step.low !== undefined
+      ) {
+        variableText +=
+          `low = ${step.low}\n`;
+      }
+
+      if (
+        step.mid !== undefined
+      ) {
+        variableText +=
+          `mid = ${step.mid}\n`;
+      }
+
+      if (
+        step.high !== undefined
+      ) {
+        variableText +=
+          `high = ${step.high}\n`;
+      }
+
+      if (
+        step.target !== undefined &&
+        step.target !== null
+      ) {
+        variableText +=
+          `target = ${step.target}\n`;
+      }
+
+      $("variables").textContent =
+        variableText;
+
+
+      /*
+        DSA VIEW
+      */
+
+      renderDSA(step);
+    }
+
+
+    /* ============================================================
+       ALGORITHM INFO
+       ============================================================ */
+
+    function updateAlgorithmInfo() {
+
+      $("algorithmName").textContent =
+        detectedAlgorithm;
+
+      $("logicName").textContent =
+        detectedAlgorithm;
+
+
+      const descriptions = {
+
+        "Bubble Sort":
+          "Compares adjacent values and swaps them when they are in the wrong order.",
+
+        "Selection Sort":
+          "Finds the smallest remaining value and places it into the correct position.",
+
+        "Insertion Sort":
+          "Builds a sorted portion by inserting each value into its correct position.",
+
+        "Binary Search":
+          "Uses low, middle and high positions to repeatedly reduce the search range.",
+
+        "Linear Search":
+          "Checks values one by one until the target is found or the array ends.",
+
+        "Stack":
+          "Visualizes LIFO operations using push and pop.",
+
+        "Queue":
+          "Visualizes FIFO operations using enqueue and dequeue.",
+
+        "Linked List":
+          "Visualizes nodes connected through next references.",
+
+        "Binary Tree":
+          "Visualizes values being inserted into a binary tree.",
+
+        "BFS":
+          "Visualizes breadth-first graph traversal.",
+
+        "DFS":
+          "Visualizes depth-first graph traversal.",
+
+        "Generic Program":
+          "TraceLab will inspect the program and create a general execution flow."
       };
 
-      document.head.appendChild(script);
 
-    });
-
-  return pyodidePromise;
-
-}
-
-
-async function runPythonCode(code){
-
-  const logs = [];
-
-  try{
-
-    $("#status").textContent =
-      "● Loading Python runtime…";
-
-    const py =
-      await getPyodide();
-
-    py.setStdout({
-      batched:text=>{
-        logs.push(String(text));
-      }
-    });
-
-    py.setStderr({
-      batched:text=>{
-        logs.push("✕ " + String(text));
-      }
-    });
-
-    await py.runPythonAsync(code);
-
-  }catch(error){
-
-    logs.push(
-      "✕ " +
-      String(
-        error?.message || error
-      )
-      .split("\n")
-      .filter(Boolean)
-      .slice(-1)[0]
-    );
-
-  }
-
-  if(!logs.length){
-
-    logs.push(
-      "(No output — add print(...) to your Python code.)"
-    );
-
-  }
-
-  return logs;
-
-}
-
-
-/* =========================================================
-   JAVASCRIPT
-========================================================= */
-
-function runJavaScriptCode(code){
-
-  return new Promise(resolve=>{
-
-    const logs = [];
-
-    let finished = false;
-
-    const iframe =
-      document.createElement("iframe");
-
-    iframe.style.display =
-      "none";
-
-    iframe.sandbox =
-      "allow-scripts";
-
-    const source = `
-<!doctype html>
-<html>
-<body>
-<script>
-
-const send = (type,args) => {
-
-  parent.postMessage(
-    {
-      __tracelab:true,
-      type:type,
-      args:args.map(value=>{
-
-        try{
-
-          return typeof value === "object"
-            ? JSON.stringify(value)
-            : String(value);
-
-        }catch(error){
-
-          return String(value);
-
-        }
-
-      })
-    },
-    "*"
-  );
-
-};
-
-console.log = (...args) =>
-  send("log",args);
-
-console.warn = (...args) =>
-  send("warn",args);
-
-console.error = (...args) =>
-  send("error",args);
-
-try{
-
-${code}
-
-send("done",[]);
-
-}catch(error){
-
-send("error",[
-  error?.message || String(error)
-]);
-
-send("done",[]);
-
-}
-
-<\/script>
-</body>
-</html>
-`;
-
-    function finish(result){
-
-      if(finished) return;
-
-      finished = true;
-
-      window.removeEventListener(
-        "message",
-        handler
-      );
-
-      iframe.remove();
-
-      resolve(result);
-
+      $("logicDescription").textContent =
+        descriptions[detectedAlgorithm] ||
+        descriptions["Generic Program"];
     }
 
-    function handler(event){
 
-      if(
-        !event.data ||
-        !event.data.__tracelab
-      ) return;
+    /* ============================================================
+       PLAYBACK
+       ============================================================ */
 
-      if(event.data.type === "done"){
+    function stopPlayback() {
 
-        finish(
-          logs.length
-            ? logs
-            : [
-              "(No output — add console.log(...) to your code.)"
-            ]
+      if (playTimer) {
+
+        clearInterval(
+          playTimer
         );
 
-        return;
-
+        playTimer = null;
       }
 
-      const prefix =
-        event.data.type === "error"
-          ? "✕ "
-          : event.data.type === "warn"
-            ? "⚠ "
-            : "";
-
-      logs.push(
-        prefix +
-        event.data.args.join(" ")
-      );
-
+      $("play").textContent =
+        "▶ Play";
     }
 
-    window.addEventListener(
-      "message",
-      handler
-    );
 
-    iframe.srcdoc =
-      source;
+    function playTrace() {
 
-    document.body.appendChild(
-      iframe
-    );
+      stopPlayback();
 
-    setTimeout(()=>{
-
-      finish(
-        logs.length
-          ? logs
-          : [
-            "(No output after 2 seconds — check for an infinite loop.)"
-          ]
-      );
-
-    },2000);
-
-  });
-
-}
-
-
-/* =========================================================
-   PREVIEW
-========================================================= */
-
-function renderPreview(language,code){
-
-  $("#previewWrap").style.display =
-    "block";
-
-  $("#previewFrame").srcdoc =
-    buildFullDoc(language,code);
-
-}
-
-
-function hidePreview(){
-
-  $("#previewWrap").style.display =
-    "none";
-
-  $("#previewFrame").srcdoc =
-    "about:blank";
-
-}
-
-
-/* =========================================================
-   WEB UI
-========================================================= */
-
-function updateWebUI(){
-
-  const language =
-    $("#language").value;
-
-  const web =
-    language === "html" ||
-    language === "css" ||
-    language === "javascript";
-
-  $("#openBrowser").style.display =
-    web ? "inline-block" : "none";
-
-  if(language !== "html" &&
-     language !== "css"){
-
-    hidePreview();
-
-  }
-
-  updateModeStatus();
-
-}
-
-
-function updateModeStatus(){
-
-  const language =
-    $("#language").value;
-
-  const labels = {
-
-    html:
-      "HTML renders in the browser",
-
-    css:
-      "CSS renders in the browser",
-
-    python:
-      "Python runs locally in your browser",
-
-    javascript:
-      "JavaScript runs locally in your browser"
-
-  };
-
-  $("#modeStatus").textContent =
-    labels[language] ||
-    "Live execution via TraceLab backend";
-
-}
-
-
-/* =========================================================
-   BACKEND
-========================================================= */
-
-const TRACE_BACKEND =
-  "https://tracelab-free.onrender.com";
-
-
-async function checkBackend(){
-
-  const status =
-    $("#serverStatus");
-
-  const backend =
-    location.hostname.endsWith("onrender.com")
-      ? location.origin
-      : TRACE_BACKEND;
-
-  try{
-
-    const response =
-      await fetch(
-        backend + "/api/health",
-        {
-          method:"GET",
-          headers:{
-            "Accept":"application/json"
-          },
-          cache:"no-store"
-        }
-      );
-
-    const data =
-      await response.json().catch(()=>({}));
-
-    if(!response.ok){
-      throw new Error(
-        "HTTP " + response.status
-      );
-    }
-
-    if(data.ok){
-
-      if(data.executorConfigured){
-
-        status.textContent =
-          "● Backend online";
-
-        status.className =
-          "server-pill online";
-
-      }else{
-
-        status.textContent =
-          "● Backend online · API key needed";
-
-        status.className =
-          "server-pill warning";
-
+      if (
+        currentStep >=
+        steps.length - 1
+      ) {
+        currentStep = 0;
+        renderStep(currentStep);
       }
 
-    }else{
 
-      throw new Error(
-        data.error || "Backend unavailable"
-      );
+      $("play").textContent =
+        "⏸ Pause";
 
+
+      playTimer =
+        setInterval(
+          () => {
+
+            if (
+              currentStep >=
+              steps.length - 1
+            ) {
+
+              stopPlayback();
+
+              return;
+            }
+
+            renderStep(
+              currentStep + 1
+            );
+
+          },
+          Number(
+            $("speed").value
+          )
+        );
     }
 
-  }catch(error){
 
-    status.textContent =
-      "● Backend unavailable";
+    $("play").addEventListener(
+      "click",
+      () => {
 
-    status.className =
-      "server-pill offline";
+        if (playTimer) {
+          stopPlayback();
+        } else {
+          playTrace();
+        }
 
-  }
+      }
+    );
 
-}
+
+    $("next").addEventListener(
+      "click",
+      () => {
+
+        stopPlayback();
+
+        renderStep(
+          currentStep + 1
+        );
+
+      }
+    );
 
 
-/* =========================================================
-   REMOTE EXECUTION
-========================================================= */
+    $("prev").addEventListener(
+      "click",
+      () => {
 
-async function runRemoteCode(
-  language,
-  code,
-  label
-){
+        stopPlayback();
 
-  const backend =
-    location.hostname.endsWith("onrender.com")
-      ? location.origin
-      : TRACE_BACKEND;
+        renderStep(
+          currentStep - 1
+        );
 
-  try{
+      }
+    );
 
-    const response =
-      await fetch(
-        backend + "/api/execute",
-        {
-          method:"POST",
 
-          headers:{
-            "Content-Type":
-              "application/json",
+    $("speed").addEventListener(
+      "change",
+      () => {
 
-            "Accept":
-              "application/json"
-          },
+        if (playTimer) {
+          playTrace();
+        }
 
-          body:JSON.stringify({
+      }
+    );
 
-            language,
-            code,
-            stdin:""
 
-          })
+    /* ============================================================
+       EXECUTE HTML / CSS
+       ============================================================ */
+
+    function runPreview() {
+
+      const language =
+        languageEl.value;
+
+      const code =
+        codeEl.value;
+
+
+      if (
+        language === "html"
+      ) {
+
+        $("preview").style.display =
+          "block";
+
+        $("preview").srcdoc =
+          code;
+
+        outputEl.textContent =
+          "HTML preview loaded.";
+
+        return true;
+      }
+
+
+      if (
+        language === "css"
+      ) {
+
+        $("preview").style.display =
+          "block";
+
+        $("preview").srcdoc = `
+          <!doctype html>
+          <html>
+          <head>
+            <style>
+              ${code}
+            </style>
+          </head>
+          <body>
+            <h2>CSS Preview</h2>
+            <p>Your CSS is being previewed here.</p>
+            <button>Sample Button</button>
+          </body>
+          </html>
+        `;
+
+        outputEl.textContent =
+          "CSS preview loaded.";
+
+        return true;
+      }
+
+
+      $("preview").style.display =
+        "none";
+
+      return false;
+    }
+
+
+    /* ============================================================
+       PYTHON EXECUTION WITH PYODIDE
+       ============================================================ */
+
+    let pyodidePromise =
+      null;
+
+
+    async function getPyodide() {
+
+      if (!pyodidePromise) {
+
+        if (
+          !window.loadPyodide
+        ) {
+
+          await new Promise(
+            (resolve, reject) => {
+
+              const script =
+                document.createElement(
+                  "script"
+                );
+
+              script.src =
+                "https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.js";
+
+              script.onload =
+                resolve;
+
+              script.onerror =
+                reject;
+
+              document.head.appendChild(
+                script
+              );
+
+            }
+          );
+        }
+
+
+        pyodidePromise =
+          window.loadPyodide();
+      }
+
+
+      return pyodidePromise;
+    }
+
+
+    async function runPython(code) {
+
+      const pyodide =
+        await getPyodide();
+
+
+      let captured = "";
+
+
+      pyodide.setStdout({
+        batched:
+          text => {
+            captured +=
+              text + "\n";
+          }
+      });
+
+
+      try {
+
+        await pyodide.runPythonAsync(
+          code
+        );
+
+        return captured.trim();
+
+      } catch (error) {
+
+        throw error;
+      }
+    }
+
+
+    /* ============================================================
+       JAVASCRIPT EXECUTION
+       ============================================================ */
+
+    async function runJavaScript(code) {
+
+      return new Promise(
+        (resolve, reject) => {
+
+          const iframe =
+            document.createElement(
+              "iframe"
+            );
+
+          iframe.style.display =
+            "none";
+
+          document.body.appendChild(
+            iframe
+          );
+
+
+          let output = "";
+
+
+          const win =
+            iframe.contentWindow;
+
+
+          const originalLog =
+            win.console.log;
+
+
+          win.console.log =
+            (...args) => {
+
+              output +=
+                args
+                  .map(String)
+                  .join(" ") +
+                "\n";
+
+            };
+
+
+          try {
+
+            const result =
+              win.eval(code);
+
+
+            if (
+              result !== undefined &&
+              !output
+            ) {
+              output =
+                String(result);
+            }
+
+
+            setTimeout(
+              () => {
+
+                iframe.remove();
+
+                resolve(
+                  output.trim()
+                );
+
+              },
+              50
+            );
+
+          } catch (error) {
+
+            iframe.remove();
+
+            reject(error);
+          }
 
         }
       );
+    }
 
-    let data = {};
 
-    try{
-      data = await response.json();
-    }catch(error){}
+    /* ============================================================
+       BACKEND EXECUTION
+       ============================================================ */
 
-    if(!response.ok){
+    async function executeBackend(
+      code,
+      language
+    ) {
 
-      return {
+      const controller =
+        new AbortController();
 
-        ok:false,
 
-        output:
-          "✕ " +
-          label +
-          " execution failed\n\n" +
-          (
+      const timeout =
+        setTimeout(
+          () => {
+            controller.abort();
+          },
+          20000
+        );
+
+
+      try {
+
+        const response =
+          await fetch(
+            TRACE_BACKEND +
+            "/api/execute",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+                language,
+                code,
+                stdin: ""
+              }),
+
+              signal:
+                controller.signal
+            }
+          );
+
+
+        const text =
+          await response.text();
+
+
+        let data;
+
+        try {
+          data =
+            JSON.parse(text);
+        } catch {
+          data = {
+            output: text
+          };
+        }
+
+
+        if (!response.ok) {
+
+          throw new Error(
             data.error ||
             data.message ||
-            "HTTP " + response.status
-          )
+            "Backend execution failed."
+          );
+        }
 
-      };
 
-    }
+        if (
+          data.error
+        ) {
 
-    return {
+          throw new Error(
+            data.error
+          );
+        }
 
-      ok:Boolean(data.ok),
 
-      output:
-        String(
-          data.output ||
-          "(No output returned.)"
-        )
-
-    };
-
-  }catch(error){
-
-    return {
-
-      ok:false,
-
-      output:
-        "✕ Could not reach TraceLab backend.\n\n" +
-        String(
-          error?.message || error
-        ) +
-        "\n\n" +
-        "Make sure the Render Web Service is deployed."
-
-    };
-
-  }
-
-}
-
-
-/* =========================================================
-   MAIN LOGIC EXPLANATION
-========================================================= */
-
-function explainLogic(){
-
-  const code =
-    $("#code").value;
-
-  const lines =
-    code.split("\n");
-
-  const lower =
-    code.toLowerCase();
-
-  let type =
-    "general program";
-
-  if(detectBubbleSort(code))
-    type = "Bubble Sort";
-
-  else if(detectSelectionSort(code))
-    type = "Selection Sort";
-
-  else if(detectInsertionSort(code))
-    type = "Insertion Sort";
-
-  else if(detectBinarySearch(code))
-    type = "Binary Search";
-
-  else if(detectLinearSearch(code))
-    type = "Linear Search";
-
-  else if(detectStack(code))
-    type = "Stack";
-
-  else if(detectQueue(code))
-    type = "Queue";
-
-  const hits = [];
-
-  lines.forEach((line,index)=>{
-
-    const text =
-      line.trim();
-
-    if(
-      /^(def |function |class |for |while |if |else if|elif |switch |try |public static|int main|fun main|func main)/i
-        .test(text)
-    ){
-
-      hits.push([
-        index,
-        text
-      ]);
-
-    }
-
-  });
-
-  const first =
-    hits[0] ||
-    [
-      0,
-      lines.find(line=>line.trim()) ||
-      "Program entry"
-    ];
-
-  $("#logicSummary").innerHTML =
-    "<strong>" +
-    type +
-    " detected.</strong> " +
-    "TraceLab found " +
-    hits.length +
-    " important control-flow block" +
-    (hits.length === 1 ? "" : "s") +
-    " in this program.";
-
-  const start =
-    Math.max(
-      0,
-      first[0]-1
-    );
-
-  const end =
-    Math.min(
-      lines.length,
-      first[0]+8
-    );
-
-  $("#logicCode").textContent =
-    lines
-      .slice(start,end)
-      .map(
-        (line,index)=>
-          String(start+index+1)
-            .padStart(3," ") +
-          "  " +
-          line
-      )
-      .join("\n");
-
-  $("#focus").textContent =
-    "✓ Main logic explained";
-
-}
-
-
-/* =========================================================
-   RUN PROGRAM
-========================================================= */
-
-async function runProgram(){
-
-  stop();
-
-  const language =
-    $("#language").value;
-
-  const code =
-    $("#code").value;
-
-  const label =
-    $("#language").options[
-      $("#language").selectedIndex
-    ].text;
-
-  if(!code.trim()){
-
-    $("#status").textContent =
-      "● No code";
-
-    $("#output").textContent =
-      "Please enter some code first.";
-
-    return;
-
-  }
-
-  /* -----------------------------------------
-     GENERATE CODE-SPECIFIC FLOW
-  ----------------------------------------- */
-
-  const generated =
-    generateFlow(code);
-
-  steps =
-    generated.steps;
-
-  step = 0;
-
-  updateFlowLabels();
-
-  render();
-
-  explainLogic();
-
-  $("#badge").title =
-    generated.name;
-
-
-  $("#run").disabled = true;
-
-  try{
-
-    /* JAVASCRIPT */
-
-    if(language === "javascript"){
-
-      $("#status").textContent =
-        "● Running JavaScript…";
-
-      hidePreview();
-
-      const logs =
-        await runJavaScriptCode(code);
-
-      $("#output").textContent =
-        logs.join("\n");
-
-      $("#status").textContent =
-        logs.some(
-          line =>
-            String(line).startsWith("✕")
-        )
-          ? "● Execution failed"
-          : "● Executed live";
-
-    }
-
-    /* PYTHON */
-
-    else if(language === "python"){
-
-      $("#status").textContent =
-        "● Starting Python…";
-
-      hidePreview();
-
-      const logs =
-        await runPythonCode(code);
-
-      $("#output").textContent =
-        logs.join("\n");
-
-      $("#status").textContent =
-        logs.some(
-          line =>
-            String(line).startsWith("✕")
-        )
-          ? "● Python execution failed"
-          : "● Executed live";
-
-    }
-
-    /* HTML / CSS */
-
-    else if(
-      language === "html" ||
-      language === "css"
-    ){
-
-      renderPreview(
-        language,
-        code
-      );
-
-      $("#output").textContent =
-        "✓ Preview rendered successfully.\n\n" +
-        "Use Open in browser to open the preview in a new tab.";
-
-      $("#status").textContent =
-        "● Preview ready";
-
-    }
-
-    /* SERVER LANGUAGES */
-
-    else{
-
-      hidePreview();
-
-      $("#status").textContent =
-        "● Compiling and running " +
-        label +
-        "…";
-
-      const result =
-        await runRemoteCode(
-          language,
-          code,
-          label
+        return (
+          data.output ??
+          data.stdout ??
+          ""
         );
 
-      $("#output").textContent =
-        result.output;
+      } finally {
 
-      $("#status").textContent =
-        result.ok
-          ? "● Executed live"
-          : "● Execution failed";
-
+        clearTimeout(timeout);
+      }
     }
 
-  }catch(error){
 
-    $("#output").textContent =
-      "✕ Unexpected error\n\n" +
-      String(
-        error?.message || error
-      );
+    /* ============================================================
+       MAIN RUN FUNCTION
+       ============================================================ */
 
-    $("#status").textContent =
-      "● Error";
+    async function runProgram() {
 
-  }
+      stopPlayback();
 
-  $("#run").disabled = false;
+      runBtn.disabled =
+        true;
 
-  /* Start the newly generated flow */
+      runBtn.textContent =
+        "⏳ Running…";
 
-  play();
 
-}
+      outputEl.textContent =
+        "Running program…";
 
 
-/* =========================================================
-   OPEN PREVIEW
-========================================================= */
+      statusEl.textContent =
+        "● Analyzing code…";
 
-function openBrowser(){
 
-  const language =
-    $("#language").value;
+      const code =
+        codeEl.value;
 
-  const code =
-    $("#code").value;
 
-  const html =
-    buildFullDoc(
-      language,
-      code
-    );
+      const language =
+        languageEl.value;
 
-  const blob =
-    new Blob(
-      [html],
-      {type:"text/html"}
-    );
 
-  const url =
-    URL.createObjectURL(blob);
+      if (!code.trim()) {
 
-  window.open(
-    url,
-    "_blank"
-  );
+        outputEl.textContent =
+          "Please enter some code.";
 
-}
+        statusEl.textContent =
+          "● No code";
 
+        runBtn.disabled =
+          false;
 
-/* =========================================================
-   EVENTS
-========================================================= */
+        runBtn.textContent =
+          "▶ Analyze & visualize";
 
-$("#run").addEventListener(
-  "click",
-  runProgram
-);
+        return;
+      }
 
 
-$("#prev").addEventListener(
-  "click",
-  ()=>{
+      try {
 
-    stop();
+        /*
+          FIRST:
+          Build the dynamic visualization.
+        */
 
-    if(!steps.length) return;
+        steps =
+          buildTrace(code);
 
-    step =
-      step <= 0
-        ? steps.length-1
-        : step-1;
+        currentStep =
+          0;
 
-    render();
+        updateAlgorithmInfo();
 
-  }
-);
+        renderStep(0);
 
 
-$("#next").addEventListener(
-  "click",
-  ()=>{
+        /*
+          THEN:
+          Execute actual code.
+        */
 
-    stop();
+        statusEl.textContent =
+          "● Executing " +
+          language.toUpperCase() +
+          "…";
 
-    if(!steps.length) return;
 
-    step =
-      step >= steps.length-1
-        ? 0
-        : step+1;
+        if (
+          language === "html" ||
+          language === "css"
+        ) {
 
-    render();
+          runPreview();
 
-  }
-);
+        }
 
+        else if (
+          language === "python"
+        ) {
 
-$("#play").addEventListener(
-  "click",
-  play
-);
+          const result =
+            await runPython(code);
 
+          outputEl.textContent =
+            result ||
+            "(Program finished with no output.)";
+        }
 
-$("#reset").addEventListener(
-  "click",
-  ()=>{
+        else if (
+          language === "javascript"
+        ) {
 
-    stop();
+          const result =
+            await runJavaScript(code);
 
-    putCode();
+          outputEl.textContent =
+            result ||
+            "(Program finished with no output.)";
+        }
 
-    const generated =
-      generateFlow(
-        $("#code").value
-      );
+        else {
 
-    steps =
-      generated.steps;
+          /*
+            C, C++, Java, Go, Kotlin,
+            Swift, Ruby, PHP, Perl,
+            Bash and SQL use the
+            deployed backend.
+          */
 
-    step = 0;
+          const result =
+            await executeBackend(
+              code,
+              language
+            );
 
-    updateFlowLabels();
+          outputEl.textContent =
+            result ||
+            "(Program finished with no output.)";
+        }
 
-    render();
 
-    hidePreview();
+        statusEl.textContent =
+          "● Execution complete";
 
-    $("#status").textContent =
-      "● Ready";
 
-    $("#output").textContent =
-      "Analyze your code to see its execution flow.";
+        /*
+          Start visualization.
+        */
 
-    $("#detect").textContent =
-      "✦ Auto-detect";
+        renderStep(0);
 
-    explainLogic();
+      } catch (error) {
 
-  }
-);
+        console.error(error);
 
 
-$("#detect").addEventListener(
-  "click",
-  detectLanguage
-);
+        let message =
+          error?.message ||
+          String(error);
 
 
-$("#focus").addEventListener(
-  "click",
-  explainLogic
-);
+        if (
+          error?.name ===
+          "AbortError"
+        ) {
 
+          message =
+            "The backend took too long to respond. " +
+            "Render may be waking up or the execution service may be busy.";
+        }
 
-$("#openBrowser").addEventListener(
-  "click",
-  openBrowser
-);
 
+        outputEl.textContent =
+          "✕ Execution error\n\n" +
+          message;
 
-$("#language").addEventListener(
-  "change",
-  ()=>{
 
-    stop();
+        statusEl.textContent =
+          "● Execution failed";
 
-    putCode();
 
-    const generated =
-      generateFlow(
-        $("#code").value
-      );
+        /*
+          The flow still works even
+          when remote execution fails.
+        */
 
-    steps =
-      generated.steps;
+        if (!steps.length) {
 
-    step = 0;
+          steps =
+            createGenericSteps(code);
 
-    updateFlowLabels();
+        }
 
-    render();
+        currentStep =
+          0;
 
-    updateWebUI();
+        detectedAlgorithm =
+          detectAlgorithm(code);
 
-    $("#status").textContent =
-      "● Ready";
+        updateAlgorithmInfo();
 
-    $("#output").textContent =
-      "Language changed. Click Analyze & visualize.";
+        renderStep(0);
 
-    $("#detect").textContent =
-      "✦ Auto-detect";
+      } finally {
 
-  }
-);
+        runBtn.disabled =
+          false;
 
+        runBtn.textContent =
+          "▶ Analyze & visualize";
 
-$("#code").addEventListener(
-  "input",
-  ()=>{
-
-    numberLines();
-
-    $("#detect").textContent =
-      "✦ Auto-detect";
-
-    $("#focus").textContent =
-      "⌘ Explain main logic";
-
-  }
-);
-
-
-$("#code").addEventListener(
-  "scroll",
-  syncLineNumbers
-);
-
-
-/* =========================================================
-   TAB SUPPORT
-========================================================= */
-
-$("#code").addEventListener(
-  "keydown",
-  event=>{
-
-    if(event.key === "Tab"){
-
-      event.preventDefault();
-
-      const textarea =
-        event.target;
-
-      const start =
-        textarea.selectionStart;
-
-      const end =
-        textarea.selectionEnd;
-
-      textarea.value =
-        textarea.value.substring(0,start) +
-        "    " +
-        textarea.value.substring(end);
-
-      textarea.selectionStart =
-        textarea.selectionEnd =
-          start+4;
-
-      numberLines();
-
+      }
     }
 
-  }
-);
 
-
-/* =========================================================
-   CTRL + ENTER
-========================================================= */
-
-document.addEventListener(
-  "keydown",
-  event=>{
-
-    if(
-      (event.ctrlKey || event.metaKey) &&
-      event.key === "Enter"
-    ){
-
-      event.preventDefault();
-
-      runProgram();
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   MOBILE MENU
-========================================================= */
-
-$("#menuBtn").addEventListener(
-  "click",
-  ()=>{
-
-    $("#siteNav").classList.toggle(
-      "open"
-    );
-
-  }
-);
-
-
-$("#siteNav")
-  .querySelectorAll("a")
-  .forEach(link=>{
-
-    link.addEventListener(
+    runBtn.addEventListener(
       "click",
-      ()=>{
-        $("#siteNav")
-          .classList.remove("open");
+      runProgram
+    );
+
+
+    /* ============================================================
+       RESET
+       ============================================================ */
+
+    resetBtn.addEventListener(
+      "click",
+      () => {
+
+        stopPlayback();
+
+        codeEl.value =
+          DEFAULT_CODE;
+
+        languageEl.value =
+          "cpp";
+
+        updateFilename();
+
+        updateLineNumbers();
+
+
+        steps = [];
+
+        currentStep = 0;
+
+        detectedAlgorithm =
+          "Generic Program";
+
+        detectedData = [];
+
+        detectedTarget =
+          null;
+
+
+        outputEl.textContent =
+          "● Ready";
+
+
+        statusEl.textContent =
+          "● Ready";
+
+
+        $("algorithmName").textContent =
+          "Generic Program";
+
+        $("logicName").textContent =
+          "Generic Program";
+
+        $("logicDescription").textContent =
+          "TraceLab will inspect the program and create a general execution flow.";
+
+        $("stepCounter").textContent =
+          "Step 1 of 5";
+
+        $("stepTitle").textContent =
+          "Start program";
+
+        $("stepDescription").textContent =
+          "TraceLab begins analyzing your program.";
+
+        $("lineRef").textContent =
+          "Line: —";
+
+        $("stepType").textContent =
+          "Type: start";
+
+        $("currentType").textContent =
+          "Program Start";
+
+        $("happening").textContent =
+          "Execution begins. The code is being inspected.";
+
+        $("variables").textContent =
+          "program = started";
+
+        $("dsaView").textContent =
+          "No algorithm-specific data detected.";
+
+
+        flowNodes.forEach(
+          (node, index) => {
+
+            node.classList.remove(
+              "active",
+              "done"
+            );
+
+            if (index === 0) {
+              node.classList.add(
+                "active"
+              );
+            }
+
+          }
+        );
+
+
+        $("timelineFill").style.width =
+          "0%";
+
+
+        $("preview").style.display =
+          "none";
+
       }
     );
 
-  });
+
+    /* ============================================================
+       KEYBOARD SUPPORT
+       ============================================================ */
+
+    codeEl.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key === "Tab"
+        ) {
+
+          event.preventDefault();
+
+          const start =
+            codeEl.selectionStart;
+
+          const end =
+            codeEl.selectionEnd;
 
 
-/* =========================================================
-   INITIALIZE
-========================================================= */
-
-$("#year").textContent =
-  new Date().getFullYear();
-
-putCode();
-
-steps =
-  generateFlow(
-    $("#code").value
-  ).steps;
-
-step = 0;
-
-updateFlowLabels();
-
-render();
-
-explainLogic();
-
-updateWebUI();
-
-checkBackend();
+          codeEl.value =
+            codeEl.value.substring(
+              0,
+              start
+            ) +
+            "  " +
+            codeEl.value.substring(
+              end
+            );
 
 
-setInterval(
-  checkBackend,
-  30000
-);
+          codeEl.selectionStart =
+            codeEl.selectionEnd =
+              start + 2;
 
-</script>
+
+          updateLineNumbers();
+        }
+
+      }
+    );
+
+
+    /* ============================================================
+       INITIAL TRACE
+       ============================================================ */
+
+    steps =
+      buildTrace(
+        codeEl.value
+      );
+
+    updateAlgorithmInfo();
+
+    renderStep(0);
+
+  </script>
 
 </body>
 </html>
