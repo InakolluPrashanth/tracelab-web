@@ -251,14 +251,67 @@ async function runPython(code,inputValues=[]){
   }catch(e){logs.push('✕ '+String(e?.message||e))}
   return logs.length?logs:['(No output — add print(...) to see the result.)'];
 }
-async function remote(lang,code,label,inputValues=[]){try{
-  const c=new AbortController();const t=setTimeout(()=>c.abort(),20000);
-  const r=await fetch(EXECUTE_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({language:lang,code,stdin:inputValues.join('\n')}),signal:c.signal});
-  clearTimeout(t);let d={};try{d=await r.json()}catch(_){ }
-  if(!r.ok)return{ok:false,output:`✕ ${label} execution failed\n\n${d.error||d.message||'HTTP '+r.status}`};
-  const raw=String(d.output??d.stdout??d.stderr??'(No output.)');
-  return{ok:Boolean(d.ok),output:cleanOutput(raw,code)};
-}catch(e){return{ok:false,output:`✕ Could not reach TraceLab backend.\n\n${String(e?.message||e)}\n\n${TRACE_BACKEND}`}}}
+async function fetchBackendHealth(timeoutMs=8000){
+  const c=new AbortController();
+  const t=setTimeout(()=>c.abort(),timeoutMs);
+  try{
+    const r=await fetch(HEALTH_URL,{cache:'no-store',headers:{Accept:'application/json'},signal:c.signal});
+    const d=await r.json().catch(()=>({}));
+    return {ok:r.ok&&Boolean(d.ok),data:d,status:r.status};
+  }catch(e){
+    return {ok:false,data:{},status:0,error:e};
+  }finally{clearTimeout(t)}
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+// Keep the free Render service warm while the TraceLab page is open.
+// This runs in the background and never blocks Analyze & visualize.
+let lastWarmAttempt=0;
+async function warmBackendInBackground(){
+  const now=Date.now();
+  if(now-lastWarmAttempt<8*60*1000) return;
+  lastWarmAttempt=now;
+  const state=await fetchBackendHealth(7000);
+  const el=$('#serverStatus');
+  if(state.ok){
+    el.textContent=state.data.executorConfigured?'● Backend online · compiler ready':'● Backend online · API key needed';
+    el.className=state.data.executorConfigured?'server-pill online':'server-pill warning';
+  }else{
+    el.textContent='● Backend sleeping · will connect on Run';
+    el.className='server-pill warning';
+  }
+}
+async function remote(lang,code,label,inputValues=[]){
+  let lastError='';
+  for(let attempt=1;attempt<=2;attempt++){
+    const c=new AbortController();
+    // One direct execution request. No progress percentage and no staged wake-up wait.
+    const t=setTimeout(()=>c.abort(),75000);
+    try{
+      status(attempt===1?'● Compiling and running '+label+'…':`● Reconnecting to compiler…`);
+      const r=await fetch(EXECUTE_URL,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Accept':'application/json'},
+        body:JSON.stringify({language,code,stdin:inputValues.join('\n')}),
+        signal:c.signal,
+        cache:'no-store'
+      });
+      const d=await r.json().catch(()=>({}));
+      if(r.ok){
+        const raw=String(d.output??d.stdout??d.stderr??'(No output.)');
+        return {ok:Boolean(d.ok),output:cleanOutput(raw,code)};
+      }
+      lastError=d.error||d.message||`HTTP ${r.status}`;
+      if((r.status===429||r.status>=500)&&attempt<2){await sleep(600);continue;}
+      return {ok:false,output:`✕ ${label} execution failed\n\n${lastError}`};
+    }catch(e){
+      lastError=e?.name==='AbortError'
+        ? 'The backend/compiler took too long to respond. Render may be waking from sleep.'
+        : String(e?.message||e||'Network connection failed.');
+      if(attempt<2){await sleep(600);continue;}
+    }finally{clearTimeout(t)}
+  }
+  return {ok:false,output:`✕ TraceLab could not connect to the compiler.\n\n${lastError}\n\nPlease try Analyze & visualize once more.`};
+}
 async function runProgram(){
   stop();step=0;
   const lang=$('#language').value,code=$('#code').value,label=LABELS[lang];
@@ -281,7 +334,7 @@ async function runProgram(){
     }else if(lang==='html'||lang==='css'){
       renderPreview(lang,code);$('#output').textContent='Rendered in the live preview.';status('● Preview ready');
     }else{
-      hidePreview();status('● Compiling and running '+label+'…');
+      hidePreview();status('● Connecting to TraceLab backend…');
       const r=await remote(lang,code,label,inputState.values);$('#output').textContent=r.output;status(r.ok?'● Executed live':'● Execution failed',!r.ok);
     }
   }catch(e){status('● Execution failed',true);$('#output').textContent='✕ Unexpected TraceLab error\n\n'+String(e?.message||e)}
@@ -316,9 +369,28 @@ function mismatch(lang,code){
   return null;
 }
 function detectLanguage(){const code=$('#code').value;const tests=[['html',/<!doctype\s+html|<html|<body|<div|<h1/i],['css',/[.#]?[A-Za-z][\w-]*\s*\{[\s\S]*:[\s\S]*;/i],['cpp',/#include\s*<iostream>|using\s+namespace\s+std|cout\s*<</i],['c',/#include\s*<stdio\.h>|printf\s*\(/i],['java',/public\s+static\s+void\s+main|System\.out|class\s+\w+/i],['python',/\bdef\s+\w+|\bprint\s*\(/i],['javascript',/console\.log|\bconst\s+\w+\s*=|\blet\s+\w+\s*=/i],['typescript',/:\s*(number|string|boolean)\b|interface\s+\w+/i],['go',/package\s+main|fmt\.Print/i],['kotlin',/fun\s+main|println\s*\(/i],['swift',/import\s+Foundation|print\s*\(/i],['ruby',/puts\s+|do\s*\|/i],['php',/<\?php|\$\w+\s*=/i],['perl',/my\s+[@$%]\w+/i],['bash',/^#!\/bin\/bash|echo\s+/im],['sql',/^\s*(select|insert|update|delete|create|alter)\b/im]];const found=tests.find(([k,r])=>r.test(code));if(!found){status('● Could not detect language',true);return}$('#language').value=found[0];$('#file').textContent=codes[found[0]]?.[0]||'main.'+(EXT[found[0]]||'txt');$('#detect').textContent='✓ '+LABELS[found[0]];updateWeb();status('✦ Detected '+LABELS[found[0]]);$('#output').textContent='Detected '+LABELS[found[0]]+'. Your code was not changed. Press Analyze & visualize.'}
-async function health(){const el=$('#serverStatus');try{const c=new AbortController();const t=setTimeout(()=>c.abort(),7000);const r=await fetch(HEALTH_URL,{cache:'no-store',headers:{Accept:'application/json'},signal:c.signal});clearTimeout(t);const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error();el.textContent=d.executorConfigured?'● Backend online · compiler ready':'● Backend online · API key needed';el.className=d.executorConfigured?'server-pill online':'server-pill warning'}catch(_){el.textContent='● Backend waking / unavailable';el.className='server-pill warning'}}
+async function health(){
+  const el=$('#serverStatus');
+  const state=await fetchBackendHealth(10000);
+  if(state.ok){
+    el.textContent=state.data.executorConfigured?'● Backend online · compiler ready':'● Backend online · API key needed';
+    el.className=state.data.executorConfigured?'server-pill online':'server-pill warning';
+    return;
+  }
+  el.textContent='● Backend sleeping — will wake on Run';
+  el.className='server-pill warning';
+}
 function openBrowser(){const blob=new Blob([buildDoc($('#language').value,$('#code').value)],{type:'text/html'});window.open(URL.createObjectURL(blob),'_blank')}
-$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);render();explainLogic();updateWeb();health();setInterval(health,30000);
+$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();
+loadSample();
+steps=buildTrace($('#code').value);
+setFlow(currentKind);
+render();
+explainLogic();
+updateWeb();
+warmBackendInBackground();
+setInterval(warmBackendInBackground,8*60*1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)warmBackendInBackground()});
 </script>
 </body>
 </html>
