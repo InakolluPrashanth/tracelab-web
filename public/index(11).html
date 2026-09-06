@@ -90,7 +90,7 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
 <section class="faq" id="faq"><div class="section-head"><h2>Frequently asked</h2></div><div class="faq-grid"><div class="faq-item"><h3>Does the flow use a fixed five-step algorithm?</h3><p>No. The number and meaning of timeline steps change with the source code.</p></div><div class="faq-item"><h3>Will every possible algorithm be understood perfectly?</h3><p>Not yet. The frontend provides a broad source-driven trace and recognizes common DSA patterns; exact runtime tracing for every language requires backend instrumentation.</p></div><div class="faq-item"><h3>Where does hosted code run?</h3><p>Hosted languages are sent to the TraceLab execution backend when you press Run.</p></div><div class="faq-item"><h3>Can I keep updating the public site?</h3><p>Yes. Replace and redeploy the HTML whenever you fix bugs or add features.</p></div></div></section>
 <footer class="site-footer"><div class="foot-top"><div class="brand"><div class="mark">&gt;_</div>TraceLab</div><nav class="foot-links"><a href="#playground">Playground</a><a href="#how-it-works">How it works</a><a href="#capabilities">What runs live</a><a href="#faq">FAQ</a></nav></div><p class="foot-note">TraceLab traces source structure across 16 languages. © <span id="year"></span> · Built for people learning to read code.</p></footer>
 <script>
-const TRACE_BACKEND='https://tracelab-free.onrender.com';
+const TRACE_BACKEND=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?location.origin:'https://tracelab-free.onrender.com';
 const EXECUTE_URL=TRACE_BACKEND+'/api/execute';
 const HEALTH_URL=TRACE_BACKEND+'/api/health';
 const $=s=>document.querySelector(s);
@@ -140,37 +140,105 @@ function render(){if(!steps.length)return;const total=steps.length;const d=steps
 function play(){if(timer){stop();return}if(!steps.length)return;$('#play').textContent='❚❚ Pause';$('#play').classList.add('playing');timer=setInterval(()=>{if(step>=steps.length-1){stop();return}step++;render()},Number($('#speed').value))}
 function explainLogic(){const lines=$('#code').value.split('\n');const hits=[];lines.forEach((t,i)=>{if(/\b(for|while|if|else|elif|switch|case|def|function|func|fun|class|return|push|pop|enqueue|dequeue|print|println|printf|console\.log|select)\b/i.test(t.trim()))hits.push([i+1,t.trim()])});const first=hits[0]||[1,lines.find(x=>x.trim())||'Program entry'];const kind=/for|while/i.test(first[1])?'loop':/if|else|switch|case/i.test(first[1])?'decision':/def|function|func|fun|class/i.test(first[1])?'function':'entry point';$('#logicSummary').innerHTML=`<strong>Main path found.</strong> This program has ${hits.length} recognizable control-flow or key-operation line${hits.length===1?'':'s'}. Start at the ${kind} on line ${first[0]}.`;$('#logicCode').textContent=lines.slice(Math.max(0,first[0]-2),Math.min(lines.length,first[0]+6)).map((x,i)=>String(Math.max(0,first[0]-1)+i+1).padStart(3,' ')+'  '+x).join('\n')}
 let pyodidePromise=null;function getPyodide(){if(pyodidePromise)return pyodidePromise;pyodidePromise=new Promise((resolve,reject)=>{if(window.loadPyodide){window.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'}).then(resolve).catch(reject);return}const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';s.onload=()=>window.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'}).then(resolve).catch(reject);s.onerror=()=>reject(new Error('Could not load the Python runtime.'));document.head.appendChild(s)});return pyodidePromise}
-function pythonInputCount(code){
-  const cleaned=code.replace(/#.*$/gm,'').replace(/("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')/g,'');
-  return (cleaned.match(/\binput\s*\(/g)||[]).length;
+function stripCodeStringsAndComments(code,lang){
+  let s=String(code||'');
+  if(lang==='python') s=s.replace(/#.*$/gm,'');
+  else if(lang==='bash'||lang==='ruby'||lang==='perl') s=s.replace(/#.*/g,'');
+  else s=s.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,'');
+  return s;
 }
-function preparePythonInput(code){
+function inputCount(lang,code){
+  const s=stripCodeStringsAndComments(code,lang);
+  const patterns={
+    python:/\binput\s*\(/g,
+    javascript:/(?:\bprompt\s*\(|\breadline\s*\()/g,
+    typescript:/(?:\bprompt\s*\(|\breadline\s*\(|\breadFileSync\s*\(\s*0)/g,
+    c:/(?:\bscanf\s*\(|\bfscanf\s*\(|\bfgets\s*\(|\bgetchar\s*\()/g,
+    cpp:/(?:\bcin\s*>>|\bstd::cin\s*>>|\bgetline\s*\(\s*(?:std::)?cin\s*,)/g,
+    java:/(?:\.next(?:Int|Double|Float|Long|Short|Byte|Boolean|Line)?\s*\(|\.readLine\s*\()/g,
+    go:/(?:\bfmt\.(?:F?Scan(?:f|ln)?|Scan)\s*\(|\bFscan(?:f|ln)?\s*\()/g,
+    kotlin:/(?:\breadLine\s*\(|\breadln\s*\()/g,
+    swift:/\breadLine\s*\(/g,
+    ruby:/\bgets\b/g,
+    php:/(?:\bfgets\s*\(\s*STDIN|\btrim\s*\(\s*fgets\s*\(\s*STDIN)/g,
+    perl:/(?:<STDIN>|\breadline\s*\()/g,
+    bash:/(?:^|[;\n\s])read\b/gm,
+    sql:/(?!x)x/g
+  };
+  const p=patterns[lang]; return p?(s.match(p)||[]).length:0;
+}
+function pythonInputCount(code){return inputCount('python',code)}
+function prepareProgramInput(lang,code){
   const panel=$('#inputPanel'),box=$('#programInput'),message=$('#inputMessage');
-  const count=pythonInputCount(code);
+  const count=inputCount(lang,code);
   panel.classList.toggle('show',count>0);
   panel.classList.remove('required');
-  if(count===0)return {ok:true,values:[]};
+  if(count===0)return {ok:true,values:[],count:0};
   const raw=box.value.replace(/\r/g,'');
   const values=raw.split('\n');
-  if(raw.trim()===''){
-    panel.classList.add('required');
-    message.textContent='Input is required. Enter the value before running the program.';
-    box.focus();
-    status('● Input required',true);
-    $('#output').textContent='⚠ Input required\n\nThis Python program uses input(). Enter the required value in the Program input box, then press Analyze & visualize again.';
-    return {ok:false,values:[]};
-  }
   const supplied=values.filter(v=>v.trim()!=='');
-  if(supplied.length<count){
+  if(!raw.trim()){
+    panel.classList.add('required');
+    message.textContent=`Input is required. This ${LABELS[lang]||'program'} reads input before it can finish.`;
+    box.focus(); status('● Input required',true);
+    $('#output').textContent=`⚠ Input required\n\nThis ${LABELS[lang]||'program'} reads input before it can finish. Enter the required input in the Program input box, one value per line.`;
+    return {ok:false,values:[],count};
+  }
+  const interactive=(lang==='python'||lang==='javascript'||lang==='typescript');
+  if(interactive && supplied.length<count){
     panel.classList.add('required');
     message.textContent=`This program requests ${count} input value${count===1?'':'s'}. Enter one value per line.`;
-    box.focus();
-    status('● More input required',true);
-    $('#output').textContent=`⚠ More input required\n\nDetected ${count} input() call${count===1?'':'s'}. Enter one value per line in the Program input box.`;
-    return {ok:false,values:[]};
+    box.focus(); status('● More input required',true);
+    $('#output').textContent=`⚠ More input required\n\nDetected ${count} input operation${count===1?'':'s'} in the ${LABELS[lang]||'program'}. Enter one value per line in the Program input box.`;
+    return {ok:false,values:[],count};
   }
-  return {ok:true,values:values.slice(0,count)};
+  return {ok:true,values:interactive?values.slice(0,count):values,count};
 }
+function preparePythonInput(code){return prepareProgramInput('python',code)}
+function sanitizePythonPrompts(code){
+  return String(code||'').replace(/\binput\s*\(\s*(['"])(?:\\.|(?!\1)[\s\S])*?\1\s*\)/g,'input()');
+}
+function extractPromptTexts(code){
+  const prompts=new Set();
+  const s=String(code||'');
+  const patterns=[
+    /\binput\s*\(\s*(['"])(.*?)\1\s*\)/gs,
+    /\bprompt\s*\(\s*(['"])(.*?)\1\s*\)/gs,
+    /\b(?:printf|fprintf|cout|System\.out\.print(?:ln)?|fmt\.Print(?:f|ln)?|echo|puts?)\b[\s\S]{0,120}?(['"])([^'"\r\n]{1,120})\1[\s\S]{0,120}?\b(?:scanf|fscanf|cin|std::cin|next(?:Int|Double|Float|Long|Short|Byte|Boolean)?|readLine|readln|gets|STDIN|read)\b/gi
+  ];
+  for(const re of patterns){ for(const m of s.matchAll(re)){ const v=(m[2]||m[1]||'').replace(/\\n/g,'\n').replace(/\\t/g,'\t').trim(); if(v) prompts.add(v); } }
+  for(const m of s.matchAll(/(['"])([^'"\r\n]{1,100})\1/g)){
+    const v=m[2].trim();
+    if(/\b(enter|input|type|provide|please|your)\b/i.test(v) && /[:?]$/.test(v)) prompts.add(v);
+  }
+  return [...prompts].sort((a,b)=>b.length-a.length);
+}
+function cleanOutput(raw,code){
+  let out=String(raw??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
+  const prompts=extractPromptTexts(code);
+  for(const p of prompts){
+    const escaped=p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    out=out.replace(new RegExp(`^\\s*${escaped}\\s*`,'gm'),'');
+  }
+  out=out.replace(/^\s*Enter\s+(?:the\s+)?(?:name|number|value|input|element|choice|target)\s*[:?]?\s*/gmi,'');
+  return out.trim();
+}
+function runJS(code,inputValues=[]){return new Promise(resolve=>{
+  const logs=[];let done=false;const f=document.createElement('iframe');f.style.display='none';f.sandbox='allow-scripts';
+  const inputJSON=JSON.stringify(inputValues).replace(/</g,'\\u003c');
+  const src=`<!doctype html><html><body><script>
+    const __tracelabInput=${inputJSON}; let __tracelabInputIndex=0;
+    const send=(type,args)=>parent.postMessage({__tracelab:true,type,args:args.map(a=>{try{return typeof a==='object'?JSON.stringify(a):String(a)}catch(e){return String(a)}})},'*');
+    console.log=(...a)=>send('log',a); console.error=(...a)=>send('error',a); console.warn=(...a)=>send('warn',a);
+    const __nextInput=()=>__tracelabInputIndex<__tracelabInput.length?String(__tracelabInput[__tracelabInputIndex++]):'';
+    const prompt=(message)=>__nextInput();
+    const readline=()=>__nextInput();
+    try{${code}\nsend('done',[])}catch(e){send('error',[e.message||String(e)]);send('done',[])}
+  <\/script></body></html>`;
+  const finish=()=>{if(done)return;done=true;window.removeEventListener('message',handler);f.remove();resolve(logs.length?logs:['(No output — add console.log(...) to see the result.)'])};
+  const handler=e=>{if(!e.data?.__tracelab)return;if(e.data.type==='done'){finish();return}const p=e.data.type==='error'?'✕ ':e.data.type==='warn'?'⚠ ':'';logs.push(p+e.data.args.join(' '))};
+  window.addEventListener('message',handler);f.srcdoc=src;document.body.appendChild(f);setTimeout(finish,5000)
+})}
 async function runPython(code,inputValues=[]){
   const logs=[];
   try{
@@ -179,18 +247,78 @@ async function runPython(code,inputValues=[]){
     py.setStderr({batched:v=>logs.push('✕ '+String(v))});
     const queue=[...inputValues];
     py.setStdin({stdin:()=>queue.length?queue.shift()+'\n':null});
-    await py.runPythonAsync(code);
+    await py.runPythonAsync(sanitizePythonPrompts(code));
   }catch(e){logs.push('✕ '+String(e?.message||e))}
   return logs.length?logs:['(No output — add print(...) to see the result.)'];
 }
-function runJS(code){return new Promise(resolve=>{const logs=[];let done=false;const f=document.createElement('iframe');f.style.display='none';f.sandbox='allow-scripts';const src=`<!doctype html><html><body><script>const send=(type,args)=>parent.postMessage({__tracelab:true,type,args:args.map(a=>{try{return typeof a==='object'?JSON.stringify(a):String(a)}catch(e){return String(a)}})},'*');console.log=(...a)=>send('log',a);console.error=(...a)=>send('error',a);console.warn=(...a)=>send('warn',a);try{${code}\nsend('done',[])}catch(e){send('error',[e.message]);send('done',[])}<\/script></body></html>`;const finish=()=>{if(done)return;done=true;window.removeEventListener('message',handler);f.remove();resolve(logs.length?logs:['(No output — add console.log(...) to see the result.)'])};const handler=e=>{if(!e.data?.__tracelab)return;if(e.data.type==='done'){finish();return}const p=e.data.type==='error'?'✕ ':e.data.type==='warn'?'⚠ ':'';logs.push(p+e.data.args.join(' '))};window.addEventListener('message',handler);f.srcdoc=src;document.body.appendChild(f);setTimeout(finish,2500)})}
-async function remote(lang,code,label){try{const c=new AbortController();const t=setTimeout(()=>c.abort(),20000);const r=await fetch(EXECUTE_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({language:lang,code,stdin:''}),signal:c.signal});clearTimeout(t);let d={};try{d=await r.json()}catch(_){}if(!r.ok)return{ok:false,output:`✕ ${label} execution failed\n\n${d.error||d.message||'HTTP '+r.status}`};return{ok:Boolean(d.ok),output:String(d.output||d.stdout||d.stderr||'(No output.)')}}catch(e){return{ok:false,output:`✕ Could not reach TraceLab backend.\n\n${String(e?.message||e)}\n\n${TRACE_BACKEND}`}}}
-function mismatch(lang,code){const l=code.toLowerCase();const map=[['cpp',/#include\s*<iostream>|using\s+namespace\s+std|cout\s*<</i],['java',/public\s+static\s+void\s+main|system\.out|class\s+\w+/i],['python,',/(^|\n)\s*(def|import|from)\s+|print\s*\(/i]];for(const [det,re] of map){if(re.test(l)&&!det.includes(lang)){return LABELS[det.replace(',','')]||det}}return null}
-async function runProgram(){stop();step=0;const lang=$('#language').value,code=$('#code').value,label=LABELS[lang];if(!code.trim()){status('● No code',true);$('#output').textContent='Please enter some code first.';return}const mis=mismatch(lang,code);if(mis){status('● Language mismatch',true);$('#output').textContent=`⚠ Language mismatch\n\nSelected language: ${label}\nCode appears to be: ${mis}\n\nSelect ${mis} or change the code.`;return}steps=buildTrace(code);setFlow(currentKind);render();explainLogic();const inputState=lang==='python'?preparePythonInput(code):{ok:true,values:[]};if(!inputState.ok)return;$('#inputPanel').classList.remove('required');$('#run').disabled=true;try{if(lang==='javascript'){status('● Running JavaScript…');hidePreview();const logs=await runJS(code);$('#output').textContent=logs.join('\n');const bad=logs.some(x=>x.startsWith('✕'));status(bad?'● Execution failed':'● Executed live in your browser',bad);if(!bad)renderPreview(lang,code)}else if(lang==='python'){status('● Starting Python…');hidePreview();const logs=await runPython(code,inputState.values);$('#output').textContent=logs.join('\n');const bad=logs.some(x=>x.startsWith('✕'));status(bad?'● Python execution failed':'● Executed live in your browser',bad)}else if(lang==='html'||lang==='css'){renderPreview(lang,code);$('#output').textContent='Rendered in the live preview.';status('● Preview ready')}else{hidePreview();status('● Compiling and running '+label+'…');const r=await remote(lang,code,label);$('#output').textContent=r.output;status(r.ok?'● Executed live':'● Execution failed',!r.ok)}}catch(e){status('● Execution failed',true);$('#output').textContent='✕ Unexpected TraceLab error\n\n'+String(e?.message||e)}finally{$('#run').disabled=false;render()}}
+async function remote(lang,code,label,inputValues=[]){try{
+  const c=new AbortController();const t=setTimeout(()=>c.abort(),20000);
+  const r=await fetch(EXECUTE_URL,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({language:lang,code,stdin:inputValues.join('\n')}),signal:c.signal});
+  clearTimeout(t);let d={};try{d=await r.json()}catch(_){ }
+  if(!r.ok)return{ok:false,output:`✕ ${label} execution failed\n\n${d.error||d.message||'HTTP '+r.status}`};
+  const raw=String(d.output??d.stdout??d.stderr??'(No output.)');
+  return{ok:Boolean(d.ok),output:cleanOutput(raw,code)};
+}catch(e){return{ok:false,output:`✕ Could not reach TraceLab backend.\n\n${String(e?.message||e)}\n\n${TRACE_BACKEND}`}}}
+async function runProgram(){
+  stop();step=0;
+  const lang=$('#language').value,code=$('#code').value,label=LABELS[lang];
+  if(!code.trim()){status('● No code',true);$('#output').textContent='Please enter some code first.';return}
+  const mis=mismatch(lang,code);
+  if(mis){status('● Language mismatch',true);$('#output').textContent=`⚠ Language mismatch\n\nSelected language: ${label}\nCode appears to be: ${mis}\n\nSelect ${mis} or change the code.`;return}
+  steps=buildTrace(code);setFlow(currentKind);render();explainLogic();
+  const inputState=prepareProgramInput(lang,code);
+  if(!inputState.ok)return;
+  $('#inputPanel').classList.remove('required');$('#run').disabled=true;
+  try{
+    if(lang==='javascript'){
+      status('● Running JavaScript…');hidePreview();
+      const logs=await runJS(code,inputState.values);$('#output').textContent=cleanOutput(logs.join('\n'),code);
+      const bad=logs.some(x=>x.startsWith('✕'));status(bad?'● Execution failed':'● Executed live in your browser',bad);if(!bad)renderPreview(lang,code);
+    }else if(lang==='python'){
+      status('● Starting Python…');hidePreview();
+      const logs=await runPython(code,inputState.values);$('#output').textContent=cleanOutput(logs.join('\n'),code);
+      const bad=logs.some(x=>x.startsWith('✕'));status(bad?'● Python execution failed':'● Executed live in your browser',bad);
+    }else if(lang==='html'||lang==='css'){
+      renderPreview(lang,code);$('#output').textContent='Rendered in the live preview.';status('● Preview ready');
+    }else{
+      hidePreview();status('● Compiling and running '+label+'…');
+      const r=await remote(lang,code,label,inputState.values);$('#output').textContent=r.output;status(r.ok?'● Executed live':'● Execution failed',!r.ok);
+    }
+  }catch(e){status('● Execution failed',true);$('#output').textContent='✕ Unexpected TraceLab error\n\n'+String(e?.message||e)}
+  finally{$('#run').disabled=false;render()}
+}
+function mismatch(lang,code){
+  const l=String(code||'');
+  const tests={
+    html:/(?:<!doctype\s+html|<html\b|<head\b|<body\b|<div\b|<h[1-6]\b)/i,
+    css:/(?:^|[}\n])\s*[.#]?[A-Za-z_-][\w-]*\s*\{[^{}]*:[^{};]+;?/i,
+    python:/(?:^|\n)\s*(?:def\s+\w+\s*\(|import\s+\w+|from\s+\w+\s+import\s+|if\s+__name__\s*==|elif\b|print\s*\(|input\s*\()/i,
+    javascript:/(?:console\.log\s*\(|=>\s*|\b(?:const|let|var)\s+\w+\s*=|\bfunction\s+\w+\s*\()/i,
+    typescript:/(?:interface\s+\w+|:\s*(?:number|string|boolean|any)\b|as\s+(?:number|string|boolean))/i,
+    c:/(?:#include\s*<stdio\.h>|\bprintf\s*\(|\bscanf\s*\(|\bint\s+main\s*\()/i,
+    cpp:/(?:#include\s*<iostream>|using\s+namespace\s+std\b|\b(?:cout|cin)\s*(?:<<|>>)|std::(?:cout|cin))/i,
+    java:/(?:public\s+static\s+void\s+main\s*\(|System\.out\.|import\s+java\.|class\s+\w+\s*\{)/i,
+    go:/(?:^|\n)\s*package\s+main\b|\bfmt\.(?:Print|Scan)/i,
+    kotlin:/(?:\bfun\s+main\s*\(|\bprintln\s*\(|\breadLine\s*\()/i,
+    swift:/(?:\bimport\s+Foundation\b|\blet\s+\w+\s*=|\bvar\s+\w+\s*=|\bprint\s*\()/i,
+    ruby:/(?:\bdef\s+\w+|\bputs\s+|\bgets\b|\bdo\s*\|)/i,
+    php:/(?:<\?php|\becho\s+|\$\w+\s*=)/i,
+    perl:/(?:\bmy\s+[@$%]\w+|<STDIN>|\bprint\s+['\"])/i,
+    bash:/(?:^#!\/bin\/bash|^#!\/usr\/bin\/env\s+bash|\becho\s+|\bread\s+\w*)/im,
+    sql:/(?:^|\n)\s*(?:SELECT|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|WITH)\b/i
+  };
+  if(tests[lang] && tests[lang].test(l)) return null;
+  const order=['cpp','java','python','javascript','typescript','c','go','kotlin','swift','ruby','php','perl','bash','sql','html','css'];
+  for(const candidate of order){
+    if(candidate===lang) continue;
+    if(tests[candidate]?.test(l)) return LABELS[candidate]||candidate;
+  }
+  return null;
+}
 function detectLanguage(){const code=$('#code').value;const tests=[['html',/<!doctype\s+html|<html|<body|<div|<h1/i],['css',/[.#]?[A-Za-z][\w-]*\s*\{[\s\S]*:[\s\S]*;/i],['cpp',/#include\s*<iostream>|using\s+namespace\s+std|cout\s*<</i],['c',/#include\s*<stdio\.h>|printf\s*\(/i],['java',/public\s+static\s+void\s+main|System\.out|class\s+\w+/i],['python',/\bdef\s+\w+|\bprint\s*\(/i],['javascript',/console\.log|\bconst\s+\w+\s*=|\blet\s+\w+\s*=/i],['typescript',/:\s*(number|string|boolean)\b|interface\s+\w+/i],['go',/package\s+main|fmt\.Print/i],['kotlin',/fun\s+main|println\s*\(/i],['swift',/import\s+Foundation|print\s*\(/i],['ruby',/puts\s+|do\s*\|/i],['php',/<\?php|\$\w+\s*=/i],['perl',/my\s+[@$%]\w+/i],['bash',/^#!\/bin\/bash|echo\s+/im],['sql',/^\s*(select|insert|update|delete|create|alter)\b/im]];const found=tests.find(([k,r])=>r.test(code));if(!found){status('● Could not detect language',true);return}$('#language').value=found[0];$('#file').textContent=codes[found[0]]?.[0]||'main.'+(EXT[found[0]]||'txt');$('#detect').textContent='✓ '+LABELS[found[0]];updateWeb();status('✦ Detected '+LABELS[found[0]]);$('#output').textContent='Detected '+LABELS[found[0]]+'. Your code was not changed. Press Analyze & visualize.'}
 async function health(){const el=$('#serverStatus');try{const c=new AbortController();const t=setTimeout(()=>c.abort(),7000);const r=await fetch(HEALTH_URL,{cache:'no-store',headers:{Accept:'application/json'},signal:c.signal});clearTimeout(t);const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error();el.textContent=d.executorConfigured?'● Backend online · compiler ready':'● Backend online · API key needed';el.className=d.executorConfigured?'server-pill online':'server-pill warning'}catch(_){el.textContent='● Backend waking / unavailable';el.className='server-pill warning'}}
 function openBrowser(){const blob=new Blob([buildDoc($('#language').value,$('#code').value)],{type:'text/html'});window.open(URL.createObjectURL(blob),'_blank')}
-$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',$('#language').value==='python'&&pythonInputCount($('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',$('#language').value==='python'&&pythonInputCount($('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',$('#language').value==='python'&&pythonInputCount($('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);render();explainLogic();updateWeb();health();setInterval(health,30000);
+$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);render();explainLogic();updateWeb();health();setInterval(health,30000);
 </script>
 </body>
 </html>
