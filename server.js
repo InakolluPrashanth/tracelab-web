@@ -13,9 +13,18 @@ const ONECOMPILER_URL =
 const ONECOMPILER_API_KEY =
   process.env.ONECOMPILER_API_KEY || '';
 
-const FRONTEND_ORIGIN =
-  process.env.FRONTEND_ORIGIN ||
-  'https://tracelabcompiler.netlify.app';
+/*
+  Supports both the current Netlify site and the older site.
+  You can also override this with the FRONTEND_ORIGINS
+  environment variable in Render.
+*/
+const FRONTEND_ORIGINS = new Set(
+  (process.env.FRONTEND_ORIGINS ||
+    'https://tracelab-free.netlify.app,https://tracelabcompiler.netlify.app')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean)
+);
 
 
 /* =========================================================
@@ -31,7 +40,12 @@ app.set('trust proxy', 1);
 
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+
+  res.setHeader(
+    'X-Frame-Options',
+    'SAMEORIGIN'
+  );
+
   res.setHeader(
     'Referrer-Policy',
     'strict-origin-when-cross-origin'
@@ -48,13 +62,16 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (origin === FRONTEND_ORIGIN) {
+  if (origin && FRONTEND_ORIGINS.has(origin)) {
     res.setHeader(
       'Access-Control-Allow-Origin',
       origin
     );
 
-    res.setHeader('Vary', 'Origin');
+    res.setHeader(
+      'Vary',
+      'Origin'
+    );
   }
 
   res.setHeader(
@@ -93,9 +110,13 @@ app.use(
 app.use(
   rateLimit({
     windowMs: 60 * 1000,
+
     max: 20,
+
     standardHeaders: true,
+
     legacyHeaders: false,
+
     message: {
       ok: false,
       error:
@@ -191,7 +212,10 @@ const SUPPORTED = {
 function health() {
   return {
     ok: true,
-    service: 'TraceLab free execution backend',
+
+    service:
+      'TraceLab free execution backend',
+
     executorConfigured:
       Boolean(ONECOMPILER_API_KEY)
   };
@@ -223,7 +247,9 @@ app.use('/api', (req, res, next) => {
 app.get('/api/health', (_req, res) => {
   res.json({
     ...health(),
-    timestamp: new Date().toISOString()
+
+    timestamp:
+      new Date().toISOString()
   });
 });
 
@@ -248,285 +274,20 @@ app.get('/api/runtimes', (_req, res) => {
    PROVIDER DIAGNOSTIC
 ========================================================= */
 
-app.post('/api/diagnostics', async (_req, res) => {
+app.post(
+  '/api/diagnostics',
+  async (_req, res) => {
 
-  if (!ONECOMPILER_API_KEY) {
-    return res.status(503).json({
-      ok: false,
-      backend: true,
-      provider: false,
-      error:
-        'ONECOMPILER_API_KEY is not configured in the deployment environment.'
-    });
-  }
-
-  const controller =
-    new AbortController();
-
-  const timer =
-    setTimeout(() => {
-      controller.abort();
-    }, 12000);
-
-  try {
-
-    const response =
-      await fetch(
-        ONECOMPILER_URL,
-        {
-          method: 'POST',
-
-          headers: {
-            'Content-Type':
-              'application/json',
-
-            'X-API-Key':
-              ONECOMPILER_API_KEY
-          },
-
-          body: JSON.stringify({
-            language: 'cpp',
-
-            stdin: '',
-
-            files: [
-              {
-                name: 'main.cpp',
-
-                content:
-                  '#include <iostream>\n' +
-                  'int main(){std::cout << 21;}'
-              }
-            ]
-          }),
-
-          signal: controller.signal
-        }
-      );
-
-    const text =
-      await response.text();
-
-    let data;
-
-    try {
-      data = JSON.parse(text);
-    } catch {
-      data = {
-        error: text
-      };
-    }
-
-    if (!response.ok) {
-
-      return res.status(502).json({
+    if (!ONECOMPILER_API_KEY) {
+      return res.status(503).json({
         ok: false,
         backend: true,
         provider: false,
-        httpStatus: response.status,
+
         error:
-          data.error ||
-          data.message ||
-          `Provider HTTP ${response.status}`
+          'ONECOMPILER_API_KEY is not configured in the deployment environment.'
       });
-
     }
-
-    const output =
-      String(data.stdout || '').trim();
-
-    const failed =
-      data.status === 'failed' ||
-      Boolean(
-        data.error ||
-        data.exception
-      );
-
-    return res.json({
-
-      ok:
-        !failed &&
-        output === '21',
-
-      backend: true,
-
-      provider:
-        !failed,
-
-      cpp: {
-        expected: '21',
-
-        received: output,
-
-        status:
-          data.status || null,
-
-        exception:
-          data.exception || null,
-
-        stderr:
-          data.stderr || null
-      }
-
-    });
-
-  } catch (error) {
-
-    return res.status(503).json({
-
-      ok: false,
-
-      backend: true,
-
-      provider: false,
-
-      error:
-        error?.name === 'AbortError'
-          ? 'Provider diagnostic timed out.'
-          : (
-              error?.message ||
-              'Provider connection failed.'
-            )
-
-    });
-
-  } finally {
-
-    clearTimeout(timer);
-
-  }
-
-});
-
-
-/* =========================================================
-   EXECUTE CODE
-========================================================= */
-
-app.post('/api/execute', async (req, res) => {
-
-  const {
-    language,
-    code,
-    stdin = ''
-  } = req.body || {};
-
-
-  /* -------------------------------------------------------
-     VALIDATION
-  ------------------------------------------------------- */
-
-  if (
-    !language ||
-    typeof code !== 'string'
-  ) {
-
-    return res.status(400).json({
-      ok: false,
-      error:
-        'language and code are required'
-    });
-
-  }
-
-
-  if (code.length > 18000) {
-
-    return res.status(413).json({
-      ok: false,
-      error:
-        'Code is limited to 18,000 characters.'
-    });
-
-  }
-
-
-  if (
-    typeof stdin !== 'string' ||
-    stdin.length > 8000
-  ) {
-
-    return res.status(413).json({
-      ok: false,
-      error:
-        'Input is limited to 8,000 characters.'
-    });
-
-  }
-
-
-  if (!SUPPORTED[language]) {
-
-    return res.status(400).json({
-      ok: false,
-      error:
-        `Unsupported language: ${language}`
-    });
-
-  }
-
-
-  if (!ONECOMPILER_API_KEY) {
-
-    return res.status(503).json({
-      ok: false,
-      error:
-        'The free execution provider is not configured yet. Add ONECOMPILER_API_KEY in Render environment variables.'
-    });
-
-  }
-
-
-  /* -------------------------------------------------------
-     RUNTIME
-  ------------------------------------------------------- */
-
-  const runtime =
-    SUPPORTED[language];
-
-
-  /* -------------------------------------------------------
-     FILE NAME
-     
-     Java is special:
-     class Main -> Main.java
-  ------------------------------------------------------- */
-
-  const fileName =
-    language === 'java'
-      ? 'Main.java'
-      : `main.${runtime.ext}`;
-
-
-  /* -------------------------------------------------------
-     ONECOMPILER PAYLOAD
-  ------------------------------------------------------- */
-
-  const payload = {
-
-    language:
-      runtime.id,
-
-    stdin,
-
-    files: [
-      {
-        name:
-          fileName,
-
-        content:
-          code
-      }
-    ]
-
-  };
-
-
-  /* -------------------------------------------------------
-     SEND TO ONECOMPILER
-  ------------------------------------------------------- */
-
-  try {
 
     const controller =
       new AbortController();
@@ -534,15 +295,11 @@ app.post('/api/execute', async (req, res) => {
     const timer =
       setTimeout(() => {
         controller.abort();
-      }, 15000);
-
-
-    let response;
-
+      }, 12000);
 
     try {
 
-      response =
+      const response =
         await fetch(
           ONECOMPILER_URL,
           {
@@ -556,15 +313,132 @@ app.post('/api/execute', async (req, res) => {
                 ONECOMPILER_API_KEY
             },
 
-            body:
-              JSON.stringify(
-                payload
-              ),
+            body: JSON.stringify({
+              language: 'cpp',
+
+              stdin: '',
+
+              files: [
+                {
+                  name:
+                    'main.cpp',
+
+                  content:
+                    '#include <iostream>\n' +
+                    'int main(){std::cout << 21;}'
+                }
+              ]
+            }),
 
             signal:
               controller.signal
           }
         );
+
+
+      const text =
+        await response.text();
+
+
+      let data;
+
+      try {
+
+        data =
+          JSON.parse(text);
+
+      } catch {
+
+        data = {
+          error: text
+        };
+
+      }
+
+
+      if (!response.ok) {
+
+        return res.status(502).json({
+          ok: false,
+
+          backend: true,
+
+          provider: false,
+
+          httpStatus:
+            response.status,
+
+          error:
+            data.error ||
+            data.message ||
+            `Provider HTTP ${response.status}`
+        });
+
+      }
+
+
+      const output =
+        String(
+          data.stdout || ''
+        ).trim();
+
+
+      const failed =
+        data.status === 'failed' ||
+        Boolean(
+          data.error ||
+          data.exception
+        );
+
+
+      return res.json({
+
+        ok:
+          !failed &&
+          output === '21',
+
+        backend: true,
+
+        provider:
+          !failed,
+
+        cpp: {
+          expected: '21',
+
+          received:
+            output,
+
+          status:
+            data.status || null,
+
+          exception:
+            data.exception || null,
+
+          stderr:
+            data.stderr || null
+        }
+
+      });
+
+    } catch (error) {
+
+      return res.status(503).json({
+
+        ok: false,
+
+        backend: true,
+
+        provider: false,
+
+        error:
+          error?.name === 'AbortError'
+            ? 'Provider diagnostic timed out.'
+            : (
+                error?.message ||
+                'Provider connection failed.'
+              )
+
+      });
 
     } finally {
 
@@ -572,46 +446,391 @@ app.post('/api/execute', async (req, res) => {
 
     }
 
-
-    /* -----------------------------------------------------
-       READ RESPONSE
-    ----------------------------------------------------- */
-
-    const text =
-      await response.text();
+  }
+);
 
 
+/* =========================================================
+   FAST PROVIDER REQUEST
+========================================================= */
+
+function sleep(ms) {
+  return new Promise(
+    resolve =>
+      setTimeout(resolve, ms)
+  );
+}
+
+
+async function runOneCompiler(payload) {
+
+  let lastError = null;
+
+
+  /*
+    Maximum two attempts.
+
+    This is intentionally short.
+    We do NOT make the user wait through
+    a long percentage/progress system.
+  */
+
+  for (
+    let attempt = 1;
+    attempt <= 2;
+    attempt++
+  ) {
+
+    const controller =
+      new AbortController();
+
+
+    /*
+      45 seconds gives Render/OneCompiler
+      enough time to wake and respond
+      without immediately producing a
+      browser "signal aborted" error.
+    */
+
+    const timer =
+      setTimeout(() => {
+        controller.abort();
+      }, 45000);
+
+
+    try {
+
+      const response =
+        await fetch(
+          ONECOMPILER_URL,
+          {
+            method: 'POST',
+
+            headers: {
+              'Content-Type':
+                'application/json',
+
+              'Accept':
+                'application/json',
+
+              'X-API-Key':
+                ONECOMPILER_API_KEY
+            },
+
+            body:
+              JSON.stringify(payload),
+
+            signal:
+              controller.signal
+          }
+        );
+
+
+      const text =
+        await response.text();
+
+
+      let data;
+
+      try {
+
+        data =
+          JSON.parse(text);
+
+      } catch {
+
+        data = {
+          error: text
+        };
+
+      }
+
+
+      /*
+        Successful HTTP response.
+      */
+
+      if (response.ok) {
+        return {
+          response,
+          data
+        };
+      }
+
+
+      lastError =
+        new Error(
+          data.error ||
+          data.message ||
+          `Provider HTTP ${response.status}`
+        );
+
+
+      /*
+        Retry only temporary provider errors.
+      */
+
+      if (
+        (
+          response.status >= 500 ||
+          response.status === 429
+        ) &&
+        attempt < 2
+      ) {
+
+        await sleep(250);
+
+        continue;
+      }
+
+
+      throw lastError;
+
+
+    } catch (error) {
+
+      lastError =
+        error;
+
+
+      /*
+        Retry temporary connection errors only.
+      */
+
+      if (
+        attempt < 2 &&
+        (
+          error?.name ===
+            'AbortError' ||
+
+          error?.code ===
+            'ECONNRESET' ||
+
+          error?.code ===
+            'ETIMEDOUT' ||
+
+          error?.code ===
+            'UND_ERR_CONNECT_TIMEOUT' ||
+
+          error?.code ===
+            'UND_ERR_SOCKET'
+        )
+      ) {
+
+        await sleep(250);
+
+        continue;
+      }
+
+
+      throw error;
+
+
+    } finally {
+
+      clearTimeout(timer);
+
+    }
+
+  }
+
+
+  throw (
+    lastError ||
+    new Error(
+      'Execution provider is unavailable.'
+    )
+  );
+
+}
+
+
+/* =========================================================
+   EXECUTE CODE
+========================================================= */
+
+app.post(
+  '/api/execute',
+  async (req, res) => {
+
+    const {
+      language,
+      code,
+      stdin = ''
+    } = req.body || {};
+
+
+    /* -------------------------------------------------------
+       VALIDATION
+    ------------------------------------------------------- */
+
+    if (
+      !language ||
+      typeof code !== 'string'
+    ) {
+
+      return res.status(400).json({
+
+        ok: false,
+
+        error:
+          'language and code are required'
+
+      });
+
+    }
+
+
+    if (
+      code.length > 18000
+    ) {
+
+      return res.status(413).json({
+
+        ok: false,
+
+        error:
+          'Code is limited to 18,000 characters.'
+
+      });
+
+    }
+
+
+    if (
+      typeof stdin !== 'string' ||
+      stdin.length > 8000
+    ) {
+
+      return res.status(413).json({
+
+        ok: false,
+
+        error:
+          'Input is limited to 8,000 characters.'
+
+      });
+
+    }
+
+
+    if (
+      !SUPPORTED[language]
+    ) {
+
+      return res.status(400).json({
+
+        ok: false,
+
+        error:
+          `Unsupported language: ${language}`
+
+      });
+
+    }
+
+
+    if (
+      !ONECOMPILER_API_KEY
+    ) {
+
+      return res.status(503).json({
+
+        ok: false,
+
+        error:
+          'The free execution provider is not configured yet. Add ONECOMPILER_API_KEY in Render environment variables.'
+
+      });
+
+    }
+
+
+    /* -------------------------------------------------------
+       RUNTIME
+    ------------------------------------------------------- */
+
+    const runtime =
+      SUPPORTED[language];
+
+
+    /* -------------------------------------------------------
+       FILE NAME
+
+       Java is special:
+       class Main -> Main.java
+    ------------------------------------------------------- */
+
+    const fileName =
+      language === 'java'
+        ? 'Main.java'
+        : `main.${runtime.ext}`;
+
+
+    /* -------------------------------------------------------
+       ONECOMPILER PAYLOAD
+    ------------------------------------------------------- */
+
+    const payload = {
+
+      language:
+        runtime.id,
+
+      stdin,
+
+      files: [
+        {
+          name:
+            fileName,
+
+          content:
+            code
+        }
+      ]
+
+    };
+
+
+    /* -------------------------------------------------------
+       SEND TO ONECOMPILER
+    ------------------------------------------------------- */
+
+    let response;
     let data;
 
 
     try {
 
-      data =
-        JSON.parse(text);
-
-    } catch {
-
-      data = {
-        error: text
-      };
-
-    }
+      ({
+        response,
+        data
+      } =
+        await runOneCompiler(
+          payload
+        ));
 
 
-    /* -----------------------------------------------------
-       PROVIDER HTTP ERROR
-    ----------------------------------------------------- */
+    } catch (error) {
 
-    if (!response.ok) {
+      const message =
+        error?.name ===
+          'AbortError'
 
-      return res.status(502).json({
+          ? 'Execution timed out while waiting for the execution provider.'
+
+          : (
+              error?.message ||
+              'Execution provider is temporarily unavailable.'
+            );
+
+
+      return res.status(503).json({
 
         ok: false,
 
-        error:
-          data.error ||
-          data.message ||
-          `Provider HTTP ${response.status}`
+        error: message,
+
+        retryable: true
 
       });
 
@@ -625,45 +844,61 @@ app.post('/api/execute', async (req, res) => {
     const outputParts = [];
 
 
-    if (data.stdout) {
+    if (
+      data.stdout
+    ) {
 
       outputParts.push(
+
         String(
           data.stdout
         ).trimEnd()
+
       );
 
     }
 
 
-    if (data.stderr) {
+    if (
+      data.stderr
+    ) {
 
       outputParts.push(
+
         `stderr:\n${String(
           data.stderr
         ).trimEnd()}`
+
       );
 
     }
 
 
-    if (data.exception) {
+    if (
+      data.exception
+    ) {
 
       outputParts.push(
+
         `exception:\n${String(
           data.exception
         ).trimEnd()}`
+
       );
 
     }
 
 
-    if (data.error) {
+    if (
+      data.error
+    ) {
 
       outputParts.push(
+
         `error:\n${String(
           data.error
         ).trimEnd()}`
+
       );
 
     }
@@ -671,7 +906,7 @@ app.post('/api/execute', async (req, res) => {
 
     /* -----------------------------------------------------
        EXECUTION STATUS
-       
+
        stderr alone does NOT automatically mean failure.
     ----------------------------------------------------- */
 
@@ -683,7 +918,11 @@ app.post('/api/execute', async (req, res) => {
 
     const output =
       outputParts.length > 0
-        ? outputParts.join('\n')
+
+        ? outputParts.join(
+            '\n'
+          )
+
         : '(No output)';
 
 
@@ -702,37 +941,18 @@ app.post('/api/execute', async (req, res) => {
         runtime.name,
 
       executionTime:
-        data.executionTime ?? null,
+        data.executionTime ??
+        null,
 
       memoryUsed:
-        data.memoryUsed ?? null
-
-    });
-
-
-  } catch (error) {
-
-    const message =
-      error?.name === 'AbortError'
-        ? 'Execution timed out. Try a shorter program.'
-        : (
-            error?.message ||
-            'Execution provider is unavailable.'
-          );
-
-
-    return res.status(503).json({
-
-      ok: false,
-
-      error:
-        message
+        data.memoryUsed ??
+        null
 
     });
 
   }
 
-});
+);
 
 
 /* =========================================================
@@ -753,28 +973,39 @@ app.use(
    SPA FALLBACK
 ========================================================= */
 
-app.use((req, res) => {
+app.use(
+  (req, res) => {
 
-  if (
-    req.path.startsWith('/api/')
-  ) {
+    if (
+      req.path.startsWith(
+        '/api/'
+      )
+    ) {
 
-    return res.status(404).json({
-      ok: false,
-      error: 'Not found'
-    });
+      return res.status(404).json({
+
+        ok: false,
+
+        error:
+          'Not found'
+
+      });
+
+    }
+
+
+    res.sendFile(
+
+      path.join(
+        __dirname,
+        'public',
+        'index.html'
+      )
+
+    );
 
   }
-
-  res.sendFile(
-    path.join(
-      __dirname,
-      'public',
-      'index.html'
-    )
-  );
-
-});
+);
 
 
 /* =========================================================
@@ -782,8 +1013,11 @@ app.use((req, res) => {
 ========================================================= */
 
 app.listen(
+
   PORT,
+
   '0.0.0.0',
+
   () => {
 
     console.log(
@@ -791,10 +1025,13 @@ app.listen(
     );
 
     console.log(
-      `OneCompiler configured: ${Boolean(
-        ONECOMPILER_API_KEY
-      )}`
+      `OneCompiler configured: ${
+        Boolean(
+          ONECOMPILER_API_KEY
+        )
+      }`
     );
 
   }
+
 );
