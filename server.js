@@ -13,18 +13,13 @@ const ONECOMPILER_URL =
 const ONECOMPILER_API_KEY =
   process.env.ONECOMPILER_API_KEY || '';
 
-/*
-  Allowed frontend origins.
-  The current TraceLab site is included, along with
-  the older Netlify domain.
-*/
 const FRONTEND_ORIGINS = new Set(
   (
     process.env.FRONTEND_ORIGINS ||
     'https://tracelab-free.netlify.app,https://tracelabcompiler.netlify.app'
   )
     .split(',')
-    .map(origin => origin.trim())
+    .map(s => s.trim())
     .filter(Boolean)
 );
 
@@ -120,16 +115,12 @@ app.use(
 app.use(
   rateLimit({
     windowMs: 60 * 1000,
-
     max: 20,
-
     standardHeaders: true,
-
     legacyHeaders: false,
 
     message: {
       ok: false,
-
       error:
         'Too many execution requests. Please wait a minute and try again.'
     }
@@ -223,6 +214,7 @@ const SUPPORTED = {
 ========================================================= */
 
 function health() {
+
   return {
     ok: true,
 
@@ -234,6 +226,7 @@ function health() {
         ONECOMPILER_API_KEY
       )
   };
+
 }
 
 
@@ -524,33 +517,9 @@ app.post(
 
 
 /* =========================================================
-   HELPERS
+   LANGUAGE NORMALIZATION
 ========================================================= */
 
-function sleep(ms) {
-
-  return new Promise(
-    resolve =>
-      setTimeout(resolve, ms)
-  );
-
-}
-
-
-/*
-  Convert language values to a normal string.
-
-  Examples:
-
-  "java"
-  { id: "java" }
-  { value: "java" }
-  { language: "java" }
-
-  all become:
-
-  "java"
-*/
 function normalizeLanguage(value) {
 
   if (
@@ -594,215 +563,6 @@ function normalizeLanguage(value) {
 
 
 /* =========================================================
-   FAST ONECOMPILER REQUEST
-========================================================= */
-
-async function runOneCompiler(
-  payload
-) {
-
-  let lastError = null;
-
-
-  /*
-    Two attempts only.
-
-    This keeps the request fast while
-    allowing a temporary Render/provider
-    connection failure to recover.
-  */
-
-  for (
-    let attempt = 1;
-    attempt <= 2;
-    attempt++
-  ) {
-
-    const controller =
-      new AbortController();
-
-
-    /*
-      45 seconds is long enough for
-      Render/OneCompiler cold start,
-      but we don't create a huge
-      artificial waiting cycle.
-    */
-
-    const timer =
-      setTimeout(
-        () => controller.abort(),
-        45000
-      );
-
-
-    try {
-
-      const response =
-        await fetch(
-          ONECOMPILER_URL,
-          {
-
-            method: 'POST',
-
-            headers: {
-
-              'Content-Type':
-                'application/json',
-
-              'Accept':
-                'application/json',
-
-              'X-API-Key':
-                ONECOMPILER_API_KEY
-
-            },
-
-            body:
-              JSON.stringify(
-                payload
-              ),
-
-            signal:
-              controller.signal
-
-          }
-        );
-
-
-      const text =
-        await response.text();
-
-
-      let data;
-
-
-      try {
-
-        data =
-          JSON.parse(text);
-
-      } catch {
-
-        data = {
-          error: text
-        };
-
-      }
-
-
-      if (
-        response.ok
-      ) {
-
-        return {
-          response,
-          data
-        };
-
-      }
-
-
-      lastError =
-        new Error(
-
-          data.error ||
-          data.message ||
-          `Provider HTTP ${response.status}`
-
-        );
-
-
-      /*
-        Retry server/provider errors
-        and rate-limit responses.
-      */
-
-      if (
-
-        (
-          response.status >= 500 ||
-          response.status === 429
-        )
-
-        &&
-
-        attempt < 2
-
-      ) {
-
-        await sleep(250);
-
-        continue;
-
-      }
-
-
-      throw lastError;
-
-
-    } catch (error) {
-
-      lastError =
-        error;
-
-
-      /*
-        Retry temporary connection errors.
-      */
-
-      const retryable =
-        error?.name ===
-          'AbortError' ||
-
-        error?.code ===
-          'ECONNRESET' ||
-
-        error?.code ===
-          'ETIMEDOUT' ||
-
-        error?.code ===
-          'UND_ERR_CONNECT_TIMEOUT' ||
-
-        error?.code ===
-          'UND_ERR_SOCKET';
-
-
-      if (
-        retryable &&
-        attempt < 2
-      ) {
-
-        await sleep(250);
-
-        continue;
-
-      }
-
-
-      throw error;
-
-
-    } finally {
-
-      clearTimeout(timer);
-
-    }
-
-  }
-
-
-  throw (
-    lastError ||
-    new Error(
-      'Execution provider is unavailable.'
-    )
-  );
-
-}
-
-
-/* =========================================================
    EXECUTE CODE
 ========================================================= */
 
@@ -818,17 +578,16 @@ app.post(
       req.body || {};
 
 
-    /* -------------------------------------------------------
-       NORMALIZE LANGUAGE
+    /*
+      IMPORTANT:
+      Always convert language to a real string.
 
-       This fixes:
+      This prevents:
+      Unsupported language: [object Object]
 
-       Unsupported language:
-       [object Object]
-
-       when the frontend accidentally
-       sends a language object.
-    ------------------------------------------------------- */
+      and:
+      Unsupported language: language
+    */
 
     language =
       normalizeLanguage(
@@ -974,21 +733,216 @@ app.post(
        SEND TO ONECOMPILER
     ------------------------------------------------------- */
 
-    let result;
-
-
     try {
 
-      result =
-        await runOneCompiler(
-          payload
+      const controller =
+        new AbortController();
+
+
+      const timer =
+        setTimeout(
+          () => controller.abort(),
+          45000
         );
+
+
+      let response;
+
+
+      try {
+
+        response =
+          await fetch(
+            ONECOMPILER_URL,
+            {
+
+              method: 'POST',
+
+              headers: {
+
+                'Content-Type':
+                  'application/json',
+
+                'Accept':
+                  'application/json',
+
+                'X-API-Key':
+                  ONECOMPILER_API_KEY
+
+              },
+
+              body:
+                JSON.stringify(
+                  payload
+                ),
+
+              signal:
+                controller.signal
+
+            }
+          );
+
+      } finally {
+
+        clearTimeout(timer);
+
+      }
+
+
+      const text =
+        await response.text();
+
+
+      let data;
+
+
+      try {
+
+        data =
+          JSON.parse(text);
+
+      } catch {
+
+        data = {
+          error: text
+        };
+
+      }
+
+
+      /* ---------------------------------------------------
+         PROVIDER HTTP ERROR
+      --------------------------------------------------- */
+
+      if (
+        !response.ok
+      ) {
+
+        return res.status(502).json({
+
+          ok: false,
+
+          error:
+            data.error ||
+            data.message ||
+            `Provider HTTP ${response.status}`
+
+        });
+
+      }
+
+
+      /* ---------------------------------------------------
+         OUTPUT
+      --------------------------------------------------- */
+
+      const outputParts = [];
+
+
+      if (
+        data.stdout
+      ) {
+
+        outputParts.push(
+
+          String(
+            data.stdout
+          ).trimEnd()
+
+        );
+
+      }
+
+
+      if (
+        data.stderr
+      ) {
+
+        outputParts.push(
+
+          `stderr:\n${String(
+            data.stderr
+          ).trimEnd()}`
+
+        );
+
+      }
+
+
+      if (
+        data.exception
+      ) {
+
+        outputParts.push(
+
+          `exception:\n${String(
+            data.exception
+          ).trimEnd()}`
+
+        );
+
+      }
+
+
+      if (
+        data.error
+      ) {
+
+        outputParts.push(
+
+          `error:\n${String(
+            data.error
+          ).trimEnd()}`
+
+        );
+
+      }
+
+
+      const failed =
+        data.status === 'failed' ||
+        Boolean(
+          data.exception
+        ) ||
+        Boolean(
+          data.error
+        );
+
+
+      const output =
+        outputParts.length > 0
+
+          ? outputParts.join(
+              '\n'
+            )
+
+          : '(No output)';
+
+
+      return res.json({
+
+        ok:
+          !failed,
+
+        output,
+
+        runtime:
+          runtime.name,
+
+        executionTime:
+          data.executionTime ??
+          null,
+
+        memoryUsed:
+          data.memoryUsed ??
+          null
+
+      });
 
 
     } catch (error) {
 
       const message =
-
         error?.name ===
           'AbortError'
 
@@ -1014,131 +968,7 @@ app.post(
 
     }
 
-
-    const response =
-      result.response;
-
-    const data =
-      result.data;
-
-
-    /* -------------------------------------------------------
-       BUILD OUTPUT
-    ------------------------------------------------------- */
-
-    const outputParts = [];
-
-
-    if (
-      data.stdout
-    ) {
-
-      outputParts.push(
-
-        String(
-          data.stdout
-        ).trimEnd()
-
-      );
-
-    }
-
-
-    if (
-      data.stderr
-    ) {
-
-      outputParts.push(
-
-        `stderr:\n${String(
-          data.stderr
-        ).trimEnd()}`
-
-      );
-
-    }
-
-
-    if (
-      data.exception
-    ) {
-
-      outputParts.push(
-
-        `exception:\n${String(
-          data.exception
-        ).trimEnd()}`
-
-      );
-
-    }
-
-
-    if (
-      data.error
-    ) {
-
-      outputParts.push(
-
-        `error:\n${String(
-          data.error
-        ).trimEnd()}`
-
-      );
-
-    }
-
-
-    /* -------------------------------------------------------
-       EXECUTION STATUS
-    ------------------------------------------------------- */
-
-    const failed =
-      data.status === 'failed' ||
-      Boolean(
-        data.exception
-      ) ||
-      Boolean(
-        data.error
-      );
-
-
-    const output =
-      outputParts.length > 0
-
-        ? outputParts.join(
-            '\n'
-          )
-
-        : '(No output)';
-
-
-    /* -------------------------------------------------------
-       RESPONSE
-    ------------------------------------------------------- */
-
-    return res.json({
-
-      ok:
-        !failed,
-
-      output,
-
-      runtime:
-        runtime.name,
-
-      executionTime:
-        data.executionTime ??
-        null,
-
-      memoryUsed:
-        data.memoryUsed ??
-        null
-
-    });
-
   }
-
 );
 
 
