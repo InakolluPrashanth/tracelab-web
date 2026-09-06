@@ -14,15 +14,17 @@ const ONECOMPILER_API_KEY =
   process.env.ONECOMPILER_API_KEY || '';
 
 /*
-  Supports both the current Netlify site and the older site.
-  You can also override this with the FRONTEND_ORIGINS
-  environment variable in Render.
+  Allowed frontend origins.
+  The current TraceLab site is included, along with
+  the older Netlify domain.
 */
 const FRONTEND_ORIGINS = new Set(
-  (process.env.FRONTEND_ORIGINS ||
-    'https://tracelab-free.netlify.app,https://tracelabcompiler.netlify.app')
+  (
+    process.env.FRONTEND_ORIGINS ||
+    'https://tracelab-free.netlify.app,https://tracelabcompiler.netlify.app'
+  )
     .split(',')
-    .map(s => s.trim())
+    .map(origin => origin.trim())
     .filter(Boolean)
 );
 
@@ -39,7 +41,10 @@ app.set('trust proxy', 1);
 ========================================================= */
 
 app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader(
+    'X-Content-Type-Options',
+    'nosniff'
+  );
 
   res.setHeader(
     'X-Frame-Options',
@@ -62,7 +67,10 @@ app.use((req, res, next) => {
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (origin && FRONTEND_ORIGINS.has(origin)) {
+  if (
+    origin &&
+    FRONTEND_ORIGINS.has(origin)
+  ) {
     res.setHeader(
       'Access-Control-Allow-Origin',
       origin
@@ -84,7 +92,9 @@ app.use((req, res, next) => {
     'Content-Type, Accept'
   );
 
-  if (req.method === 'OPTIONS') {
+  if (
+    req.method === 'OPTIONS'
+  ) {
     return res.sendStatus(204);
   }
 
@@ -119,6 +129,7 @@ app.use(
 
     message: {
       ok: false,
+
       error:
         'Too many execution requests. Please wait a minute and try again.'
     }
@@ -131,6 +142,7 @@ app.use(
 ========================================================= */
 
 const SUPPORTED = {
+
   typescript: {
     id: 'typescript',
     ext: 'ts',
@@ -202,6 +214,7 @@ const SUPPORTED = {
     ext: 'sql',
     name: 'SQL / SQLite'
   }
+
 };
 
 
@@ -217,7 +230,9 @@ function health() {
       'TraceLab free execution backend',
 
     executorConfigured:
-      Boolean(ONECOMPILER_API_KEY)
+      Boolean(
+        ONECOMPILER_API_KEY
+      )
   };
 }
 
@@ -226,48 +241,69 @@ function health() {
    API CACHE CONTROL
 ========================================================= */
 
-app.use('/api', (req, res, next) => {
-  res.setHeader(
-    'Cache-Control',
-    'no-store'
-  );
+app.use(
+  '/api',
+  (req, res, next) => {
 
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
+    res.setHeader(
+      'Cache-Control',
+      'no-store'
+    );
+
+    if (
+      req.method === 'OPTIONS'
+    ) {
+      return res.sendStatus(204);
+    }
+
+    next();
+
   }
-
-  next();
-});
+);
 
 
 /* =========================================================
    HEALTH ENDPOINT
 ========================================================= */
 
-app.get('/api/health', (_req, res) => {
-  res.json({
-    ...health(),
+app.get(
+  '/api/health',
+  (_req, res) => {
 
-    timestamp:
-      new Date().toISOString()
-  });
-});
+    res.json({
+      ...health(),
+
+      timestamp:
+        new Date().toISOString()
+    });
+
+  }
+);
 
 
 /* =========================================================
    RUNTIMES ENDPOINT
 ========================================================= */
 
-app.get('/api/runtimes', (_req, res) => {
-  res.json(
-    Object.entries(SUPPORTED).map(
-      ([id, item]) => ({
-        id,
-        name: item.name
-      })
-    )
-  );
-});
+app.get(
+  '/api/runtimes',
+  (_req, res) => {
+
+    res.json(
+
+      Object.entries(
+        SUPPORTED
+      ).map(
+        ([id, item]) => ({
+          id,
+          name: item.name
+        })
+      )
+
+    );
+
+  }
+);
 
 
 /* =========================================================
@@ -278,24 +314,36 @@ app.post(
   '/api/diagnostics',
   async (_req, res) => {
 
-    if (!ONECOMPILER_API_KEY) {
+    if (
+      !ONECOMPILER_API_KEY
+    ) {
+
       return res.status(503).json({
+
         ok: false,
+
         backend: true,
+
         provider: false,
 
         error:
           'ONECOMPILER_API_KEY is not configured in the deployment environment.'
+
       });
+
     }
+
 
     const controller =
       new AbortController();
 
+
     const timer =
-      setTimeout(() => {
-        controller.abort();
-      }, 12000);
+      setTimeout(
+        () => controller.abort(),
+        12000
+      );
+
 
     try {
 
@@ -303,35 +351,48 @@ app.post(
         await fetch(
           ONECOMPILER_URL,
           {
+
             method: 'POST',
 
             headers: {
+
               'Content-Type':
                 'application/json',
 
               'X-API-Key':
                 ONECOMPILER_API_KEY
+
             },
 
-            body: JSON.stringify({
-              language: 'cpp',
+            body:
+              JSON.stringify({
 
-              stdin: '',
+                language:
+                  'cpp',
 
-              files: [
-                {
-                  name:
-                    'main.cpp',
+                stdin:
+                  '',
 
-                  content:
-                    '#include <iostream>\n' +
-                    'int main(){std::cout << 21;}'
-                }
-              ]
-            }),
+                files: [
+
+                  {
+
+                    name:
+                      'main.cpp',
+
+                    content:
+                      '#include <iostream>\n' +
+                      'int main(){std::cout << 21;}'
+
+                  }
+
+                ]
+
+              }),
 
             signal:
               controller.signal
+
           }
         );
 
@@ -341,6 +402,7 @@ app.post(
 
 
       let data;
+
 
       try {
 
@@ -356,9 +418,12 @@ app.post(
       }
 
 
-      if (!response.ok) {
+      if (
+        !response.ok
+      ) {
 
         return res.status(502).json({
+
           ok: false,
 
           backend: true,
@@ -372,6 +437,7 @@ app.post(
             data.error ||
             data.message ||
             `Provider HTTP ${response.status}`
+
         });
 
       }
@@ -403,7 +469,9 @@ app.post(
           !failed,
 
         cpp: {
-          expected: '21',
+
+          expected:
+            '21',
 
           received:
             output,
@@ -416,9 +484,11 @@ app.post(
 
           stderr:
             data.stderr || null
+
         }
 
       });
+
 
     } catch (error) {
 
@@ -432,13 +502,16 @@ app.post(
 
         error:
           error?.name === 'AbortError'
+
             ? 'Provider diagnostic timed out.'
+
             : (
                 error?.message ||
                 'Provider connection failed.'
               )
 
       });
+
 
     } finally {
 
@@ -451,28 +524,92 @@ app.post(
 
 
 /* =========================================================
-   FAST PROVIDER REQUEST
+   HELPERS
 ========================================================= */
 
 function sleep(ms) {
+
   return new Promise(
     resolve =>
       setTimeout(resolve, ms)
   );
+
 }
 
 
-async function runOneCompiler(payload) {
+/*
+  Convert language values to a normal string.
+
+  Examples:
+
+  "java"
+  { id: "java" }
+  { value: "java" }
+  { language: "java" }
+
+  all become:
+
+  "java"
+*/
+function normalizeLanguage(value) {
+
+  if (
+    typeof value === 'string'
+  ) {
+
+    return value
+      .trim()
+      .toLowerCase();
+
+  }
+
+
+  if (
+    value &&
+    typeof value === 'object'
+  ) {
+
+    const candidate =
+      value.id ??
+      value.value ??
+      value.language ??
+      value.name;
+
+    if (
+      typeof candidate === 'string'
+    ) {
+
+      return candidate
+        .trim()
+        .toLowerCase();
+
+    }
+
+  }
+
+
+  return '';
+
+}
+
+
+/* =========================================================
+   FAST ONECOMPILER REQUEST
+========================================================= */
+
+async function runOneCompiler(
+  payload
+) {
 
   let lastError = null;
 
 
   /*
-    Maximum two attempts.
+    Two attempts only.
 
-    This is intentionally short.
-    We do NOT make the user wait through
-    a long percentage/progress system.
+    This keeps the request fast while
+    allowing a temporary Render/provider
+    connection failure to recover.
   */
 
   for (
@@ -486,16 +623,17 @@ async function runOneCompiler(payload) {
 
 
     /*
-      45 seconds gives Render/OneCompiler
-      enough time to wake and respond
-      without immediately producing a
-      browser "signal aborted" error.
+      45 seconds is long enough for
+      Render/OneCompiler cold start,
+      but we don't create a huge
+      artificial waiting cycle.
     */
 
     const timer =
-      setTimeout(() => {
-        controller.abort();
-      }, 45000);
+      setTimeout(
+        () => controller.abort(),
+        45000
+      );
 
 
     try {
@@ -504,9 +642,11 @@ async function runOneCompiler(payload) {
         await fetch(
           ONECOMPILER_URL,
           {
+
             method: 'POST',
 
             headers: {
+
               'Content-Type':
                 'application/json',
 
@@ -515,13 +655,17 @@ async function runOneCompiler(payload) {
 
               'X-API-Key':
                 ONECOMPILER_API_KEY
+
             },
 
             body:
-              JSON.stringify(payload),
+              JSON.stringify(
+                payload
+              ),
 
             signal:
               controller.signal
+
           }
         );
 
@@ -531,6 +675,7 @@ async function runOneCompiler(payload) {
 
 
       let data;
+
 
       try {
 
@@ -546,41 +691,50 @@ async function runOneCompiler(payload) {
       }
 
 
-      /*
-        Successful HTTP response.
-      */
+      if (
+        response.ok
+      ) {
 
-      if (response.ok) {
         return {
           response,
           data
         };
+
       }
 
 
       lastError =
         new Error(
+
           data.error ||
           data.message ||
           `Provider HTTP ${response.status}`
+
         );
 
 
       /*
-        Retry only temporary provider errors.
+        Retry server/provider errors
+        and rate-limit responses.
       */
 
       if (
+
         (
           response.status >= 500 ||
           response.status === 429
-        ) &&
+        )
+
+        &&
+
         attempt < 2
+
       ) {
 
         await sleep(250);
 
         continue;
+
       }
 
 
@@ -594,32 +748,35 @@ async function runOneCompiler(payload) {
 
 
       /*
-        Retry temporary connection errors only.
+        Retry temporary connection errors.
       */
 
+      const retryable =
+        error?.name ===
+          'AbortError' ||
+
+        error?.code ===
+          'ECONNRESET' ||
+
+        error?.code ===
+          'ETIMEDOUT' ||
+
+        error?.code ===
+          'UND_ERR_CONNECT_TIMEOUT' ||
+
+        error?.code ===
+          'UND_ERR_SOCKET';
+
+
       if (
-        attempt < 2 &&
-        (
-          error?.name ===
-            'AbortError' ||
-
-          error?.code ===
-            'ECONNRESET' ||
-
-          error?.code ===
-            'ETIMEDOUT' ||
-
-          error?.code ===
-            'UND_ERR_CONNECT_TIMEOUT' ||
-
-          error?.code ===
-            'UND_ERR_SOCKET'
-        )
+        retryable &&
+        attempt < 2
       ) {
 
         await sleep(250);
 
         continue;
+
       }
 
 
@@ -653,11 +810,30 @@ app.post(
   '/api/execute',
   async (req, res) => {
 
-    const {
+    let {
       language,
       code,
       stdin = ''
-    } = req.body || {};
+    } =
+      req.body || {};
+
+
+    /* -------------------------------------------------------
+       NORMALIZE LANGUAGE
+
+       This fixes:
+
+       Unsupported language:
+       [object Object]
+
+       when the frontend accidentally
+       sends a language object.
+    ------------------------------------------------------- */
+
+    language =
+      normalizeLanguage(
+        language
+      );
 
 
     /* -------------------------------------------------------
@@ -756,14 +932,13 @@ app.post(
 
     /* -------------------------------------------------------
        FILE NAME
-
-       Java is special:
-       class Main -> Main.java
     ------------------------------------------------------- */
 
     const fileName =
       language === 'java'
+
         ? 'Main.java'
+
         : `main.${runtime.ext}`;
 
 
@@ -779,13 +954,17 @@ app.post(
       stdin,
 
       files: [
+
         {
+
           name:
             fileName,
 
           content:
             code
+
         }
+
       ]
 
     };
@@ -795,24 +974,21 @@ app.post(
        SEND TO ONECOMPILER
     ------------------------------------------------------- */
 
-    let response;
-    let data;
+    let result;
 
 
     try {
 
-      ({
-        response,
-        data
-      } =
+      result =
         await runOneCompiler(
           payload
-        ));
+        );
 
 
     } catch (error) {
 
       const message =
+
         error?.name ===
           'AbortError'
 
@@ -828,18 +1004,27 @@ app.post(
 
         ok: false,
 
-        error: message,
+        error:
+          message,
 
-        retryable: true
+        retryable:
+          true
 
       });
 
     }
 
 
-    /* -----------------------------------------------------
+    const response =
+      result.response;
+
+    const data =
+      result.data;
+
+
+    /* -------------------------------------------------------
        BUILD OUTPUT
-    ----------------------------------------------------- */
+    ------------------------------------------------------- */
 
     const outputParts = [];
 
@@ -904,16 +1089,18 @@ app.post(
     }
 
 
-    /* -----------------------------------------------------
+    /* -------------------------------------------------------
        EXECUTION STATUS
-
-       stderr alone does NOT automatically mean failure.
-    ----------------------------------------------------- */
+    ------------------------------------------------------- */
 
     const failed =
       data.status === 'failed' ||
-      Boolean(data.exception) ||
-      Boolean(data.error);
+      Boolean(
+        data.exception
+      ) ||
+      Boolean(
+        data.error
+      );
 
 
     const output =
@@ -926,9 +1113,9 @@ app.post(
         : '(No output)';
 
 
-    /* -----------------------------------------------------
-       SEND RESULT BACK TO FRONTEND
-    ----------------------------------------------------- */
+    /* -------------------------------------------------------
+       RESPONSE
+    ------------------------------------------------------- */
 
     return res.json({
 
@@ -1025,11 +1212,9 @@ app.listen(
     );
 
     console.log(
-      `OneCompiler configured: ${
-        Boolean(
-          ONECOMPILER_API_KEY
-        )
-      }`
+      `OneCompiler configured: ${Boolean(
+        ONECOMPILER_API_KEY
+      )}`
     );
 
   }
