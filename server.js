@@ -5,6 +5,30 @@ const path = require('path');
 const app = express();
 
 const PORT = process.env.PORT || 10000;
+const ALLOWED_ORIGINS = new Set([
+  'https://tracelab-web.pages.dev',
+  'https://tracelab-free.netlify.app',
+  'https://tracelabcompiler.netlify.app'
+]);
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (origin && ALLOWED_ORIGINS.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
+  }
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
+
 
 const ONECOMPILER_URL =
   process.env.ONECOMPILER_URL ||
