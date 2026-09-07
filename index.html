@@ -6,11 +6,11 @@
 <title>TraceLab | Learn code by watching it run</title>
 <meta name="description" content="TraceLab is an interactive code playground with source-driven execution flow visualization across 16 programming languages.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://tracelab-free.netlify.app/">
+<link rel="canonical" href="https://tracelab-web.pages.dev/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="TraceLab — Interactive Code Playground">
 <meta property="og:description" content="Run, visualize, and understand code with TraceLab across 16 programming languages.">
-<meta property="og:url" content="https://tracelab-free.netlify.app/">
+<meta property="og:url" content="https://tracelab-web.pages.dev/">
 <meta property="og:site_name" content="TraceLab">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TraceLab — Interactive Code Playground">
@@ -287,18 +287,28 @@ async function remote(lang,code,label,inputValues=[]){
     // One direct execution request. No progress percentage and no staged wake-up wait.
     const t=setTimeout(()=>c.abort(),75000);
     try{
+      const normalizedLang=String(lang||'').trim().toLowerCase();
+      const sourceCode=String(code||'').replace(/\r\n/g,'\n');
+      const stdin=Array.isArray(inputValues)
+        ? inputValues.join('\n')
+        : String(inputValues||'');
+
       status(attempt===1?'● Compiling and running '+label+'…':`● Reconnecting to compiler…`);
       const r=await fetch(EXECUTE_URL,{
         method:'POST',
         headers:{'Content-Type':'application/json','Accept':'application/json'},
-        body:JSON.stringify({language,code,stdin:inputValues.join('\n')}),
+        body:JSON.stringify({
+          language:normalizedLang,
+          code:sourceCode,
+          stdin:stdin
+        }),
         signal:c.signal,
         cache:'no-store'
       });
       const d=await r.json().catch(()=>({}));
       if(r.ok){
         const raw=String(d.output??d.stdout??d.stderr??'(No output.)');
-        return {ok:Boolean(d.ok),output:cleanOutput(raw,code)};
+        return {ok:Boolean(d.ok),output:cleanOutput(raw,sourceCode)};
       }
       lastError=d.error||d.message||`HTTP ${r.status}`;
       if((r.status===429||r.status>=500)&&attempt<2){await sleep(600);continue;}
