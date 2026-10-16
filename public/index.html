@@ -6,11 +6,11 @@
 <title>TraceLab | Learn code by watching it run</title>
 <meta name="description" content="TraceLab is an interactive code playground with source-driven execution flow visualization across 16 programming languages.">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://tracelab-free.netlify.app/">
+<link rel="canonical" href="https://tracelab-web.pages.dev/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="TraceLab — Interactive Code Playground">
 <meta property="og:description" content="Run, visualize, and understand code with TraceLab across 16 programming languages.">
-<meta property="og:url" content="https://tracelab-free.netlify.app/">
+<meta property="og:url" content="https://tracelab-web.pages.dev/">
 <meta property="og:site_name" content="TraceLab">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TraceLab — Interactive Code Playground">
@@ -26,7 +26,7 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
 .workspace{margin-top:29px;display:grid;grid-template-columns:minmax(330px,.94fr) minmax(430px,1.35fr);background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 18px 50px #1a29420d}.editor{min-height:594px;border-right:1px solid var(--line);display:flex;flex-direction:column}.bar{min-height:58px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);gap:10px}.bar-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end}.file{font:12px 'DM Mono';color:#4d5870}.file i{display:inline-block;width:10px;height:10px;background:#f3c158;border-radius:3px;margin-right:8px}.lang,.speed{appearance:none;-webkit-appearance:none;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:7px 10px;font-size:11px;font-weight:800;cursor:pointer}.lang{min-width:136px}.lang option,.lang optgroup,.speed option{color:#18223b;background:#fff}.detect{border:1px solid #dce3ff;background:#f6f7ff;color:#526de5;border-radius:7px;padding:7px 9px;font-size:10px;font-weight:800}.detect:hover{background:#e9edff}
 .codearea{position:relative;flex:1;background:#fcfcfe;min-height:320px;overflow:hidden}.nums{position:absolute;left:0;top:16px;width:40px;text-align:right;color:#adb5c6;font:12px/27px 'DM Mono';user-select:none;pointer-events:none;transform:translateY(0)}textarea{width:100%;height:100%;min-height:320px;padding:16px 18px 16px 58px;border:0;outline:0;resize:none;background:transparent;color:#2b3852;font:13px/27px 'DM Mono';tab-size:2;white-space:pre;overflow:auto}
 .runbar{padding:13px 16px;display:flex;gap:10px;border-top:1px solid var(--line);align-items:center;flex-wrap:wrap}.run{background:var(--blue);color:#fff;padding:10px 16px;border-radius:8px;font-size:12px;font-weight:800;box-shadow:0 5px 13px #5277f542}.run:disabled{opacity:.6;cursor:progress}.reset,.circle{background:#f1f3f8;color:#536079;font-weight:800;border-radius:8px}.reset{padding:10px 13px;font-size:12px}.saved{margin-left:auto;font-size:11px;color:#9aa3b3;max-width:230px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.server-pill{font:700 10px 'DM Mono';color:#6b7892;white-space:nowrap}.server-pill.online{color:#25b98f}.server-pill.warning{color:#f3c158}.server-pill.offline{color:#e06d69}
-.input-panel{display:none;padding:12px 16px;border-top:1px solid var(--line);background:#fbfcff}.input-panel.show{display:block}.input-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:7px}.input-title{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#929baa;font-weight:800}.input-hint{font-size:10px;color:#9aa3b3}.program-input{width:100%;min-height:62px;max-height:150px;resize:vertical;border:1px solid #cfd7e7;border-radius:9px;padding:10px 12px;outline:none;background:#fff;color:#2b3852;font:12px/20px "DM Mono"}.program-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #5277f51c}.input-panel.required .program-input{border-color:#f3c158;box-shadow:0 0 0 3px #f3c15824}.input-message{display:none;margin-top:7px;font-size:10px;font-weight:800;color:#d49d25}.input-panel.required .input-message{display:block}.input-panel.required .input-message:before{content:"⚠ ";}@media(prefers-color-scheme:dark){.input-panel{background:#11182a;border-color:var(--line)}.program-input{background:#141c30;color:#d9e2f6;border-color:#40506f}.program-input::placeholder{color:#7e8aa3}}.console{min-height:128px;padding:14px 18px;background:#fbfcff;border-top:1px solid var(--line)}.chead{display:flex;justify-content:space-between;color:#929baa;text-transform:uppercase;letter-spacing:1px;font-size:10px;font-weight:800;margin-bottom:10px}.ok{color:#28a87f}.error-status{color:#e06d69!important}.console pre{margin:0;color:#5b6881;font:12px/21px 'DM Mono';white-space:pre-wrap;overflow:auto;max-height:240px}.preview{display:none;padding:14px 18px;border-top:1px solid var(--line);background:#fbfcff}.preview iframe{width:100%;height:220px;border:1px solid var(--line);border-radius:10px;background:#fff}#openBrowser{color:#28a87f;border-color:#bfe9d9;background:#f2fbf8}
+.input-panel{display:none;padding:12px 16px;border-top:1px solid var(--line);background:#fbfcff}.input-panel.show{display:block}.input-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:7px}.input-title{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#929baa;font-weight:800}.input-hint{font-size:10px;color:#9aa3b3}.program-input{width:100%;min-height:62px;max-height:150px;resize:vertical;border:1px solid #cfd7e7;border-radius:9px;padding:10px 12px;outline:none;background:#fff;color:#2b3852;font:12px/20px "DM Mono"}.program-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #5277f51c}.input-panel.required .program-input{border-color:#f3c158;box-shadow:0 0 0 3px #f3c15824}.input-message{display:none;margin-top:7px;font-size:10px;font-weight:800;color:#d49d25}.input-panel.required .input-message{display:block}.input-panel.required .input-message:before{content:"⚠ ";}.input-actions{display:flex;justify-content:flex-end;margin-top:8px}.send-input{background:var(--blue);color:#fff;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:800}.send-input:disabled{opacity:.5;cursor:not-allowed}.input-panel.live-input{border-top-color:var(--blue)}@media(prefers-color-scheme:dark){.input-panel{background:#11182a;border-color:var(--line)}.program-input{background:#141c30;color:#d9e2f6;border-color:#40506f}.program-input::placeholder{color:#7e8aa3}}.console{min-height:128px;padding:14px 18px;background:#fbfcff;border-top:1px solid var(--line)}.chead{display:flex;justify-content:space-between;color:#929baa;text-transform:uppercase;letter-spacing:1px;font-size:10px;font-weight:800;margin-bottom:10px}.ok{color:#28a87f}.error-status{color:#e06d69!important}.console pre{margin:0;color:#5b6881;font:12px/21px 'DM Mono';white-space:pre-wrap;overflow:auto;max-height:240px}.preview{display:none;padding:14px 18px;border-top:1px solid var(--line);background:#fbfcff}.preview iframe{width:100%;height:220px;border:1px solid var(--line);border-radius:10px;background:#fff}#openBrowser{color:#28a87f;border-color:#bfe9d9;background:#f2fbf8}
 .visual{min-width:0}.title{font-size:13px;font-weight:800}.badge{padding:5px 9px;border-radius:6px;background:var(--pale);color:#5570e9;font-size:10px;font-weight:800}.stage{height:317px;position:relative;overflow:hidden;border-bottom:1px solid var(--line);background-image:radial-gradient(#d8deea 1px,transparent 1px);background-size:19px 19px}.line{position:absolute;left:9%;right:9%;top:156px;height:2px;background:#cdd6eb}.pulse{position:absolute;left:11%;top:151px;width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 7px #5277f523;z-index:2;transition:left .45s ease}.node{position:absolute;top:125px;transform:translateX(-50%);z-index:1;width:64px;height:64px;border:2px solid #dce1ec;border-radius:18px;display:grid;place-items:center;background:#fff;transition:.35s}.node small{position:absolute;top:74px;white-space:nowrap;color:#6e7890;font-size:10px;font-weight:800}.node span{font-size:20px}.n1{left:11%}.n2{left:30%}.n3{left:50%}.n4{left:70%}.n5{left:89%}.node.active{border-color:var(--blue);background:#edf1ff;transform:translateX(-50%) translateY(-8px) scale(1.08);box-shadow:0 10px 25px #5277f538}.node.done{background:#edfff9;border-color:#8adeca}.node.done:after{content:'✓';position:absolute;right:-7px;bottom:-7px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:var(--mint);color:#fff;font-size:11px}.note{position:absolute;bottom:17px;left:25px;right:25px;text-align:center;color:#68738a;font-size:12px}.note b{color:var(--ink)}
 .timeline{padding:20px 25px}.toptime{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}.toptime strong{font-size:13px}.toptime span{color:#8792a8;font:11px 'DM Mono'}.tracks{display:flex;gap:9px}.track{height:6px;flex:1;border-radius:8px;background:#edf0f5;transition:.2s}.track.done{background:#78dfc5}.track.now{background:var(--blue);box-shadow:0 0 0 4px #5277f51c}.labels{display:flex;justify-content:space-between;margin-top:7px;color:#9ba4b4;font-size:9px;font-weight:700}.controls{margin-top:18px;display:flex;justify-content:space-between;align-items:center}.circle{width:34px;height:34px;margin-right:6px;font-size:14px}.play{padding:9px 13px;border-radius:8px;background:var(--blue);color:#fff;font-size:11px;font-weight:800}.play:hover{filter:brightness(.95)}.playing{background:var(--blue)}
 .lower{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:18px;margin-top:18px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px}.tiny{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:#9099aa;font-weight:800;margin-bottom:12px}.card p{color:#68738a;font-size:13px;line-height:1.65;margin:0}.card p strong{color:#4b60d3}.variables{display:flex;gap:10px;flex-wrap:wrap}.var,.chip{padding:8px 11px;border-radius:7px;background:#f4f6fb;color:#53617b;font:12px 'DM Mono'}.var b{color:#293650}.logic-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.focus{background:var(--pale);color:#4e69de;padding:8px 10px;border-radius:7px;font-size:11px;font-weight:800}.logic-code{margin:10px 0 0;background:#fbfcff;border-left:3px solid var(--blue);padding:8px 10px;color:#48556d;font:11px/1.55 'DM Mono';white-space:pre-wrap;max-height:110px;overflow:auto}.languages{margin-top:16px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}.chip{font-size:10px;padding:5px 8px}.hint{text-align:center;color:#929bac;font-size:12px;margin-top:20px}.hint b{color:#5570e9}
@@ -60,7 +60,7 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
     </div>
     <div class="codearea"><div class="nums" id="nums"></div><textarea id="code" spellcheck="false" aria-label="Code editor"></textarea></div>
     <div class="runbar"><button class="run" id="run">▶ Analyze & visualize</button><button class="reset" id="reset">↻ Reset</button><span class="saved" id="modeStatus">Python runs locally in your browser</span><span class="server-pill" id="serverStatus">● Checking backend…</span></div>
-    <div class="input-panel" id="inputPanel"><div class="input-head"><span class="input-title">Program input</span><span class="input-hint">One value per line</span></div><textarea class="program-input" id="programInput" spellcheck="false" placeholder="Enter input here — one value per line"></textarea><div class="input-message" id="inputMessage">Input is required. Enter the value before running the program.</div></div>
+    <div class="input-panel" id="inputPanel"><div class="input-head"><span class="input-title" id="inputTitle">Program input</span><span class="input-hint" id="inputHint">One value per line</span></div><textarea class="program-input" id="programInput" spellcheck="false" placeholder="Enter input here — one value per line"></textarea><div class="input-actions" id="inputActions" style="display:none"><button class="send-input" id="sendInput" type="button">Send input ↵</button></div><div class="input-message" id="inputMessage">Input is required. Enter the value before running the program.</div></div>
     <div class="console"><div class="chead"><span>Output</span><span class="ok" id="status">● Ready</span></div><pre id="output">Analyze your code to see its execution flow.</pre></div>
     <div class="preview" id="previewWrap"><div class="chead"><span>Live preview</span><span style="color:#8792a8">Rendered in a sandboxed frame</span></div><iframe id="previewFrame" title="Live preview" sandbox="allow-scripts"></iframe></div>
   </div>
@@ -89,6 +89,8 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
 <section class="capabilities" id="capabilities"><div class="section-head"><h2>What actually runs</h2><p>Browser languages execute locally; hosted languages use the TraceLab backend.</p></div><div class="cap-grid"><div class="cap-card"><span class="badge">Live</span><h3>Python</h3><p>Runs in the browser with Pyodide.</p></div><div class="cap-card"><span class="badge">Live</span><h3>JavaScript</h3><p>Runs in a sandboxed browser frame.</p></div><div class="cap-card"><span class="badge">Live</span><h3>HTML &amp; CSS</h3><p>Rendered in the live preview.</p></div><div class="cap-card"><span class="badge">Hosted</span><h3>12 runtimes</h3><p>TypeScript, C, C++, Java, Go, Kotlin, Swift, Ruby, PHP, Perl, Bash and SQL use the TraceLab backend.</p></div></div></section>
 <section class="faq" id="faq"><div class="section-head"><h2>Frequently asked</h2></div><div class="faq-grid"><div class="faq-item"><h3>Does the flow use a fixed five-step algorithm?</h3><p>No. The number and meaning of timeline steps change with the source code.</p></div><div class="faq-item"><h3>Will every possible algorithm be understood perfectly?</h3><p>Not yet. The frontend provides a broad source-driven trace and recognizes common DSA patterns; exact runtime tracing for every language requires backend instrumentation.</p></div><div class="faq-item"><h3>Where does hosted code run?</h3><p>Hosted languages are sent to the TraceLab execution backend when you press Run.</p></div><div class="faq-item"><h3>Can I keep updating the public site?</h3><p>Yes. Replace and redeploy the HTML whenever you fix bugs or add features.</p></div></div></section>
 <footer class="site-footer"><div class="foot-top"><div class="brand"><div class="mark">&gt;_</div>TraceLab</div><nav class="foot-links"><a href="#playground">Playground</a><a href="#how-it-works">How it works</a><a href="#capabilities">What runs live</a><a href="#faq">FAQ</a></nav></div><p class="foot-note">TraceLab traces source structure across 16 languages. © <span id="year"></span> · Built for people learning to read code.</p></footer>
+<script src="https://api.jdoodle.com/js/sockjs.js"></script>
+<script src="https://api.jdoodle.com/js/webstomp.js"></script>
 <script>
 const TRACE_BACKEND=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?location.origin:'https://tracelab-free.onrender.com';
 const EXECUTE_URL=TRACE_BACKEND+'/api/execute';
@@ -98,6 +100,9 @@ const nodes=[...document.querySelectorAll('.node')];
 let steps=[];let step=0;let timer=null;let currentKind='generic';
 const EXT={python:'py',javascript:'js',typescript:'ts',c:'c',cpp:'cpp',java:'java',go:'go',kotlin:'kt',swift:'swift',ruby:'rb',php:'php',perl:'pl',bash:'sh',sql:'sql'};
 const LABELS={html:'HTML',css:'CSS',python:'Python',javascript:'JavaScript',typescript:'TypeScript',c:'C',cpp:'C++',java:'Java',go:'Go',kotlin:'Kotlin',swift:'Swift',ruby:'Ruby',php:'PHP',perl:'Perl',bash:'Bash',sql:'SQL'};
+// JDoodle WebSocket compiler versions. Client secrets never belong in this page.
+const JDOODLE_RUNTIMES={typescript:{language:'typescript',versionIndex:1},c:{language:'c',versionIndex:7},cpp:{language:'cpp',versionIndex:7},java:{language:'java',versionIndex:6},go:{language:'go',versionIndex:6},kotlin:{language:'kotlin',versionIndex:5},swift:{language:'swift',versionIndex:6},ruby:{language:'ruby',versionIndex:6},php:{language:'php',versionIndex:6},perl:{language:'perl',versionIndex:6},bash:{language:'bash',versionIndex:6},sql:{language:'sql',versionIndex:6}};
+let liveCompilerClient=null,liveCompilerToken='',liveCompilerResolve=null,liveCompilerOutput='',liveCompilerFinished=false,liveCompilerCancel=null;
 const codes={
 html:['index.html',['<!doctype html>','<html>','<head>','<title>TraceLab</title>','</head>','<body>','<h1>Hello, TraceLab!</h1>','<p>Edit this HTML and run it.</p>','</body>','</html>']],
 css:['style.css',['body {','  font-family: sans-serif;','  background: #f4f6fb;','}','h1 { color: #5277f5; }']],
@@ -273,7 +278,7 @@ async function warmBackendInBackground(){
   const state=await fetchBackendHealth(7000);
   const el=$('#serverStatus');
   if(state.ok){
-    el.textContent=state.data.executorConfigured?'● Backend online · compiler ready':'● Backend online · API key needed';
+    el.textContent=state.data.executorConfigured?'● Backend online · interactive compiler ready':'● Backend online · compiler credentials needed';
     el.className=state.data.executorConfigured?'server-pill online':'server-pill warning';
   }else{
     el.textContent='● Backend sleeping · will connect on Run';
@@ -312,6 +317,129 @@ async function remote(lang,code,label,inputValues=[]){
   }
   return {ok:false,output:`✕ TraceLab could not connect to the compiler.\n\n${lastError}\n\nPlease try Analyze & visualize once more.`};
 }
+function resetLiveInputUI(){
+  if(liveCompilerCancel){const cancel=liveCompilerCancel;liveCompilerCancel=null;try{cancel();}catch(_){}}
+  else if(liveCompilerClient){try{liveCompilerClient.disconnect(()=>{});}catch(_){}}
+  liveCompilerClient=null;
+  liveCompilerToken='';liveCompilerOutput='';liveCompilerFinished=false;
+  $('#inputPanel').classList.remove('live-input','required');
+  $('#inputActions').style.display='none';
+  $('#inputTitle').textContent='Program input';
+  $('#inputHint').textContent='One value per line';
+  $('#programInput').placeholder='Enter input here — one value per line';
+  $('#programInput').value='';
+  $('#programInput').disabled=false;
+  $('#sendInput').disabled=false;
+}
+function inferLivePrompt(output){
+  const lines=String(output||'').replace(/\r/g,'').split('\n');
+  let candidate=(lines[lines.length-1]||'').trim();
+  if(!candidate && lines.length>1) candidate=(lines[lines.length-2]||'').trim();
+  if(!candidate) return '';
+  // Prompts are often printed without a newline (e.g. System.out.print("Enter choice: ")).
+  if(/[?:]$/.test(candidate) || /\b(enter|input|type|provide|choice|name|number|value|account|details|select)\b/i.test(candidate)){
+    return candidate.length>100 ? candidate.slice(-100) : candidate;
+  }
+  return '';
+}
+function setLivePromptFromOutput(){
+  const prompt=inferLivePrompt(liveCompilerOutput);
+  $('#inputTitle').textContent=prompt ? `Program asks: ${prompt}` : 'Program input';
+  $('#programInput').placeholder=prompt || 'Type your answer here, then press Send input';
+}
+function appendLiveOutput(chunk){
+  if(chunk===undefined||chunk===null) return;
+  const piece=String(chunk);
+  liveCompilerOutput+=piece;
+  $('#output').textContent=liveCompilerOutput || 'Program started. Waiting for output…';
+  setLivePromptFromOutput();
+}
+async function sendLiveCompilerInput(){
+  const value=$('#programInput').value;
+  if(!liveCompilerClient || !liveCompilerToken || liveCompilerFinished) return;
+  try{
+    // JDoodle expects raw text plus a newline in an input-type STOMP message.
+    liveCompilerClient.send('/app/execute-ws-api-token',value+'\n',{message_type:'input',token:liveCompilerToken});
+    appendLiveOutput(value+'\n');
+    $('#programInput').value='';
+    $('#inputHint').textContent='Input sent — waiting for the next prompt';
+    status('● Input sent — program continuing');
+    $('#programInput').focus();
+  }catch(error){
+    appendLiveOutput(`\n✕ Could not send input: ${error?.message||error}\n`);
+  }
+}
+function disconnectLiveCompiler(){
+  const client=liveCompilerClient;liveCompilerClient=null;
+  if(client){try{client.disconnect(()=>{});}catch(_){}}
+}
+async function runInteractiveRemote(lang,code,label){
+  const runtime=JDOODLE_RUNTIMES[lang];
+  if(!runtime) return {ok:false,output:`✕ ${label} is not configured for interactive execution.`};
+  if(typeof SockJS==='undefined'||typeof webstomp==='undefined'){
+    return {ok:false,output:'✕ The interactive compiler connection library could not load. Refresh the page and try again.'};
+  }
+  resetLiveInputUI();
+  $('#inputPanel').classList.add('show','live-input');
+  $('#inputActions').style.display='flex';
+  $('#inputTitle').textContent='Starting interactive program…';
+  $('#inputHint').textContent='When the program asks, type your answer and press Send input';
+  $('#programInput').placeholder='Waiting for the program to start…';
+  $('#programInput').disabled=false;
+  $('#sendInput').disabled=false;
+  $('#output').textContent='Connecting to the interactive compiler…';
+  const tokenResponse=await fetch(TRACE_BACKEND+'/api/interactive/token',{method:'POST',headers:{Accept:'application/json'},cache:'no-store'});
+  const tokenData=await tokenResponse.json().catch(()=>({}));
+  if(!tokenResponse.ok||!tokenData.token){
+    const detail=tokenData.error||`HTTP ${tokenResponse.status}`;
+    return {ok:false,output:`✕ Could not start the interactive compiler.\n\n${detail}\n\nThe backend administrator must configure JDoodle client ID and client secret in Render.`};
+  }
+  liveCompilerToken=String(tokenData.token);
+  liveCompilerOutput='';liveCompilerFinished=false;
+  return new Promise((resolve)=>{
+    liveCompilerResolve=resolve;
+    let settled=false;
+    const finish=(ok,extra='')=>{
+      if(settled)return;settled=true;liveCompilerFinished=true;
+      if(extra) appendLiveOutput((liveCompilerOutput&&!liveCompilerOutput.endsWith('\n')?'\n':'')+extra+'\n');
+      $('#programInput').disabled=true;$('#sendInput').disabled=true;
+      $('#inputTitle').textContent=ok?'Program finished':'Program stopped with an error';
+      $('#inputHint').textContent='Run the program again to start a new session';
+      disconnectLiveCompiler();liveCompilerToken='';liveCompilerResolve=null;liveCompilerCancel=null;
+      resolve({ok,output:liveCompilerOutput||'(The program finished without output.)'});
+    };
+    const client=webstomp.over(new SockJS('https://api.jdoodle.com/v1/stomp'),{heartbeat:false});
+    liveCompilerClient=client;
+    const timeout=setTimeout(()=>finish(false,'✕ Interactive session timed out. Please run it again.'),180000);
+    const wrappedFinish=(ok,extra='')=>{clearTimeout(timeout);finish(ok,extra)};
+    liveCompilerCancel=()=>wrappedFinish(false,'Interactive session stopped.');
+    try{
+      client.connect({},()=>{
+        client.subscribe('/user/queue/execute-i',(message)=>{
+          const responseStatus=Number(message.headers?.statusCode||0);
+          const body=String(message.body||'');
+          if(responseStatus===201){status(`● ${label} running — waiting for program output`);return;}
+          if(responseStatus===204){
+            // Allow any final stdout chunk to arrive before closing the UI session.
+            setTimeout(()=>wrappedFinish(true),120);return;
+          }
+          if(responseStatus===410){wrappedFinish(true);return;}
+          if([400,401,429,500].includes(responseStatus)){
+            wrappedFinish(false,body||`Compiler service returned status ${responseStatus}.`);return;
+          }
+          if(body) appendLiveOutput(body);
+          status('● Program running — answer prompts in Program input');
+        });
+        client.send('/app/execute-ws-api-token',JSON.stringify({script:code,language:runtime.language,versionIndex:runtime.versionIndex}),{message_type:'execute',token:liveCompilerToken});
+        $('#inputTitle').textContent='Program input';
+        $('#programInput').placeholder='Type your answer here, then press Send input';
+        $('#programInput').focus();
+        status(`● Starting ${label} interactively…`);
+      },(error)=>wrappedFinish(false,error?.body||'Could not establish the interactive compiler connection.'));
+    }catch(error){wrappedFinish(false,error?.message||'Interactive compiler connection failed.');}
+  });
+}
+
 async function runProgram(){
   stop();step=0;
   const lang=$('#language').value,code=$('#code').value,label=LABELS[lang];
@@ -319,7 +447,8 @@ async function runProgram(){
   const mis=mismatch(lang,code);
   if(mis){status('● Language mismatch',true);$('#output').textContent=`⚠ Language mismatch\n\nSelected language: ${label}\nCode appears to be: ${mis}\n\nSelect ${mis} or change the code.`;return}
   steps=buildTrace(code);setFlow(currentKind);render();explainLogic();
-  const inputState=prepareProgramInput(lang,code);
+  const hostedInteractive=Object.prototype.hasOwnProperty.call(JDOODLE_RUNTIMES,lang);
+  const inputState=hostedInteractive?{ok:true,values:[],count:inputCount(lang,code)}:prepareProgramInput(lang,code);
   if(!inputState.ok)return;
   $('#inputPanel').classList.remove('required');$('#run').disabled=true;
   try{
@@ -333,6 +462,10 @@ async function runProgram(){
       const bad=logs.some(x=>x.startsWith('✕'));status(bad?'● Python execution failed':'● Executed live in your browser',bad);
     }else if(lang==='html'||lang==='css'){
       renderPreview(lang,code);$('#output').textContent='Rendered in the live preview.';status('● Preview ready');
+    }else if(hostedInteractive){
+      hidePreview();
+      const r=await runInteractiveRemote(lang,code,label);
+      $('#output').textContent=r.output;status(r.ok?'● Executed live':'● Execution failed',!r.ok);
     }else{
       hidePreview();status('● Connecting to TraceLab backend…');
       const r=await remote(lang,code,label,inputState.values);$('#output').textContent=r.output;status(r.ok?'● Executed live':'● Execution failed',!r.ok);
@@ -381,7 +514,7 @@ async function health(){
   el.className='server-pill warning';
 }
 function openBrowser(){const blob=new Blob([buildDoc($('#language').value,$('#code').value)],{type:'text/html'});window.open(URL.createObjectURL(blob),'_blank')}
-$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();
+$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';resetLiveInputUI();$('#inputPanel').classList.remove('live-input');resetLiveInputUI();$('#inputPanel').classList.remove('live-input');$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#sendInput').addEventListener('click',sendLiveCompilerInput);$('#programInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&liveCompilerClient&&!liveCompilerFinished){e.preventDefault();sendLiveCompilerInput()}});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();
 loadSample();
 steps=buildTrace($('#code').value);
 setFlow(currentKind);
