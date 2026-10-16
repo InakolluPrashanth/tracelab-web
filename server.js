@@ -5,6 +5,8 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 10000;
 const WANDBOX_API_URL = (process.env.WANDBOX_API_URL || 'https://wandbox.org/api').replace(/\/+$/, '');
+const JDOODLE_CLIENT_ID = process.env.JDOODLE_CLIENT_ID || '';
+const JDOODLE_CLIENT_SECRET = process.env.JDOODLE_CLIENT_SECRET || '';
 
 const FRONTEND_ORIGINS = new Set(
   (
@@ -352,8 +354,8 @@ function health() {
   return {
     ok: true,
     service: 'TraceLab code execution backend',
-    provider: 'Wandbox public API',
-    executorConfigured: true
+    provider: JDOODLE_CLIENT_ID && JDOODLE_CLIENT_SECRET ? 'JDoodle interactive API (Wandbox legacy batch route)' : 'Wandbox public API; JDoodle interactive credentials missing',
+    executorConfigured: Boolean(JDOODLE_CLIENT_ID && JDOODLE_CLIENT_SECRET)
   };
 }
 
@@ -362,6 +364,56 @@ app.get('/api/health', (_req, res) => {
     ...health(),
     timestamp: new Date().toISOString()
   });
+});
+
+/* Keep token requests conservative because each token has a credit cost. */
+app.use('/api/interactive/token', rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { ok: false, error: 'Too many interactive sessions started. Please wait a minute before trying again.' }
+}));
+
+/* JDoodle interactive-session token. Keep the client secret on Render only. */
+app.post('/api/interactive/token', async (_req, res) => {
+  if (!JDOODLE_CLIENT_ID || !JDOODLE_CLIENT_SECRET) {
+    return res.status(503).json({
+      ok: false,
+      error: 'JDoodle interactive execution is not configured yet. Add JDOODLE_CLIENT_ID and JDOODLE_CLIENT_SECRET to the Render environment variables.'
+    });
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch('https://api.jdoodle.com/v1/auth-token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'text/plain' },
+      body: JSON.stringify({
+        clientId: JDOODLE_CLIENT_ID,
+        clientSecret: JDOODLE_CLIENT_SECRET
+      }),
+      signal: controller.signal
+    });
+    const token = (await response.text()).trim();
+    if (!response.ok || !token || token.startsWith('{')) {
+      return res.status(response.status >= 400 ? response.status : 502).json({
+        ok: false,
+        error: token || `JDoodle token request failed (HTTP ${response.status}).`
+      });
+    }
+    return res.json({ ok: true, token, expiresInSeconds: 180 });
+  } catch (error) {
+    return res.status(error.name === 'AbortError' ? 504 : 502).json({
+      ok: false,
+      error: error.name === 'AbortError'
+        ? 'JDoodle token request timed out. Please retry.'
+        : 'Could not contact JDoodle to start an interactive session.'
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
 });
 
 /* RUNTIMES */
@@ -562,5 +614,5 @@ app.use((req, res) => {
 /* START SERVER */
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`TraceLab backend listening on ${PORT}`);
-  console.log('Execution provider: Wandbox public API');
+  console.log(JDOODLE_CLIENT_ID && JDOODLE_CLIENT_SECRET ? 'Interactive provider: JDoodle WebSocket API; legacy batch route: Wandbox' : 'Execution provider: Wandbox public API (JDoodle interactive credentials not configured)');
 });
