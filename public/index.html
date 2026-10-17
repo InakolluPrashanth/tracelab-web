@@ -33,91 +33,6 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
 .steps,.capabilities,.faq{max-width:1440px;margin:auto;padding:64px clamp(20px,6vw,88px)}.section-head{max-width:520px;margin:0 auto 30px;text-align:center}.section-head h2{font-size:clamp(22px,2.4vw,28px);letter-spacing:-1px;margin:0 0 8px}.section-head p{color:var(--muted);font-size:14px;margin:0}.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.step .num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--pale);color:#4e69de;font:700 13px 'DM Mono';margin-bottom:14px}.step h3{margin:0 0 8px;font-size:15px}.step p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.cap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.cap-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.cap-card h3{margin:12px 0 8px;font-size:15px}.cap-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px 40px}.faq-item h3{margin:0 0 6px;font-size:14px}.faq-item p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}.site-footer{border-top:1px solid var(--line);padding:32px clamp(20px,6vw,88px) 40px;max-width:1440px;margin:auto}.foot-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}.foot-links{display:flex;gap:22px;font-size:12px;font-weight:700;color:#737d90}.foot-links a{color:inherit;text-decoration:none}.foot-note{margin:18px 0 0;color:#9099aa;font-size:12px}
 @media(max-width:1050px){.lower{grid-template-columns:1fr 1fr}.logic{grid-column:span 2}.cap-grid{grid-template-columns:1fr 1fr}}@media(max-width:860px){.nav{position:absolute;top:72px;left:0;right:0;background:#fff;flex-direction:column;align-items:flex-start;gap:0;border-bottom:1px solid var(--line);max-height:0;overflow:hidden;transition:max-height .25s ease}.nav.open{max-height:260px}.nav a{padding:14px clamp(22px,6vw,88px);width:100%}.menu-btn{display:block}.cta{display:none}.workspace{grid-template-columns:1fr}.editor{border-right:0;border-bottom:1px solid var(--line);min-height:450px}.lower{grid-template-columns:1fr}.logic{grid-column:auto}.step-grid,.cap-grid{grid-template-columns:1fr}.faq-grid{grid-template-columns:1fr}}@media(max-width:700px){.server-pill{display:none}.lang{min-width:115px}.runbar{flex-wrap:wrap}.saved{margin-left:0;width:100%}}@media(max-width:480px){main{padding-top:28px}.node{width:48px;height:48px;border-radius:15px;top:115px}.node small{top:57px;font-size:9px;white-space:normal;width:60px;text-align:center}.node span{font-size:16px}.line{top:139px}.pulse{top:134px}.stage{height:275px}.bar{padding:10px 12px;min-height:58px}.bar-actions{gap:5px}.detect{font-size:9px;padding:5px}}
 @media(prefers-color-scheme:dark){:root{--ink:#edf2ff;--muted:#aeb8cc;--line:#2a3550;--blue:#86a0ff;--mint:#56dbb8;--bg:#0e1423;--pale:#202b4d}.top,.workspace,.card,.node,.step,.cap-card{background:#141c30;border-color:var(--line)}body{background:var(--bg);color:var(--ink)}.nav{color:#a9b4ca}.nav.open{background:#141c30}.brand{color:#f4f6ff}.bar,.console,.preview{background:#141c30;border-color:var(--line)}.file{color:#b7c2d8}.lang,.speed{background:#141c30;color:#edf2ff;border-color:#40506f}.lang option,.lang optgroup,.speed option{color:#edf2ff;background:#141c30}.codearea{background:#11182a}.nums{color:#66728c}textarea{color:#d9e2f6}.reset,.circle{background:#28334c;color:#c7d1e6}.console{background:#11182a}.console pre{color:#bdc9df}.stage{background-color:#10182a;background-image:radial-gradient(#34415a 1px,transparent 1px);border-color:var(--line)}.line{background:#3a4764}.node{border-color:#40506f}.node.active{background:#26345e;border-color:var(--blue)}.node.done{background:#173b37;border-color:#4d9f91}.note{color:#b3bed3}.note b{color:var(--ink)}.toptime span,.labels{color:#96a3bd}.track{background:#29344b}.card p{color:#bac5d9}.var,.chip{background:#222d45;color:#c1cbe1}.logic-code{background:#101827;color:#cbd5e8}.focus,.detect,.badge{background:#222e53;border-color:#40558f;color:#aebdff}.languages .tiny,.hint{color:#9daac3}.step .num{background:#202b4d;color:#aebdff}.step p,.cap-card p,.section-head p,.foot-note,.faq-item p{color:#aeb8cc}.site-footer{border-color:var(--line)}.foot-links{color:#a9b4ca}.cta{background:#eef2ff;color:#18223b}.menu-btn{color:#edf2ff}}
-
-/* TraceLab dark theme: readable text colours, matching the supplied screenshot */
-:root {
-  color-scheme: dark;
-  --ink: #edf2ff;
-  --muted: #aeb8cc;
-  --line: #2a3550;
-  --blue: #86a0ff;
-  --mint: #56dbb8;
-  --bg: #0e1423;
-  --pale: #202b4d;
-}
-body {
-  background: #0e1423;
-  color: #edf2ff;
-}
-.top, .workspace, .card, .step, .cap-card {
-  background: #141c30;
-  border-color: #2a3550;
-}
-.brand, h1, .title, .toptime strong, .step h3, .cap-card h3, .faq-item h3 {
-  color: #edf2ff;
-}
-.nav, .foot-links, .sub, .card p, .step p, .cap-card p, .faq-item p, .foot-note {
-  color: #aeb8cc;
-}
-.eyebrow {
-  color: #86a0ff;
-}
-.codearea {
-  background: #11182a;
-}
-.codearea textarea {
-  color: #d9e2f6;
-}
-.nums, .file, .console pre, .logic-code {
-  color: #bdc9df;
-}
-.bar, .console, .preview, .input-panel {
-  background: #141c30;
-  border-color: #2a3550;
-}
-.program-input {
-  height: auto;
-  background: #141c30;
-  color: #d9e2f6;
-  border-color: #40506f;
-}
-.program-input::placeholder {
-  color: #7e8aa3;
-}
-.lang, .speed {
-  background: #141c30;
-  color: #edf2ff;
-  border-color: #40506f;
-}
-.lang option, .lang optgroup, .speed option {
-  color: #edf2ff;
-  background: #141c30;
-}
-.node {
-  background: #141c30;
-  border-color: #40506f;
-}
-.node.active {
-  background: #26345e;
-  border-color: #86a0ff;
-}
-.node.done {
-  background: #173b37;
-  border-color: #4d9f91;
-}
-.detect, .focus, .badge {
-  background: #222e53;
-  border-color: #40558f;
-  color: #aebdff;
-}
-.reset, .circle {
-  background: #28334c;
-  color: #c7d1e6;
-}
-.console pre, .logic-code, .var, .chip {
-  color: #cbd5e8;
-}
-
 </style>
 </head>
 <body>
@@ -174,8 +89,6 @@ body {
 <section class="capabilities" id="capabilities"><div class="section-head"><h2>What actually runs</h2><p>Browser languages execute locally; hosted languages use the TraceLab backend.</p></div><div class="cap-grid"><div class="cap-card"><span class="badge">Live</span><h3>Python</h3><p>Runs in the browser with Pyodide.</p></div><div class="cap-card"><span class="badge">Live</span><h3>JavaScript</h3><p>Runs in a sandboxed browser frame.</p></div><div class="cap-card"><span class="badge">Live</span><h3>HTML &amp; CSS</h3><p>Rendered in the live preview.</p></div><div class="cap-card"><span class="badge">Hosted</span><h3>12 runtimes</h3><p>TypeScript, C, C++, Java, Go, Kotlin, Swift, Ruby, PHP, Perl, Bash and SQL use the TraceLab backend.</p></div></div></section>
 <section class="faq" id="faq"><div class="section-head"><h2>Frequently asked</h2></div><div class="faq-grid"><div class="faq-item"><h3>Does the flow use a fixed five-step algorithm?</h3><p>No. The number and meaning of timeline steps change with the source code.</p></div><div class="faq-item"><h3>Will every possible algorithm be understood perfectly?</h3><p>Not yet. The frontend provides a broad source-driven trace and recognizes common DSA patterns; exact runtime tracing for every language requires backend instrumentation.</p></div><div class="faq-item"><h3>Where does hosted code run?</h3><p>Hosted languages are sent to the TraceLab execution backend when you press Run.</p></div><div class="faq-item"><h3>Can I keep updating the public site?</h3><p>Yes. Replace and redeploy the HTML whenever you fix bugs or add features.</p></div></div></section>
 <footer class="site-footer"><div class="foot-top"><div class="brand"><div class="mark">&gt;_</div>TraceLab</div><nav class="foot-links"><a href="#playground">Playground</a><a href="#how-it-works">How it works</a><a href="#capabilities">What runs live</a><a href="#faq">FAQ</a></nav></div><p class="foot-note">TraceLab traces source structure across 16 languages. © <span id="year"></span> · Built for people learning to read code.</p></footer>
-<script src="https://api.jdoodle.com/js/sockjs.js"></script>
-<script src="https://api.jdoodle.com/js/webstomp.js"></script>
 <script>
 const TRACE_BACKEND=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?location.origin:'https://tracelab-free.onrender.com';
 const EXECUTE_URL=TRACE_BACKEND+'/api/execute';
@@ -185,10 +98,8 @@ const nodes=[...document.querySelectorAll('.node')];
 let steps=[];let step=0;let timer=null;let currentKind='generic';
 const EXT={python:'py',javascript:'js',typescript:'ts',c:'c',cpp:'cpp',java:'java',go:'go',kotlin:'kt',swift:'swift',ruby:'rb',php:'php',perl:'pl',bash:'sh',sql:'sql'};
 const LABELS={html:'HTML',css:'CSS',python:'Python',javascript:'JavaScript',typescript:'TypeScript',c:'C',cpp:'C++',java:'Java',go:'Go',kotlin:'Kotlin',swift:'Swift',ruby:'Ruby',php:'PHP',perl:'Perl',bash:'Bash',sql:'SQL'};
-// JDoodle WebSocket compiler versions. Client secrets never belong in this page.
-const JDOODLE_RUNTIMES={typescript:{language:'typescript',versionIndex:1},c:{language:'c',versionIndex:7},cpp:{language:'cpp',versionIndex:7},java:{language:'java',versionIndex:6},go:{language:'go',versionIndex:6},kotlin:{language:'kotlin',versionIndex:5},swift:{language:'swift',versionIndex:6},ruby:{language:'ruby',versionIndex:6},php:{language:'php',versionIndex:6},perl:{language:'perl',versionIndex:6},bash:{language:'bash',versionIndex:6},sql:{language:'sql',versionIndex:6}};
-let liveCompilerClient=null,liveCompilerToken='',liveCompilerResolve=null,liveCompilerOutput='',liveCompilerFinished=false,liveCompilerCancel=null;
-let jdoodleTokenCache='',jdoodleTokenCacheExpiresAt=0;
+// Languages compiled on the hosted Wandbox backend. Input is supplied before execution.
+const WANDBOX_RUNTIMES={typescript:true,c:true,cpp:true,java:true,go:true,kotlin:true,swift:true,ruby:true,php:true,perl:true,bash:true,sql:true};
 const codes={
 html:['index.html',['<!doctype html>','<html>','<head>','<title>TraceLab</title>','</head>','<body>','<h1>Hello, TraceLab!</h1>','<p>Edit this HTML and run it.</p>','</body>','</html>']],
 css:['style.css',['body {','  font-family: sans-serif;','  background: #f4f6fb;','}','h1 { color: #5277f5; }']],
@@ -197,7 +108,7 @@ javascript:['main.js',['const numbers = [5, 3, 8, 4, 2];','let total = 0;','for 
 typescript:['main.ts',['const numbers: number[] = [5, 3, 8, 4, 2];','let total = 0;','for (const number of numbers) {','  total += number;','}','console.log(total);']],
 c:['main.c',['#include <stdio.h>','int main(void) {','  int numbers[] = {5,3,8,4,2};','  int total = 0;','  for (int i=0; i<5; i++) total += numbers[i];','  printf("%d\\n", total);','  return 0;','}']],
 cpp:['main.cpp',['#include <iostream>','using namespace std;','int main() {','  int numbers[] = {5,3,8,4,2};','  int total = 0;','  for (int number : numbers) total += number;','  cout << total << endl;','  return 0;','}']],
-java:['Main.java',['public class Main {','  public static void main(String[] args) {','    int[] numbers = {5,3,8,4,2};','    int total = 0;','    for (int number : numbers) total += number;','    System.out.println(total);','  }','}']],
+java:['Main.java',['class Main {','  public static void main(String[] args) {','    int[] numbers = {5,3,8,4,2};','    int total = 0;','    for (int number : numbers) total += number;','    System.out.println(total);','  }','}']],
 go:['main.go',['package main','import "fmt"','func main() {','  numbers := []int{5,3,8,4,2}','  total := 0','  for _, number := range numbers {','    total += number','  }','  fmt.Println(total)','}']],
 kotlin:['Main.kt',['fun main() {','  val numbers = intArrayOf(5,3,8,4,2)','  var total = 0','  for (number in numbers) total += number','  println(total)','}']],
 swift:['main.swift',['let numbers = [5,3,8,4,2]','var total = 0','for number in numbers {','  total += number','}','print(total)']],
@@ -364,7 +275,7 @@ async function warmBackendInBackground(){
   const state=await fetchBackendHealth(7000);
   const el=$('#serverStatus');
   if(state.ok){
-    el.textContent=state.data.executorConfigured?'● Backend online · interactive compiler ready':'● Backend online · compiler credentials needed';
+    el.textContent=state.data.executorConfigured?'● Backend online · Wandbox ready':'● Backend online · compiler ready';
     el.className=state.data.executorConfigured?'server-pill online':'server-pill warning';
   }else{
     el.textContent='● Backend sleeping · will connect on Run';
@@ -404,155 +315,14 @@ async function remote(lang,code,label,inputValues=[]){
   return {ok:false,output:`✕ TraceLab could not connect to the compiler.\n\n${lastError}\n\nPlease try Analyze & visualize once more.`};
 }
 function resetLiveInputUI(){
-  if(liveCompilerCancel){const cancel=liveCompilerCancel;liveCompilerCancel=null;try{cancel();}catch(_){}}
-  else if(liveCompilerClient){try{liveCompilerClient.disconnect(()=>{});}catch(_){}}
-  liveCompilerClient=null;
-  liveCompilerToken='';liveCompilerOutput='';liveCompilerFinished=false;
   $('#inputPanel').classList.remove('live-input','required');
   $('#inputActions').style.display='none';
   $('#inputTitle').textContent='Program input';
-  $('#inputHint').textContent='One value per line';
+  $('#inputHint').textContent='Enter all input before running · one value per line';
   $('#programInput').placeholder='Enter input here — one value per line';
-  $('#programInput').value='';
   $('#programInput').disabled=false;
-  $('#sendInput').disabled=false;
+  $('#sendInput').disabled=true;
 }
-function inferLivePrompt(output){
-  const lines=String(output||'').replace(/\r/g,'').split('\n');
-  let candidate=(lines[lines.length-1]||'').trim();
-  if(!candidate && lines.length>1) candidate=(lines[lines.length-2]||'').trim();
-  if(!candidate) return '';
-  // Prompts are often printed without a newline (e.g. System.out.print("Enter choice: ")).
-  if(/[?:]$/.test(candidate) || /\b(enter|input|type|provide|choice|name|number|value|account|details|select)\b/i.test(candidate)){
-    return candidate.length>100 ? candidate.slice(-100) : candidate;
-  }
-  return '';
-}
-function setLivePromptFromOutput(){
-  const prompt=inferLivePrompt(liveCompilerOutput);
-  $('#inputTitle').textContent=prompt ? `Program asks: ${prompt}` : 'Program input';
-  $('#programInput').placeholder=prompt || 'Type your answer here, then press Send input';
-}
-function appendLiveOutput(chunk){
-  if(chunk===undefined||chunk===null) return;
-  const piece=String(chunk);
-  liveCompilerOutput+=piece;
-  $('#output').textContent=liveCompilerOutput || 'Program started. Waiting for output…';
-  setLivePromptFromOutput();
-}
-async function sendLiveCompilerInput(){
-  const value=$('#programInput').value;
-  if(!liveCompilerClient || !liveCompilerToken || liveCompilerFinished) return;
-  try{
-    // JDoodle expects raw text plus a newline in an input-type STOMP message.
-    liveCompilerClient.send('/app/execute-ws-api-token',value+'\n',{message_type:'input',token:liveCompilerToken});
-    appendLiveOutput(value+'\n');
-    $('#programInput').value='';
-    $('#inputHint').textContent='Input sent — waiting for the next prompt';
-    status('● Input sent — program continuing');
-    $('#programInput').focus();
-  }catch(error){
-    appendLiveOutput(`\n✕ Could not send input: ${error?.message||error}\n`);
-  }
-}
-function disconnectLiveCompiler(){
-  const client=liveCompilerClient;liveCompilerClient=null;
-  if(client){try{client.disconnect(()=>{});}catch(_){}}
-}
-async function getJdoodleToken(){
-  if(jdoodleTokenCache && Date.now()<jdoodleTokenCacheExpiresAt-10000) return jdoodleTokenCache;
-  const controller=new AbortController();
-  const timeout=setTimeout(()=>controller.abort(),12000);
-  try{
-    const response=await fetch(TRACE_BACKEND+'/api/interactive/token',{
-      method:'POST',headers:{Accept:'application/json'},cache:'no-store',signal:controller.signal
-    });
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok||!data.token) throw new Error(data.error||`Token request failed (HTTP ${response.status}).`);
-    jdoodleTokenCache=String(data.token);
-    const seconds=Math.max(30,Math.min(Number(data.expiresInSeconds)||180,180));
-    jdoodleTokenCacheExpiresAt=Date.now()+seconds*1000;
-    return jdoodleTokenCache;
-  }catch(error){
-    if(error?.name==='AbortError') throw new Error('JDoodle token request timed out. Please retry.');
-    throw error;
-  }finally{clearTimeout(timeout)}
-}
-function ensurePublicJavaClass(source){
-  const code=String(source||'');
-  // JDoodle's interactive Java runner expects a public class declaration.
-  if(/^\s*public\s+(?:(?:abstract|final|strictfp)[ \t]+)*class[ \t]+[A-Za-z_$][\w$]*/m.test(code)) return code;
-  const classPattern=/^([ \t]*)((?:(?:abstract|final|strictfp)[ \t]+)*)(class[ \t]+[A-Za-z_$][\w$]*)/m;
-  if(!classPattern.test(code)) return code;
-  return code.replace(classPattern,(_match,indent,modifiers,declaration)=>indent+'public '+modifiers+declaration);
-}
-async function runInteractiveRemote(lang,code,label){
-  const runtime=JDOODLE_RUNTIMES[lang];
-  if(lang==='java') code=ensurePublicJavaClass(code);
-  if(!runtime) return {ok:false,output:`✕ ${label} is not configured for interactive execution.`};
-  if(typeof SockJS==='undefined'||typeof webstomp==='undefined'){
-    return {ok:false,output:'✕ The interactive compiler connection library could not load. Refresh the page and try again.'};
-  }
-  resetLiveInputUI();
-  $('#inputPanel').classList.add('show','live-input');
-  $('#inputActions').style.display='flex';
-  $('#inputTitle').textContent='Starting interactive program…';
-  $('#inputHint').textContent='When the program asks, type your answer and press Send input';
-  $('#programInput').placeholder='Waiting for the program to start…';
-  $('#programInput').disabled=false;
-  $('#sendInput').disabled=false;
-  $('#output').textContent='Connecting to the interactive compiler…';
-  try{
-    liveCompilerToken=await getJdoodleToken();
-  }catch(error){
-    return {ok:false,output:`✕ Could not start the interactive compiler.\n\n${error?.message||'The token request failed.'}\n\nCheck the JDoodle credentials in the Render backend environment variables.`};
-  }
-  liveCompilerOutput='';liveCompilerFinished=false;
-  return new Promise((resolve)=>{
-    liveCompilerResolve=resolve;
-    let settled=false;
-    const finish=(ok,extra='')=>{
-      if(settled)return;settled=true;liveCompilerFinished=true;
-      if(extra) appendLiveOutput((liveCompilerOutput&&!liveCompilerOutput.endsWith('\n')?'\n':'')+extra+'\n');
-      $('#programInput').disabled=true;$('#sendInput').disabled=true;
-      $('#inputTitle').textContent=ok?'Program finished':'Program stopped with an error';
-      $('#inputHint').textContent='Run the program again to start a new session';
-      disconnectLiveCompiler();liveCompilerToken='';liveCompilerResolve=null;liveCompilerCancel=null;
-      resolve({ok,output:liveCompilerOutput||'(The program finished without output.)'});
-    };
-    const client=webstomp.over(new SockJS('https://api.jdoodle.com/v1/stomp'),{heartbeat:false});
-    liveCompilerClient=client;
-    let timeout=null;
-    const wrappedFinish=(ok,extra='')=>{if(timeout)clearTimeout(timeout);finish(ok,extra)};
-    timeout=setTimeout(()=>wrappedFinish(false,'✕ Interactive session timed out. Please run it again.'),180000);
-    liveCompilerCancel=()=>wrappedFinish(false,'Interactive session stopped.');
-    try{
-      client.connect({},()=>{
-        client.subscribe('/user/queue/execute-i',(message)=>{
-          const responseStatus=Number(message.headers?.statusCode||0);
-          const body=String(message.body||'');
-          if(responseStatus===201){status(`● ${label} running — waiting for program output`);return;}
-          if(responseStatus===204){
-            status('● Program finished — closing session…');
-            return;
-          }
-          if(responseStatus===410){wrappedFinish(true);return;}
-          if([400,401,429,500].includes(responseStatus)){
-            wrappedFinish(false,body||`Compiler service returned status ${responseStatus}.`);return;
-          }
-          if(body) appendLiveOutput(body);
-          status('● Program running — answer prompts in Program input');
-        });
-        client.send('/app/execute-ws-api-token',JSON.stringify({script:code,language:runtime.language,versionIndex:runtime.versionIndex}),{message_type:'execute',token:liveCompilerToken});
-        $('#inputTitle').textContent='Program input';
-        $('#programInput').placeholder='Type your answer here, then press Send input';
-        $('#programInput').focus();
-        status(`● Starting ${label} interactively…`);
-      },(error)=>wrappedFinish(false,error?.body||'Could not establish the interactive compiler connection.'));
-    }catch(error){wrappedFinish(false,error?.message||'Interactive compiler connection failed.');}
-  });
-}
-
 async function runProgram(){
   stop();step=0;
   const lang=$('#language').value,code=$('#code').value,label=LABELS[lang];
@@ -560,8 +330,9 @@ async function runProgram(){
   const mis=mismatch(lang,code);
   if(mis){status('● Language mismatch',true);$('#output').textContent=`⚠ Language mismatch\n\nSelected language: ${label}\nCode appears to be: ${mis}\n\nSelect ${mis} or change the code.`;return}
   steps=buildTrace(code);setFlow(currentKind);render();explainLogic();
-  const hostedInteractive=Object.prototype.hasOwnProperty.call(JDOODLE_RUNTIMES,lang);
-  const inputState=hostedInteractive?{ok:true,values:[],count:inputCount(lang,code)}:prepareProgramInput(lang,code);
+  const hostedRemote=Object.prototype.hasOwnProperty.call(WANDBOX_RUNTIMES,lang);
+  // Wandbox is a batch API: provide all stdin lines before pressing Run.
+  const inputState=prepareProgramInput(lang,code);
   if(!inputState.ok)return;
   $('#inputPanel').classList.remove('required');$('#run').disabled=true;
   try{
@@ -575,10 +346,10 @@ async function runProgram(){
       const bad=logs.some(x=>x.startsWith('✕'));status(bad?'● Python execution failed':'● Executed live in your browser',bad);
     }else if(lang==='html'||lang==='css'){
       renderPreview(lang,code);$('#output').textContent='Rendered in the live preview.';status('● Preview ready');
-    }else if(hostedInteractive){
-      hidePreview();
-      const r=await runInteractiveRemote(lang,code,label);
-      $('#output').textContent=r.output;status(r.ok?'● Executed live':'● Execution failed',!r.ok);
+    }else if(hostedRemote){
+      hidePreview();status('● Compiling and running on Wandbox…');
+      const r=await remote(lang,code,label,inputState.values);
+      $('#output').textContent=r.output;status(r.ok?'● Executed with Wandbox':'● Execution failed',!r.ok);
     }else{
       hidePreview();status('● Connecting to TraceLab backend…');
       const r=await remote(lang,code,label,inputState.values);$('#output').textContent=r.output;status(r.ok?'● Executed live':'● Execution failed',!r.ok);
@@ -619,7 +390,7 @@ async function health(){
   const el=$('#serverStatus');
   const state=await fetchBackendHealth(10000);
   if(state.ok){
-    el.textContent=state.data.executorConfigured?'● Backend online · compiler ready':'● Backend online · API key needed';
+    el.textContent=state.data.executorConfigured?'● Backend online · compiler ready':'● Backend online · compiler ready';
     el.className=state.data.executorConfigured?'server-pill online':'server-pill warning';
     return;
   }
@@ -627,7 +398,7 @@ async function health(){
   el.className='server-pill warning';
 }
 function openBrowser(){const blob=new Blob([buildDoc($('#language').value,$('#code').value)],{type:'text/html'});window.open(URL.createObjectURL(blob),'_blank')}
-$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';resetLiveInputUI();$('#inputPanel').classList.remove('live-input');$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#sendInput').addEventListener('click',sendLiveCompilerInput);$('#programInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&liveCompilerClient&&!liveCompilerFinished){e.preventDefault();sendLiveCompilerInput()}});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();
+$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';resetLiveInputUI();$('#inputPanel').classList.remove('live-input');$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();
 loadSample();
 steps=buildTrace($('#code').value);
 setFlow(currentKind);
@@ -640,4 +411,3 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)warmBacken
 </script>
 </body>
 </html>
-
