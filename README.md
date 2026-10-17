@@ -1,6 +1,6 @@
 # TraceLab
 
-TraceLab is an interactive code playground with source-driven execution flow visualization across 16 languages. Python and JavaScript run in the browser; hosted languages use the TraceLab Node backend and Wandbox public compiler API.
+TraceLab is an interactive code playground with source-driven walkthroughs across 16 languages and live execution in 15 runtimes. Python and JavaScript run in the browser; 11 hosted languages use the TraceLab Node backend and Wandbox public compiler API. Kotlin currently supports walkthroughs only because Wandbox does not list a Kotlin compiler.
 
 ## Input handling
 

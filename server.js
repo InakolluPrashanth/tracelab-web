@@ -222,7 +222,18 @@ function health() {
 }
 
 app.get('/api/health', (_req, res) => res.json({ ...health(), timestamp: new Date().toISOString() }));
-app.get('/api/runtimes', (_req, res) => res.json(Object.entries(SUPPORTED).map(([id, item]) => ({ id, name: item.name }))));
+app.get('/api/runtimes', async (_req, res) => {
+  try {
+    const compilers = await getWandboxCompilers();
+    const available = new Set(compilers.map(item => String(item.language).trim().toLowerCase()));
+    const runtimes = Object.entries(SUPPORTED)
+      .filter(([id]) => available.has(String(WANDBOX_LANGUAGES[id] || '').toLowerCase()))
+      .map(([id, item]) => ({ id, name: item.name }));
+    return res.json(runtimes);
+  } catch (error) {
+    return res.status(error.statusCode || 503).json({ ok: false, error: error.message || 'Could not check available compilers.' });
+  }
+});
 
 app.get('/api/diagnostics', async (_req, res) => {
   try {

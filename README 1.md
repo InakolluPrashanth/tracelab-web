@@ -1,6 +1,6 @@
 # TraceLab — Free Internet Launch
 
-TraceLab is an interactive code playground with step-by-step flow visualization. It supports 16 languages: HTML, CSS, Python 3, JavaScript, TypeScript, C, C++, Java, Go, Kotlin, Swift, Ruby, PHP, Perl, Bash, and SQL/SQLite.
+TraceLab is an interactive code playground with step-by-step flow visualization for 16 languages. Fifteen runtimes execute code live: HTML, CSS, Python 3, JavaScript, TypeScript, C, C++, Java, Go, Swift, Ruby, PHP, Perl, Bash, and SQL/SQLite. Kotlin has a source walkthrough, but Wandbox currently does not provide a Kotlin compiler.
 
 ## Architecture
 

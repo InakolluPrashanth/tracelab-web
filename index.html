@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TraceLab | Learn code by watching it run</title>
-<meta name="description" content="TraceLab is an interactive code playground with source-driven execution flow visualization across 16 programming languages.">
+<meta name="description" content="TraceLab is an interactive code playground with source-driven walkthroughs for 16 languages and live execution in 15 runtimes.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://tracelab-web.pages.dev/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="TraceLab — Interactive Code Playground">
-<meta property="og:description" content="Run, visualize, and understand code with TraceLab across 16 programming languages.">
+<meta property="og:description" content="Run, visualize, and understand code with TraceLab across 15 live runtimes, plus a Kotlin walkthrough.">
 <meta property="og:url" content="https://tracelab-web.pages.dev/">
 <meta property="og:site_name" content="TraceLab">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TraceLab — Interactive Code Playground">
-<meta name="twitter:description" content="Run, visualize, and understand code with TraceLab across 16 programming languages.">
+<meta name="twitter:description" content="Run, visualize, and understand code with TraceLab across 15 live runtimes, plus a Kotlin walkthrough.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
   <div class="top-actions"><a class="cta" href="#playground">Start coding</a><button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button></div>
 </header>
 <main>
-<section class="hero"><div class="eyebrow">Interactive code playground</div><h1>Don’t just run code. <span>Watch it think.</span></h1><p class="sub">Write, run, and understand code in 16 supported languages — with real output and a source-driven visual execution flow.</p></section>
+<section class="hero"><div class="eyebrow">Interactive code playground</div><h1>Don’t just run code. <span>Watch it think.</span></h1><p class="sub">Trace code in 16 languages and run it in 15 live runtimes, with real output and a source-driven visual flow. Kotlin is available for walkthroughs.</p></section>
 <section class="workspace" id="playground">
   <div class="editor">
     <div class="bar">
@@ -53,7 +53,7 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
         <select class="lang" id="language" aria-label="Select programming language">
           <optgroup label="Web"><option value="html">HTML</option><option value="css">CSS</option></optgroup>
           <optgroup label="Popular"><option value="python">Python 3</option><option value="javascript">JavaScript</option><option value="typescript">TypeScript</option><option value="c">C</option><option value="cpp">C++</option><option value="java">Java</option><option value="go">Go</option></optgroup>
-          <optgroup label="Modern & mobile"><option value="kotlin">Kotlin</option><option value="swift">Swift</option></optgroup>
+          <optgroup label="Modern & mobile"><option value="kotlin">Kotlin · walkthrough only</option><option value="swift">Swift</option></optgroup>
           <optgroup label="Scripting & data"><option value="ruby">Ruby</option><option value="php">PHP</option><option value="perl">Perl</option><option value="bash">Bash</option><option value="sql">SQL</option></optgroup>
         </select>
       </div>
@@ -82,13 +82,13 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
   <div class="card"><div class="tiny">Live variables</div><div class="variables" id="vars"></div></div>
   <div class="card logic"><div class="logic-top"><div class="tiny" style="margin:0">Important steps</div><button class="focus" id="focus">⌘ Explain key steps</button></div><div id="logicSummary" class="logic-summary">Run the walkthrough to see the important steps in plain language.</div></div>
 </section>
-<div class="languages"><span class="tiny" style="margin:0 4px 0 0">16 supported</span><span class="chip">HTML / CSS</span><span class="chip">Python</span><span class="chip">JavaScript</span><span class="chip">TypeScript</span><span class="chip">C / C++</span><span class="chip">Java / Go</span><span class="chip">Kotlin / Swift</span><span class="chip">Ruby / PHP</span><span class="chip">Perl / Bash</span><span class="chip">SQL</span></div>
+<div class="languages"><span class="tiny" style="margin:0 4px 0 0">15 live · Kotlin walkthrough</span><span class="chip">HTML / CSS</span><span class="chip">Python</span><span class="chip">JavaScript</span><span class="chip">TypeScript</span><span class="chip">C / C++</span><span class="chip">Java / Go</span><span class="chip">Kotlin · trace only</span><span class="chip">Swift</span><span class="chip">Ruby / PHP</span><span class="chip">Perl / Bash</span><span class="chip">SQL</span></div>
 <p class="hint">Use <b>← →</b> to move through the generated trace, or press Play flow.</p>
 </main>
-<section class="steps" id="how-it-works"><div class="section-head"><h2>How it works</h2><p>TraceLab reads the structure of your source and builds a flow from the instructions it actually finds.</p></div><div class="step-grid"><div class="step"><span class="num">1</span><h3>Write or paste code</h3><p>Use the built-in example or paste your own program.</p></div><div class="step"><span class="num">2</span><h3>Choose a language</h3><p>Pick one of the 16 supported languages or use Auto-detect.</p></div><div class="step"><span class="num">3</span><h3>Analyze & visualize</h3><p>The flow is generated from your source instead of a fixed five-step story.</p></div></div></section>
-<section class="capabilities" id="capabilities"><div class="section-head"><h2>What actually runs</h2><p>Browser languages execute locally; hosted languages use the TraceLab backend.</p></div><div class="cap-grid"><div class="cap-card"><span class="badge">Live</span><h3>Python</h3><p>Runs in the browser with Pyodide.</p></div><div class="cap-card"><span class="badge">Live</span><h3>JavaScript</h3><p>Runs in a sandboxed browser frame.</p></div><div class="cap-card"><span class="badge">Live</span><h3>HTML &amp; CSS</h3><p>Rendered in the live preview.</p></div><div class="cap-card"><span class="badge">Hosted</span><h3>12 runtimes</h3><p>TypeScript, C, C++, Java, Go, Kotlin, Swift, Ruby, PHP, Perl, Bash and SQL use the TraceLab backend.</p></div></div></section>
+<section class="steps" id="how-it-works"><div class="section-head"><h2>How it works</h2><p>TraceLab reads the structure of your source and builds a flow from the instructions it actually finds.</p></div><div class="step-grid"><div class="step"><span class="num">1</span><h3>Write or paste code</h3><p>Use the built-in example or paste your own program.</p></div><div class="step"><span class="num">2</span><h3>Choose a language</h3><p>Choose one of 15 live runtimes, or use Kotlin for a source walkthrough.</p></div><div class="step"><span class="num">3</span><h3>Analyze & visualize</h3><p>The flow is generated from your source instead of a fixed five-step story.</p></div></div></section>
+<section class="capabilities" id="capabilities"><div class="section-head"><h2>What actually runs</h2><p>Browser languages execute locally; hosted languages use the TraceLab backend.</p></div><div class="cap-grid"><div class="cap-card"><span class="badge">Live</span><h3>Python</h3><p>Runs in the browser with Pyodide.</p></div><div class="cap-card"><span class="badge">Live</span><h3>JavaScript</h3><p>Runs in a sandboxed browser frame.</p></div><div class="cap-card"><span class="badge">Live</span><h3>HTML &amp; CSS</h3><p>Rendered in the live preview.</p></div><div class="cap-card"><span class="badge">Hosted</span><h3>11 runtimes</h3><p>TypeScript, C, C++, Java, Go, Swift, Ruby, PHP, Perl, Bash and SQL run through TraceLab. Kotlin walkthroughs work, but Wandbox currently has no Kotlin compiler.</p></div></div></section>
 <section class="faq" id="faq"><div class="section-head"><h2>Frequently asked</h2></div><div class="faq-grid"><div class="faq-item"><h3>Does the flow use a fixed five-step algorithm?</h3><p>No. The number and meaning of timeline steps change with the source code.</p></div><div class="faq-item"><h3>Will every possible algorithm be understood perfectly?</h3><p>Not yet. The frontend provides a broad source-driven trace and recognizes common DSA patterns; exact runtime tracing for every language requires backend instrumentation.</p></div><div class="faq-item"><h3>Where does hosted code run?</h3><p>Hosted languages are sent to the TraceLab execution backend when you press Run.</p></div><div class="faq-item"><h3>Can I keep updating the public site?</h3><p>Yes. Replace and redeploy the HTML whenever you fix bugs or add features.</p></div></div></section>
-<footer class="site-footer"><div class="foot-top"><div class="brand"><div class="mark">&gt;_</div>TraceLab</div><nav class="foot-links"><a href="#playground">Playground</a><a href="#how-it-works">How it works</a><a href="#capabilities">What runs live</a><a href="#faq">FAQ</a></nav></div><p class="foot-note">TraceLab traces source structure across 16 languages. © <span id="year"></span> · Built for people learning to read code.</p></footer>
+<footer class="site-footer"><div class="foot-top"><div class="brand"><div class="mark">&gt;_</div>TraceLab</div><nav class="foot-links"><a href="#playground">Playground</a><a href="#how-it-works">How it works</a><a href="#capabilities">What runs live</a><a href="#faq">FAQ</a></nav></div><p class="foot-note">TraceLab traces source structure across 16 languages and executes 15 runtimes live. © <span id="year"></span> · Built for people learning to read code.</p></footer>
 <script>
 const TRACE_BACKEND=(location.hostname==='127.0.0.1'||location.hostname==='localhost')?location.origin:'https://tracelab-free.onrender.com';
 const EXECUTE_URL=TRACE_BACKEND+'/api/execute';
