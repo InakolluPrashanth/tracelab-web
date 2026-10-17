@@ -205,15 +205,7 @@ function javaInputSourceForDetection(code,answers=[]){
 }
 function estimatedInputCount(lang,code,answers=[]){
   const source=lang==='java'?javaInputSourceForDetection(code,answers):code;
-  let count=inputCount(lang,source);
-  // In Java, Scanner.nextLine() immediately after nextInt/nextDouble/etc. is often
-  // used only to consume the remaining newline, not to collect another answer.
-  if(lang==='java'){
-    const cleanupPattern=/\.\s*next(?:Int|Double|Float|Long|Short|Byte|Boolean)\s*\(\s*\)\s*;\s*\w+\s*\.\s*nextLine\s*\(\s*\)\s*;/g;
-    const cleanupCount=(String(code||'').match(cleanupPattern)||[]).length;
-    count=Math.max(0,count-cleanupCount);
-  }
-  return count;
+  return inputCount(lang,source);
 }
 function buildInputPromptSteps(lang,code,answers=[]){
   const source=lang==='java'?javaInputSourceForDetection(code,answers):code;
