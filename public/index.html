@@ -478,8 +478,17 @@ async function getJdoodleToken(){
     throw error;
   }finally{clearTimeout(timeout)}
 }
+function ensurePublicJavaClass(source){
+  const code=String(source||'');
+  // JDoodle's interactive Java runner expects a public class declaration.
+  if(/^\s*public\s+(?:(?:abstract|final|strictfp)[ \t]+)*class[ \t]+[A-Za-z_$][\w$]*/m.test(code)) return code;
+  const classPattern=/^([ \t]*)((?:(?:abstract|final|strictfp)[ \t]+)*)(class[ \t]+[A-Za-z_$][\w$]*)/m;
+  if(!classPattern.test(code)) return code;
+  return code.replace(classPattern,(_match,indent,modifiers,declaration)=>indent+'public '+modifiers+declaration);
+}
 async function runInteractiveRemote(lang,code,label){
   const runtime=JDOODLE_RUNTIMES[lang];
+  if(lang==='java') code=ensurePublicJavaClass(code);
   if(!runtime) return {ok:false,output:`✕ ${label} is not configured for interactive execution.`};
   if(typeof SockJS==='undefined'||typeof webstomp==='undefined'){
     return {ok:false,output:'✕ The interactive compiler connection library could not load. Refresh the page and try again.'};
