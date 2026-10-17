@@ -248,7 +248,9 @@ app.post('/api/execute', async (req, res) => {
   language ??= body.lang ?? body.languageId;
   code ??= body.source ?? body.program;
   language = normalizeLanguage(language);
-  if (!language || typeof code !== 'string') return res.status(400).json({ ok: false, error: 'language and code are required' });
+  if (!language) return res.status(400).json({ ok: false, error: 'Choose a programming language before running the code.' });
+  if (typeof code !== 'string') return res.status(400).json({ ok: false, error: 'No source code was received. Paste or type code into the editor, then try again.' });
+  if (!code.trim()) return res.status(400).json({ ok: false, error: 'The code editor is empty. Add code before running it.' });
   if (code.length > 18000) return res.status(413).json({ ok: false, error: 'Code is limited to 18,000 characters.' });
   if (typeof stdin !== 'string' || stdin.length > 8000) return res.status(413).json({ ok: false, error: 'Input is limited to 8,000 characters.' });
   if (!SUPPORTED[language]) return res.status(400).json({ ok: false, error: `Unsupported language: ${language}` });
@@ -276,6 +278,17 @@ app.post('/api/execute', async (req, res) => {
   } catch (error) {
     return res.status(error.statusCode || 503).json({ ok: false, error: error.message || 'Wandbox execution service is temporarily unavailable.', retryable: error.statusCode !== 501 });
   }
+});
+
+app.use((error, _req, res, _next) => {
+  if (error?.type === 'entity.parse.failed') {
+    return res.status(400).json({ ok: false, error: 'The execution request was not valid JSON. Please try again.' });
+  }
+  if (error?.type === 'entity.too.large') {
+    return res.status(413).json({ ok: false, error: 'The request is too large. Shorten the code or input and try again.' });
+  }
+  console.error('Unhandled request error:', error);
+  return res.status(500).json({ ok: false, error: 'TraceLab hit an unexpected server error. Please retry.' });
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
