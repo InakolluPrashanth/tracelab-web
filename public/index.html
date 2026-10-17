@@ -103,6 +103,7 @@ const LABELS={html:'HTML',css:'CSS',python:'Python',javascript:'JavaScript',type
 // JDoodle WebSocket compiler versions. Client secrets never belong in this page.
 const JDOODLE_RUNTIMES={typescript:{language:'typescript',versionIndex:1},c:{language:'c',versionIndex:7},cpp:{language:'cpp',versionIndex:7},java:{language:'java',versionIndex:6},go:{language:'go',versionIndex:6},kotlin:{language:'kotlin',versionIndex:5},swift:{language:'swift',versionIndex:6},ruby:{language:'ruby',versionIndex:6},php:{language:'php',versionIndex:6},perl:{language:'perl',versionIndex:6},bash:{language:'bash',versionIndex:6},sql:{language:'sql',versionIndex:6}};
 let liveCompilerClient=null,liveCompilerToken='',liveCompilerResolve=null,liveCompilerOutput='',liveCompilerFinished=false,liveCompilerCancel=null;
+let jdoodleTokenCache='',jdoodleTokenCacheExpiresAt=0;
 const codes={
 html:['index.html',['<!doctype html>','<html>','<head>','<title>TraceLab</title>','</head>','<body>','<h1>Hello, TraceLab!</h1>','<p>Edit this HTML and run it.</p>','</body>','</html>']],
 css:['style.css',['body {','  font-family: sans-serif;','  background: #f4f6fb;','}','h1 { color: #5277f5; }']],
@@ -373,6 +374,25 @@ function disconnectLiveCompiler(){
   const client=liveCompilerClient;liveCompilerClient=null;
   if(client){try{client.disconnect(()=>{});}catch(_){}}
 }
+async function getJdoodleToken(){
+  if(jdoodleTokenCache && Date.now()<jdoodleTokenCacheExpiresAt-10000) return jdoodleTokenCache;
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),12000);
+  try{
+    const response=await fetch(TRACE_BACKEND+'/api/interactive/token',{
+      method:'POST',headers:{Accept:'application/json'},cache:'no-store',signal:controller.signal
+    });
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok||!data.token) throw new Error(data.error||`Token request failed (HTTP ${response.status}).`);
+    jdoodleTokenCache=String(data.token);
+    const seconds=Math.max(30,Math.min(Number(data.expiresInSeconds)||180,180));
+    jdoodleTokenCacheExpiresAt=Date.now()+seconds*1000;
+    return jdoodleTokenCache;
+  }catch(error){
+    if(error?.name==='AbortError') throw new Error('JDoodle token request timed out. Please retry.');
+    throw error;
+  }finally{clearTimeout(timeout)}
+}
 async function runInteractiveRemote(lang,code,label){
   const runtime=JDOODLE_RUNTIMES[lang];
   if(!runtime) return {ok:false,output:`✕ ${label} is not configured for interactive execution.`};
@@ -388,13 +408,11 @@ async function runInteractiveRemote(lang,code,label){
   $('#programInput').disabled=false;
   $('#sendInput').disabled=false;
   $('#output').textContent='Connecting to the interactive compiler…';
-  const tokenResponse=await fetch(TRACE_BACKEND+'/api/interactive/token',{method:'POST',headers:{Accept:'application/json'},cache:'no-store'});
-  const tokenData=await tokenResponse.json().catch(()=>({}));
-  if(!tokenResponse.ok||!tokenData.token){
-    const detail=tokenData.error||`HTTP ${tokenResponse.status}`;
-    return {ok:false,output:`✕ Could not start the interactive compiler.\n\n${detail}\n\nThe backend administrator must configure JDoodle client ID and client secret in Render.`};
+  try{
+    liveCompilerToken=await getJdoodleToken();
+  }catch(error){
+    return {ok:false,output:`✕ Could not start the interactive compiler.\n\n${error?.message||'The token request failed.'}\n\nCheck the JDoodle credentials in the Render backend environment variables.`};
   }
-  liveCompilerToken=String(tokenData.token);
   liveCompilerOutput='';liveCompilerFinished=false;
   return new Promise((resolve)=>{
     liveCompilerResolve=resolve;
@@ -410,8 +428,9 @@ async function runInteractiveRemote(lang,code,label){
     };
     const client=webstomp.over(new SockJS('https://api.jdoodle.com/v1/stomp'),{heartbeat:false});
     liveCompilerClient=client;
-    const timeout=setTimeout(()=>finish(false,'✕ Interactive session timed out. Please run it again.'),180000);
-    const wrappedFinish=(ok,extra='')=>{clearTimeout(timeout);finish(ok,extra)};
+    let timeout=null;
+    const wrappedFinish=(ok,extra='')=>{if(timeout)clearTimeout(timeout);finish(ok,extra)};
+    timeout=setTimeout(()=>wrappedFinish(false,'✕ Interactive session timed out. Please run it again.'),180000);
     liveCompilerCancel=()=>wrappedFinish(false,'Interactive session stopped.');
     try{
       client.connect({},()=>{
@@ -420,8 +439,8 @@ async function runInteractiveRemote(lang,code,label){
           const body=String(message.body||'');
           if(responseStatus===201){status(`● ${label} running — waiting for program output`);return;}
           if(responseStatus===204){
-            // Allow any final stdout chunk to arrive before closing the UI session.
-            setTimeout(()=>wrappedFinish(true),120);return;
+            status('● Program finished — closing session…');
+            return;
           }
           if(responseStatus===410){wrappedFinish(true);return;}
           if([400,401,429,500].includes(responseStatus)){
@@ -514,7 +533,7 @@ async function health(){
   el.className='server-pill warning';
 }
 function openBrowser(){const blob=new Blob([buildDoc($('#language').value,$('#code').value)],{type:'text/html'});window.open(URL.createObjectURL(blob),'_blank')}
-$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';resetLiveInputUI();$('#inputPanel').classList.remove('live-input');resetLiveInputUI();$('#inputPanel').classList.remove('live-input');$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#sendInput').addEventListener('click',sendLiveCompilerInput);$('#programInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&liveCompilerClient&&!liveCompilerFinished){e.preventDefault();sendLiveCompilerInput()}});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();
+$('#run').addEventListener('click',runProgram);$('#reset').addEventListener('click',()=>{stop();loadSample();$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');$('#output').textContent='Analyze your code to see its execution flow.';$('#detect').textContent='✦ Auto-detect';resetLiveInputUI();$('#inputPanel').classList.remove('live-input');$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#detect').addEventListener('click',detectLanguage);$('#openBrowser').addEventListener('click',openBrowser);$('#focus').addEventListener('click',explainLogic);$('#play').addEventListener('click',play);$('#next').addEventListener('click',()=>{stop();step=Math.min(step+1,Math.max(0,steps.length-1));render()});$('#prev').addEventListener('click',()=>{stop();step=Math.max(step-1,0);render()});$('#language').addEventListener('change',()=>{stop();loadSample();steps=buildTrace($('#code').value);setFlow(currentKind);step=0;render();updateWeb();status('● Ready');$('#output').textContent='Language changed. A matching example has been loaded.';$('#detect').textContent='✦ Auto-detect';$('#programInput').value='';$('#inputPanel').classList.remove('required');$('#inputPanel').classList.toggle('show',inputCount($('#language').value,$('#code').value)>0);explainLogic()});$('#programInput').addEventListener('input',()=>{$('#inputPanel').classList.remove('required');});$('#sendInput').addEventListener('click',sendLiveCompilerInput);$('#programInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&liveCompilerClient&&!liveCompilerFinished){e.preventDefault();sendLiveCompilerInput()}});$('#code').addEventListener('input',()=>{lineCount();$('#detect').textContent='✦ Auto-detect';$('#focus').textContent='⌘ Explain main logic'});$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();
 loadSample();
 steps=buildTrace($('#code').value);
 setFlow(currentKind);
