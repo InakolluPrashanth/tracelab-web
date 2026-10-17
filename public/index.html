@@ -33,6 +33,91 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
 .steps,.capabilities,.faq{max-width:1440px;margin:auto;padding:64px clamp(20px,6vw,88px)}.section-head{max-width:520px;margin:0 auto 30px;text-align:center}.section-head h2{font-size:clamp(22px,2.4vw,28px);letter-spacing:-1px;margin:0 0 8px}.section-head p{color:var(--muted);font-size:14px;margin:0}.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.step .num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--pale);color:#4e69de;font:700 13px 'DM Mono';margin-bottom:14px}.step h3{margin:0 0 8px;font-size:15px}.step p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.cap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.cap-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.cap-card h3{margin:12px 0 8px;font-size:15px}.cap-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px 40px}.faq-item h3{margin:0 0 6px;font-size:14px}.faq-item p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}.site-footer{border-top:1px solid var(--line);padding:32px clamp(20px,6vw,88px) 40px;max-width:1440px;margin:auto}.foot-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}.foot-links{display:flex;gap:22px;font-size:12px;font-weight:700;color:#737d90}.foot-links a{color:inherit;text-decoration:none}.foot-note{margin:18px 0 0;color:#9099aa;font-size:12px}
 @media(max-width:1050px){.lower{grid-template-columns:1fr 1fr}.logic{grid-column:span 2}.cap-grid{grid-template-columns:1fr 1fr}}@media(max-width:860px){.nav{position:absolute;top:72px;left:0;right:0;background:#fff;flex-direction:column;align-items:flex-start;gap:0;border-bottom:1px solid var(--line);max-height:0;overflow:hidden;transition:max-height .25s ease}.nav.open{max-height:260px}.nav a{padding:14px clamp(22px,6vw,88px);width:100%}.menu-btn{display:block}.cta{display:none}.workspace{grid-template-columns:1fr}.editor{border-right:0;border-bottom:1px solid var(--line);min-height:450px}.lower{grid-template-columns:1fr}.logic{grid-column:auto}.step-grid,.cap-grid{grid-template-columns:1fr}.faq-grid{grid-template-columns:1fr}}@media(max-width:700px){.server-pill{display:none}.lang{min-width:115px}.runbar{flex-wrap:wrap}.saved{margin-left:0;width:100%}}@media(max-width:480px){main{padding-top:28px}.node{width:48px;height:48px;border-radius:15px;top:115px}.node small{top:57px;font-size:9px;white-space:normal;width:60px;text-align:center}.node span{font-size:16px}.line{top:139px}.pulse{top:134px}.stage{height:275px}.bar{padding:10px 12px;min-height:58px}.bar-actions{gap:5px}.detect{font-size:9px;padding:5px}}
 @media(prefers-color-scheme:dark){:root{--ink:#edf2ff;--muted:#aeb8cc;--line:#2a3550;--blue:#86a0ff;--mint:#56dbb8;--bg:#0e1423;--pale:#202b4d}.top,.workspace,.card,.node,.step,.cap-card{background:#141c30;border-color:var(--line)}body{background:var(--bg);color:var(--ink)}.nav{color:#a9b4ca}.nav.open{background:#141c30}.brand{color:#f4f6ff}.bar,.console,.preview{background:#141c30;border-color:var(--line)}.file{color:#b7c2d8}.lang,.speed{background:#141c30;color:#edf2ff;border-color:#40506f}.lang option,.lang optgroup,.speed option{color:#edf2ff;background:#141c30}.codearea{background:#11182a}.nums{color:#66728c}textarea{color:#d9e2f6}.reset,.circle{background:#28334c;color:#c7d1e6}.console{background:#11182a}.console pre{color:#bdc9df}.stage{background-color:#10182a;background-image:radial-gradient(#34415a 1px,transparent 1px);border-color:var(--line)}.line{background:#3a4764}.node{border-color:#40506f}.node.active{background:#26345e;border-color:var(--blue)}.node.done{background:#173b37;border-color:#4d9f91}.note{color:#b3bed3}.note b{color:var(--ink)}.toptime span,.labels{color:#96a3bd}.track{background:#29344b}.card p{color:#bac5d9}.var,.chip{background:#222d45;color:#c1cbe1}.logic-code{background:#101827;color:#cbd5e8}.focus,.detect,.badge{background:#222e53;border-color:#40558f;color:#aebdff}.languages .tiny,.hint{color:#9daac3}.step .num{background:#202b4d;color:#aebdff}.step p,.cap-card p,.section-head p,.foot-note,.faq-item p{color:#aeb8cc}.site-footer{border-color:var(--line)}.foot-links{color:#a9b4ca}.cta{background:#eef2ff;color:#18223b}.menu-btn{color:#edf2ff}}
+
+/* TraceLab dark theme: readable text colours, matching the supplied screenshot */
+:root {
+  color-scheme: dark;
+  --ink: #edf2ff;
+  --muted: #aeb8cc;
+  --line: #2a3550;
+  --blue: #86a0ff;
+  --mint: #56dbb8;
+  --bg: #0e1423;
+  --pale: #202b4d;
+}
+body {
+  background: #0e1423;
+  color: #edf2ff;
+}
+.top, .workspace, .card, .step, .cap-card {
+  background: #141c30;
+  border-color: #2a3550;
+}
+.brand, h1, .title, .toptime strong, .step h3, .cap-card h3, .faq-item h3 {
+  color: #edf2ff;
+}
+.nav, .foot-links, .sub, .card p, .step p, .cap-card p, .faq-item p, .foot-note {
+  color: #aeb8cc;
+}
+.eyebrow {
+  color: #86a0ff;
+}
+.codearea {
+  background: #11182a;
+}
+.codearea textarea {
+  color: #d9e2f6;
+}
+.nums, .file, .console pre, .logic-code {
+  color: #bdc9df;
+}
+.bar, .console, .preview, .input-panel {
+  background: #141c30;
+  border-color: #2a3550;
+}
+.program-input {
+  height: auto;
+  background: #141c30;
+  color: #d9e2f6;
+  border-color: #40506f;
+}
+.program-input::placeholder {
+  color: #7e8aa3;
+}
+.lang, .speed {
+  background: #141c30;
+  color: #edf2ff;
+  border-color: #40506f;
+}
+.lang option, .lang optgroup, .speed option {
+  color: #edf2ff;
+  background: #141c30;
+}
+.node {
+  background: #141c30;
+  border-color: #40506f;
+}
+.node.active {
+  background: #26345e;
+  border-color: #86a0ff;
+}
+.node.done {
+  background: #173b37;
+  border-color: #4d9f91;
+}
+.detect, .focus, .badge {
+  background: #222e53;
+  border-color: #40558f;
+  color: #aebdff;
+}
+.reset, .circle {
+  background: #28334c;
+  color: #c7d1e6;
+}
+.console pre, .logic-code, .var, .chip {
+  color: #cbd5e8;
+}
+
 </style>
 </head>
 <body>
@@ -112,7 +197,7 @@ javascript:['main.js',['const numbers = [5, 3, 8, 4, 2];','let total = 0;','for 
 typescript:['main.ts',['const numbers: number[] = [5, 3, 8, 4, 2];','let total = 0;','for (const number of numbers) {','  total += number;','}','console.log(total);']],
 c:['main.c',['#include <stdio.h>','int main(void) {','  int numbers[] = {5,3,8,4,2};','  int total = 0;','  for (int i=0; i<5; i++) total += numbers[i];','  printf("%d\\n", total);','  return 0;','}']],
 cpp:['main.cpp',['#include <iostream>','using namespace std;','int main() {','  int numbers[] = {5,3,8,4,2};','  int total = 0;','  for (int number : numbers) total += number;','  cout << total << endl;','  return 0;','}']],
-java:['Main.java',['class Main {','  public static void main(String[] args) {','    int[] numbers = {5,3,8,4,2};','    int total = 0;','    for (int number : numbers) total += number;','    System.out.println(total);','  }','}']],
+java:['Main.java',['public class Main {','  public static void main(String[] args) {','    int[] numbers = {5,3,8,4,2};','    int total = 0;','    for (int number : numbers) total += number;','    System.out.println(total);','  }','}']],
 go:['main.go',['package main','import "fmt"','func main() {','  numbers := []int{5,3,8,4,2}','  total := 0','  for _, number := range numbers {','    total += number','  }','  fmt.Println(total)','}']],
 kotlin:['Main.kt',['fun main() {','  val numbers = intArrayOf(5,3,8,4,2)','  var total = 0','  for (number in numbers) total += number','  println(total)','}']],
 swift:['main.swift',['let numbers = [5,3,8,4,2]','var total = 0','for number in numbers {','  total += number','}','print(total)']],
