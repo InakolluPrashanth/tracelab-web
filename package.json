@@ -2,7 +2,7 @@
   "name": "tracelab-free-launch",
   "version": "2.0.0",
   "private": true,
-  "description": "TraceLab free launch build with Render + OneCompiler backend",
+  "description": "TraceLab playground with Render + Wandbox backend",
   "main": "server.js",
   "scripts": { "start": "node server.js" },
   "engines": { "node": ">=20" },

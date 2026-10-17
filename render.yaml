@@ -6,6 +6,3 @@ services:
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /api/health
-    envVars:
-      - key: ONECOMPILER_API_KEY
-        sync: false

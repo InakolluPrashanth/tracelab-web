@@ -1,21 +1,18 @@
 # TraceLab Launch Checklist
 
-- [ ] GitHub repository contains `public/index.html`, `server.js`, `package.json`, `render.yaml`
+- [ ] Git repository contains `public/index.html`, `server.js`, `package.json`, and `render.yaml`
 - [ ] Render service type is **Web Service**
 - [ ] Build command is `npm install`
 - [ ] Start command is `npm start`
 - [ ] Health check path is `/api/health`
-- [ ] Plan is Free
-- [ ] `ONECOMPILER_API_KEY` is configured as a secret environment variable
-- [ ] `/api/health` returns `ok: true`
-- [ ] TraceLab shows `Backend online · compiler ready`
-- [ ] **Test backend** returns C++ output `21`
+- [ ] `/api/health` identifies Wandbox as the execution provider
+- [ ] `/api/diagnostics` can load the current Wandbox compiler catalog
+- [ ] A program using stdin shows sequential input prompts and runs after the final answer
 - [ ] C++ program returns output
-- [ ] C compiler returns output
-- [ ] JavaScript/Python still run locally
+- [ ] C program returns output
+- [ ] JavaScript and Python still run locally
 - [ ] HTML/CSS preview still works
-- [ ] Pause button is blue
-- [ ] No API key appears in browser source
+- [ ] No API key is present in browser source
 
 ## Quick production smoke test
 

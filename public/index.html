@@ -198,6 +198,7 @@ function renderInputPromptGuidance(lang,code,count){
   list.replaceChildren();
   if(inputCollectionActive){
     const activePrompt=inputPromptSteps[inputStepIndex]||`Enter input ${inputStepIndex+1}`;
+    $('#programInput').placeholder=activePrompt;
     const current=document.createElement('div');
     current.className='input-prompt current';
     current.textContent=activePrompt;
@@ -214,6 +215,7 @@ function renderInputPromptGuidance(lang,code,count){
     return;
   }
   if(stdinStored && pendingStdinValues.length){
+    $('#programInput').placeholder='All answers collected — compiling and running…';
     pendingStdinValues.forEach((answer,index)=>{
       const item=document.createElement('div');
       item.className='input-prompt done';

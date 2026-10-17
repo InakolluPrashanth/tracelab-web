@@ -1,54 +1,28 @@
-# TraceLab — Free Render Deployment
+# TraceLab — Render Deployment
 
-## Important
-Deploy this repository as a **Render Web Service**, NOT a Static Site. The Node server serves the frontend and provides `/api/health`, `/api/runtimes`, `/api/diagnostics`, and `/api/execute`.
+## Service type
+Deploy this repository as a **Render Web Service**, not a Static Site. The Node server serves `public/index.html` and provides `/api/health`, `/api/runtimes`, `/api/diagnostics`, and `/api/execute`.
 
-## 1. GitHub
-Upload the contents of this folder to a GitHub repository. Do not upload the ZIP as the only file.
-
-## 2. Render
-Create **New → Web Service**, connect the GitHub repository, and use:
+## Render settings
 
 - Runtime: Node
 - Build command: `npm install`
 - Start command: `npm start`
-- Plan: Free
 - Health check path: `/api/health`
 - Root directory: leave blank
 
-The included `render.yaml` can also be used with Render Blueprints.
+The included `render.yaml` can also be used with Render Blueprints. No Wandbox API key is required; the backend calls Wandbox's public API. `WANDBOX_API_URL` is optional and defaults to `https://wandbox.org/api`.
 
-## 3. Environment variable
-Add this in Render → Environment:
+## Verify
 
-`ONECOMPILER_API_KEY` = your OneCompiler API key
+After deployment, open `https://YOUR-SERVICE.onrender.com/api/health`. The response should have `ok: true` and identify Wandbox as the provider. Then open TraceLab, enter code that reads from standard input, and follow the prompts shown in **Program input**. The page collects all answers first, then sends them to Wandbox as stdin in one execution request.
 
-Never put this key in `public/index.html`.
+You can also run `bash smoke_test.sh https://YOUR-SERVICE.onrender.com` from a shell with `curl` available. The C++ response should contain output `21` and `ok: true`.
 
-OneCompiler's current Code Execution API uses `POST https://api.onecompiler.org/v1/run`, the `X-API-Key` header, and a payload containing `language`, `stdin`, and `files`. The backend in this project follows that format.
+## Input behavior
 
-## 4. Verify
-After deployment, open:
+Wandbox executes programs in batch mode: it cannot pause to ask a browser user for input while the program is running. TraceLab detects common input calls, collects their answers one at a time in the page, and sends the completed lines to Wandbox before execution. When code reads multiple values in one call (for example, `scanf("%d %d", ...)`), enter those values separated by spaces in the answer field.
 
-`https://YOUR-SERVICE.onrender.com/api/health`
+## Free-tier behavior
 
-Expected when configured:
-
-```json
-{"ok":true,"service":"TraceLab free execution backend","executorConfigured":true}
-```
-
-Then open TraceLab and click **Test backend**. It runs one tiny C++ test and expects `21`.
-
-You can also run:
-
-`bash smoke_test.sh https://YOUR-SERVICE.onrender.com`
-
-## 5. If you see HTTP 405
-That almost always means the frontend was deployed as a Static Site or another static host. Move the repository to a Render **Web Service** so `POST /api/execute` is handled by Node.
-
-## 6. If you see 'Backend online · add API key'
-The Node server is running. Add `ONECOMPILER_API_KEY` in Render Environment and redeploy/restart.
-
-## 7. Free-tier limitation
-Render Free services can sleep when inactive, so the first request after inactivity can be slow. OneCompiler's API currently gives new accounts 100 free credits to start; execution is not an unlimited free production service.
+Render Free services may sleep while inactive, so the first request after inactivity can take longer. Wandbox is a public service; availability, compiler catalog, and throttling are controlled by Wandbox.
