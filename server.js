@@ -61,7 +61,7 @@ const SUPPORTED = {
 const WANDBOX_LANGUAGES = {
   typescript: 'TypeScript', c: 'C', cpp: 'C++', java: 'Java', go: 'Go',
   kotlin: 'Kotlin', swift: 'Swift', ruby: 'Ruby', php: 'PHP', perl: 'Perl',
-  bash: 'Bash', sql: 'SQL'
+  bash: 'Bash script', sql: 'SQL'
 };
 const COMPILER_NAME_PREFERENCES = {
   typescript: [/^wandbox-tsc$/i, /^tsc-head$/i, /^tsc-/i, /typescript/i],
