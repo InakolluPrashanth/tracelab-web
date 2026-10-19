@@ -33,6 +33,7 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
 .steps,.capabilities,.faq{max-width:1440px;margin:auto;padding:64px clamp(20px,6vw,88px)}.section-head{max-width:520px;margin:0 auto 30px;text-align:center}.section-head h2{font-size:clamp(22px,2.4vw,28px);letter-spacing:-1px;margin:0 0 8px}.section-head p{color:var(--muted);font-size:14px;margin:0}.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.step .num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;background:var(--pale);color:#4e69de;font:700 13px 'DM Mono';margin-bottom:14px}.step h3{margin:0 0 8px;font-size:15px}.step p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.cap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.cap-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px}.cap-card h3{margin:12px 0 8px;font-size:15px}.cap-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px 40px}.faq-item h3{margin:0 0 6px;font-size:14px}.faq-item p{margin:0;color:var(--muted);font-size:13px;line-height:1.65}.site-footer{border-top:1px solid var(--line);padding:32px clamp(20px,6vw,88px) 40px;max-width:1440px;margin:auto}.foot-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}.foot-links{display:flex;gap:22px;font-size:12px;font-weight:700;color:#737d90}.foot-links a{color:inherit;text-decoration:none}.foot-note{margin:18px 0 0;color:#9099aa;font-size:12px}
 @media(max-width:1050px){.lower{grid-template-columns:1fr 1fr}.logic{grid-column:span 2}.cap-grid{grid-template-columns:1fr 1fr}}@media(max-width:860px){.nav{position:absolute;top:72px;left:0;right:0;background:#fff;flex-direction:column;align-items:flex-start;gap:0;border-bottom:1px solid var(--line);max-height:0;overflow:hidden;transition:max-height .25s ease}.nav.open{max-height:260px}.nav a{padding:14px clamp(22px,6vw,88px);width:100%}.menu-btn{display:block}.cta{display:none}.workspace{grid-template-columns:1fr}.editor{border-right:0;border-bottom:1px solid var(--line);min-height:450px}.lower{grid-template-columns:1fr}.logic{grid-column:auto}.step-grid,.cap-grid{grid-template-columns:1fr}.faq-grid{grid-template-columns:1fr}}@media(max-width:700px){.server-pill{display:none}.lang{min-width:115px}.runbar{flex-wrap:wrap}.saved{margin-left:0;width:100%}}@media(max-width:480px){main{padding-top:28px}.node{width:48px;height:48px;border-radius:15px;top:115px}.node small{top:57px;font-size:9px;white-space:normal;width:60px;text-align:center}.node span{font-size:16px}.line{top:139px}.pulse{top:134px}.stage{height:275px}.bar{padding:10px 12px;min-height:58px}.bar-actions{gap:5px}.detect{font-size:9px;padding:5px}}
 @media(prefers-color-scheme:dark){:root{--ink:#edf2ff;--muted:#aeb8cc;--line:#2a3550;--blue:#86a0ff;--mint:#56dbb8;--bg:#0e1423;--pale:#202b4d}.top,.workspace,.card,.node,.step,.cap-card{background:#141c30;border-color:var(--line)}body{background:var(--bg);color:var(--ink)}.nav{color:#a9b4ca}.nav.open{background:#141c30}.brand{color:#f4f6ff}.bar,.console,.preview{background:#141c30;border-color:var(--line)}.file{color:#b7c2d8}.lang,.speed{background:#141c30;color:#edf2ff;border-color:#40506f}.lang option,.lang optgroup,.speed option{color:#edf2ff;background:#141c30}.codearea{background:#11182a}.nums{color:#66728c}textarea{color:#d9e2f6}.reset,.circle{background:#28334c;color:#c7d1e6}.console{background:#11182a}.console pre{color:#bdc9df}.stage{background-color:#10182a;background-image:radial-gradient(#34415a 1px,transparent 1px);border-color:var(--line)}.line{background:#3a4764}.node{border-color:#40506f}.node.active{background:#26345e;border-color:var(--blue)}.node.done{background:#173b37;border-color:#4d9f91}.note{color:#b3bed3}.note b{color:var(--ink)}.toptime span,.labels{color:#96a3bd}.track{background:#29344b}.card p{color:#bac5d9}.var,.chip{background:#222d45;color:#c1cbe1}.logic-summary{color:#bac5d9}.logic-summary strong{color:#aebdff}.focus,.detect,.badge{background:#222e53;border-color:#40558f;color:#aebdff}.languages .tiny,.hint{color:#9daac3}.step .num{background:#202b4d;color:#aebdff}.step p,.cap-card p,.section-head p,.foot-note,.faq-item p{color:#aeb8cc}.site-footer{border-color:var(--line)}.foot-links{color:#a9b4ca}.cta{background:#eef2ff;color:#18223b}.menu-btn{color:#edf2ff}}
+.lower{grid-template-columns:repeat(2,minmax(0,1fr))}.logic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.logic-grid .logic,.logic-source{min-width:0}.main-logic-code{margin:0;min-height:150px;max-height:360px;overflow:auto;border-radius:9px;padding:13px 15px;background:#f6f8fc;color:#2b3852;font:12px/1.75 'DM Mono',monospace;white-space:pre;tab-size:2}.main-logic-empty{color:var(--muted);font:13px/1.6 Manrope,sans-serif;white-space:normal}.logic-grid .logic{grid-column:auto}@media(max-width:860px){.lower,.logic-grid{grid-template-columns:1fr}}@media(prefers-color-scheme:dark){.main-logic-code{background:#11182a;color:#d9e2f6}}
 </style>
 </head>
 <body>
@@ -80,7 +81,10 @@ main{max-width:1440px;margin:auto;padding:39px clamp(20px,6vw,88px) 60px}.eyebro
 <section class="lower">
   <div class="card"><div class="tiny">What’s happening now</div><p id="insight"><strong>Ready.</strong> Run your program to build a source-driven trace.</p></div>
   <div class="card"><div class="tiny">Live variables</div><div class="variables" id="vars"></div></div>
-  <div class="card logic"><div class="logic-top"><div class="tiny" style="margin:0">Important steps</div><button class="focus" id="focus">⌘ Explain key steps</button></div><div id="logicSummary" class="logic-summary">Run the walkthrough to see the important steps in plain language.</div></div>
+</section>
+<section class="logic-grid" aria-label="Main logic and code explanation">
+  <div class="card logic-source"><div class="tiny">Main logic program</div><pre id="mainLogicProgram" class="main-logic-code" aria-live="polite">Key source lines appear here when you enter a program.</pre></div>
+  <div class="card logic"><div class="logic-top"><div class="tiny" style="margin:0">Main code explanation</div><button class="focus" id="focus">⌘ Explain key steps</button></div><div id="logicSummary" class="logic-summary">Run the walkthrough to see the important steps in plain language.</div></div>
 </section>
 <div class="languages"><span class="tiny" style="margin:0 4px 0 0">15 live · Kotlin walkthrough</span><span class="chip">HTML / CSS</span><span class="chip">Python</span><span class="chip">JavaScript</span><span class="chip">TypeScript</span><span class="chip">C / C++</span><span class="chip">Java / Go</span><span class="chip">Kotlin · trace only</span><span class="chip">Swift</span><span class="chip">Ruby / PHP</span><span class="chip">Perl / Bash</span><span class="chip">SQL</span></div>
 <p class="hint">Use <b>← →</b> to move through the generated trace, or press Play flow.</p>
@@ -148,6 +152,29 @@ function setFlow(kind){const maps={generic:[['Start','⚡'],['Analyze','◆'],['
 function render(){if(!steps.length)return;const total=steps.length;const d=steps[step];$('#badge').textContent=`Step ${step+1} of ${total}`;$('#stepname').textContent=d.name;$('#lineref').textContent=d.line;$('#note').innerHTML=d.note;$('#insight').innerHTML=d.insight;$('#vars').innerHTML=d.vars||'';const p=[11,30,50,70,89][Math.min(4,Math.floor(step/Math.max(1,total/5)))];$('#pulse').style.left=p+'%';nodes.forEach((n,i)=>{const bucket=Math.floor(i*total/5);n.className='node n'+(i+1)+(step>bucket?' done':'')+(step>=bucket&&step<bucket+Math.max(1,total/5)?' active':'')});$('#tracks').innerHTML=Array.from({length:5},(_,i)=>{const a=i*total/5,b=(i+1)*total/5;return `<i class="track ${step>=b?'done':''} ${step>=a&&step<b?'now':''}"></i>`}).join('')}
 function play(){if(timer){stop();return}if(!steps.length)return;$('#play').textContent='❚❚ Pause';$('#play').classList.add('playing');timer=setInterval(()=>{if(step>=steps.length-1){stop();return}step++;render()},Number($('#speed').value))}
 function explainLogic(){const lines=$('#code').value.split('\n'),known=new Map(),items=[];for(let i=0;i<lines.length;i++){const text=lines[i].trim();if(!text||isMarkupLine(text))continue;const kind=classifyLine(text)[0];if(kind==='assign'||kind==='update'){if(!isImportantAssignment(text))continue;const detail=explainAssignment(text,i+1,known,lines,i);if(detail)items.push(detail)}else if(['input','output','decision','loop','compare','return'].includes(kind)){const desc={input:'The program reads a value from the user.',output:'The program displays a message or result.',decision:'A condition chooses which branch runs.',loop:'The loop repeats its body while its condition allows.',compare:'Values are compared to decide what happens next.',return:'The program returns a value or changes control flow.'};const arithmetic=kind==='output'?inlineArithmetic(text,known):null;items.push(arithmetic?'Line '+(i+1)+': '+arithmetic+', so the displayed result is '+arithmetic.split(' = ')[1]+'.':'Line '+(i+1)+': '+desc[kind])}}const summary=$('#logicSummary');summary.innerHTML=items.length?'<ol>'+items.slice(0,16).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ol>':'<strong>No important operations found yet.</strong> Paste code, then choose Analyze.'}
+function importantLogicLines(code,language){
+  const keyKinds=new Set(['input','output','decision','loop','compare','return','data']);
+  const rows=[];
+  for(const [index,raw] of String(code||'').split(/\r?\n/).entries()){
+    const text=raw.trim();
+    if(!text)continue;
+    if(language==='html'&&(/^<!doctype\b/i.test(text)||/<\/?[A-Za-z][^>]*>/.test(text)))continue;
+    const kind=classifyLine(text)[0];
+    const assignment=(kind==='assign'||kind==='update')&&(isImportantAssignment(text)||/\+=|-=|\*=|\/=|%=|:=|=\s*\(\(/.test(text));
+    if(!keyKinds.has(kind)&&!assignment)continue;
+    rows.push({line:index+1,source:text});
+    if(rows.length===30)break;
+  }
+  return rows;
+}
+function renderMainLogicProgram(){
+  const panel=$('#mainLogicProgram');
+  if(!panel)return;
+  const language=$('#language').value,rows=importantLogicLines($('#code').value,language);
+  if(!rows.length){panel.classList.add('main-logic-empty');panel.textContent=language==='html'||language==='css'?'This code is markup or styling, so it has no program logic lines to list.':'No key logic lines were recognized. Try code with input, output, conditions, loops, or variable updates.';return}
+  panel.classList.remove('main-logic-empty');
+  panel.textContent=rows.map(row=>String(row.line).padStart(3,' ')+' │ '+row.source).join('\n');
+}
 let pendingStdinValues=[];let stdinStored=false;
 let inputPromptSteps=[];let inputStepIndex=0;let inputCollectedAnswers=[];let inputCollectionActive=false;let inputCollectionKey="";
 let pyodidePromise=null;function getPyodide(){if(pyodidePromise)return pyodidePromise;pyodidePromise=new Promise((resolve,reject)=>{if(window.loadPyodide){window.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'}).then(resolve).catch(reject);return}const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';s.onload=()=>window.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'}).then(resolve).catch(reject);s.onerror=()=>reject(new Error('Could not load the Python runtime.'));document.head.appendChild(s)});return pyodidePromise}
@@ -657,11 +684,15 @@ $('#code').addEventListener('input',()=>{
   $('#inputPanel').classList.toggle('show',currentCount>0||Object.prototype.hasOwnProperty.call(WANDBOX_RUNTIMES,currentLang));
   renderInputPromptGuidance(currentLang,currentCode,currentCount);
 });$('#code').addEventListener('scroll',()=>{$('#nums').style.transform=`translateY(${-$('#code').scrollTop}px)`});$('#menuBtn').addEventListener('click',()=>{$('#siteNav').classList.toggle('open')});document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();runProgram()}if(document.activeElement!==$('#code')&&e.key==='ArrowRight'){e.preventDefault();$('#next').click()}if(document.activeElement!==$('#code')&&e.key==='ArrowLeft'){e.preventDefault();$('#prev').click()}});$('#year').textContent=new Date().getFullYear();
+$('#code').addEventListener('input',renderMainLogicProgram);
+$('#language').addEventListener('change',renderMainLogicProgram);
+$('#detect').addEventListener('click',renderMainLogicProgram);
 loadSample();
 steps=buildTrace($('#code').value);
 setFlow(currentKind);
 render();
 explainLogic();
+renderMainLogicProgram();
 updateWeb();
 const initialLang=$('#language').value,initialCode=$('#code').value,initialInputCount=estimatedInputCount(initialLang,initialCode);
 $('#inputPanel').classList.toggle('show',initialInputCount>0||Object.prototype.hasOwnProperty.call(WANDBOX_RUNTIMES,initialLang));
