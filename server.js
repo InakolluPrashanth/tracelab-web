@@ -201,18 +201,75 @@ async function executeOnWandbox(language, code, stdin) {
   }
 }
 
+function maskJavaNonCode(source) {
+  const chars = source.split('');
+  const blank = (start, end) => {
+    for (let i = start; i < end; i++) if (chars[i] !== '\n' && chars[i] !== '\r') chars[i] = ' ';
+  };
+  for (let i = 0; i < source.length;) {
+    if (source.startsWith('//', i)) {
+      let end = i + 2;
+      while (end < source.length && source[end] !== '\n' && source[end] !== '\r') end++;
+      blank(i, end);
+      i = end;
+      continue;
+    }
+    if (source.startsWith('/*', i)) {
+      const close = source.indexOf('*/', i + 2);
+      const end = close < 0 ? source.length : close + 2;
+      blank(i, end);
+      i = end;
+      continue;
+    }
+    if (source.startsWith('"""', i)) {
+      let end = i + 3;
+      while (end < source.length) {
+        if (source.startsWith('"""', end)) {
+          let slashes = 0;
+          for (let j = end - 1; j >= i && source[j] === '\\'; j--) slashes++;
+          if (slashes % 2 === 0) { end += 3; break; }
+        }
+        end++;
+      }
+      blank(i, end);
+      i = end;
+      continue;
+    }
+    if (source[i] === '"' || source[i] === "'") {
+      const quote = source[i];
+      let end = i + 1;
+      while (end < source.length) {
+        if (source[end] === '\\') { end += 2; continue; }
+        if (source[end++] === quote) break;
+      }
+      blank(i, Math.min(end, source.length));
+      i = end;
+      continue;
+    }
+    i++;
+  }
+  return chars.join('');
+}
+
 function normalizeJavaEntryClass(source) {
-  const declarations = [...source.matchAll(/\b(?:public\s+)?class\s+([A-Za-z_$][\w$]*)\b/g)];
+  const code = maskJavaNonCode(source);
+  const declarations = [...code.matchAll(/\b(?:public\s+)?class\s+([A-Za-z_$][\w$]*)\b/g)];
   for (let i = 0; i < declarations.length; i++) {
     const match = declarations[i];
     const start = match.index;
     const end = declarations[i + 1]?.index ?? source.length;
-    const segment = source.slice(start, end);
+    const segment = code.slice(start, end);
     if (!/\bstatic\s+void\s+main\s*\(/.test(segment)) continue;
     const oldName = match[1];
     if (oldName === 'prog') return source;
-    const escaped = oldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    return source.replace(new RegExp(`\\b${escaped}\\b`, 'g'), 'prog');
+    let result = '';
+    let cursor = 0;
+    for (const token of code.matchAll(/[A-Za-z_$][\w$]*/g)) {
+      if (token[0] !== oldName) continue;
+      result += source.slice(cursor, token.index) + 'prog';
+      cursor = token.index + token[0].length;
+    }
+    return result + source.slice(cursor);
   }
   return source;
 }

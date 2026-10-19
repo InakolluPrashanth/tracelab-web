@@ -642,7 +642,7 @@ async function health(){
 function openBrowser(){const blob=new Blob([buildDoc($('#language').value,$('#code').value)],{type:'text/html'});window.open(URL.createObjectURL(blob),'_blank')}
 $('#run').addEventListener('click',runProgram);
 $('#reset').addEventListener('click',()=>{
-  stop();loadSample();resetLiveInputUI();
+  stop();loadSample();resetLiveInputUI();renderMainLogicProgram();
   const lang=$('#language').value,code=$('#code').value,count=estimatedInputCount(lang,code);
   $('#inputPanel').classList.toggle('show',count>0||Object.prototype.hasOwnProperty.call(WANDBOX_RUNTIMES,lang));
   steps=buildTrace(code);setFlow(currentKind);step=0;render();hidePreview();status('● Ready');
