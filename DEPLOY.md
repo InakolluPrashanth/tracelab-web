@@ -13,9 +13,17 @@ Deploy this repository as a **Render Web Service**, not a Static Site. The Node 
 
 The included `render.yaml` can also be used with Render Blueprints. No Wandbox API key is required; the backend calls Wandbox's public API. `WANDBOX_API_URL` is optional and defaults to `https://wandbox.org/api`.
 
+## AI tutor setup
+
+The AI Agent tab calls OpenAI from the server, so an API key is never sent to the browser. In the Render service's **Environment** settings, add `OPENAI_API_KEY` with a key from your OpenAI API account. `OPENAI_MODEL` is optional and defaults to `gpt-4.1-mini`. The editor reports whether the tutor is configured at `/api/assistant/status`.
+
+## Feedback
+
+The Feedback tab sends short feedback to the backend, which writes it to the Render service logs for the developer to review. Do not include passwords, API keys, or personal information. Feedback is not stored in a database.
+
 ## Verify
 
-After deployment, open `https://YOUR-SERVICE.onrender.com/api/health`. The response should have `ok: true` and identify Wandbox as the provider. Then open TraceLab, enter code that reads from standard input, and follow the prompts shown in **Program input**. The page collects all answers first, then sends them to Wandbox as stdin in one execution request.
+After deployment, open `https://YOUR-SERVICE.onrender.com/api/health`. The response should have `ok: true` and identify Wandbox as the provider. Check `/api/assistant/status` to confirm the tutor is configured. Then open TraceLab, choose a language, enter code that reads from standard input, and follow the prompts shown in **I/O**. The page collects all answers first, then sends them to Wandbox as stdin in one execution request.
 
 You can also run `bash smoke_test.sh https://YOUR-SERVICE.onrender.com` from a shell with `curl` available. The C++ response should contain output `21` and `ok: true`.
 
@@ -26,3 +34,4 @@ Wandbox executes programs in batch mode: it cannot pause to ask a browser user f
 ## Free-tier behavior
 
 Render Free services may sleep while inactive, so the first request after inactivity can take longer. Wandbox is a public service; availability, compiler catalog, and throttling are controlled by Wandbox.
+
