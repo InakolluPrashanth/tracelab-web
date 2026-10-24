@@ -15,7 +15,9 @@ The included `render.yaml` can also be used with Render Blueprints. No Wandbox A
 
 ## AI tutor setup
 
-The AI Agent tab calls OpenAI from the server, so an API key is never sent to the browser. In the Render service's **Environment** settings, add `OPENAI_API_KEY` with a key from your OpenAI API account. `OPENAI_MODEL` is optional and defaults to `gpt-4.1-mini`. The editor reports whether the tutor is configured at `/api/assistant/status`.
+The AI Agent tab calls Google Gemini from the server, so the API key is never sent to the browser. In the Render service's **Environment** settings, set `GEMINI_API_KEY` to your Gemini API key. `GOOGLE_API_KEY`, `GEMINI_KEY`, and `GOOGLE_GEMINI_API_KEY` are accepted aliases. `GEMINI_API_URL` (also accepts `GEMINI_URL`, `GEMINI_BASE_URL`, or `GOOGLE_GEMINI_URL`) and `GEMINI_MODEL` are optional; the defaults are Google's `generateContent` API and `gemini-3.8-flash`. A full HTTPS `generateContent` URL or a base URL ending in `/v1beta/models` is supported. `/api/assistant/status` reports whether the server has a key and a custom URL configured without returning either value.
+
+Google currently lists a free tier for selected Gemini models, subject to model availability and rate limits. Verify the project's tier and quota in Google AI Studio before using the tutor; usage with a paid-tier key can incur charges. See [Google's Gemini API pricing](https://ai.google.dev/gemini-api/docs/pricing).
 
 ## Feedback
 
@@ -34,4 +36,3 @@ Wandbox executes programs in batch mode: it cannot pause to ask a browser user f
 ## Free-tier behavior
 
 Render Free services may sleep while inactive, so the first request after inactivity can take longer. Wandbox is a public service; availability, compiler catalog, and throttling are controlled by Wandbox.
-

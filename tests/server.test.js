@@ -1,8 +1,9 @@
 const { test, before, after } = require('node:test');
 const assert = require('node:assert/strict');
 
-process.env.OPENAI_API_KEY = 'test-key';
-process.env.OPENAI_MODEL = 'test-model';
+process.env.GEMINI_API_KEY = 'test-gemini-key';
+process.env.GEMINI_MODEL = 'test-model';
+process.env.GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 const { app } = require('../server');
 
 const originalFetch = global.fetch;
@@ -10,6 +11,8 @@ let server;
 let baseUrl;
 let compileRequest;
 let aiRequest;
+let aiRequestUrl;
+let aiHeaders;
 let aiStatus = 200;
 
 const jsonResponse = (body, status = 200) => new Response(JSON.stringify(body), {
@@ -33,10 +36,12 @@ global.fetch = async (url, options = {}) => {
     }
     return jsonResponse({ status: '0', program_output: compileRequest.stdin ? `input=${compileRequest.stdin}` : 'PASS' });
   }
-  if (address.endsWith('/v1/responses')) {
+  if (address.endsWith(':generateContent')) {
     aiRequest = JSON.parse(options.body);
+    aiRequestUrl = address;
+    aiHeaders = options.headers;
     if (aiStatus !== 200) return jsonResponse({ error: { message: 'mock provider error' } }, aiStatus);
-    return jsonResponse({ output_text: 'Here is the explanation.\n```java\nclass Demo {}\n```' });
+    return jsonResponse({ candidates: [{ content: { parts: [{ text: 'Here is the explanation.\n```java\nclass Demo {}\n```' }] } }] });
   }
   return originalFetch(url, options);
 };
@@ -64,11 +69,16 @@ async function request(path, body, method = 'POST') {
 test('serves the IDE page and reports provider configuration without exposing a key', async () => {
   const page = await fetch(baseUrl + '/');
   assert.equal(page.status, 200);
-  assert.match(await page.text(), /AI coding tutor/);
+  const pageText = await page.text();
+  assert.match(pageText, /AI coding tutor/);
   const status = await request('/api/assistant/status', undefined, 'GET');
   assert.equal(status.data.configured, true);
   assert.equal(status.data.model, 'test-model');
-  assert.equal(JSON.stringify(status.data).includes('test-key'), false);
+  assert.equal(status.data.provider, 'Google Gemini');
+  assert.equal(status.data.customEndpointConfigured, true);
+  assert.equal(JSON.stringify(status.data).includes('test-gemini-key'), false);
+  assert.match(pageText, /Google Gemini/);
+  assert.doesNotMatch(pageText, /OpenAI|OPENAI_API_KEY/);
 });
 
 test('rejects invalid execution requests clearly', async () => {
@@ -110,17 +120,29 @@ test('normalizes Java entry class names without rewriting comments or string lit
   assert.match(compileRequest.code, /println\("Core"\)/);
 });
 
-test('validates assistant requests and returns tutor replies', async () => {
+test('validates assistant requests and sends Gemini chat history without exposing the key', async () => {
   let result = await request('/api/assistant', { language: 'java', code: 'class Main {}', prompt: '' });
   assert.equal(result.response.status, 400);
   assert.match(result.data.error, /question/i);
 
-  result = await request('/api/assistant', { language: 'java', code: 'class Main {}', prompt: 'Explain this', history: [{ role: 'system', content: 'ignored' }, { role: 'user', content: 'Earlier question' }] });
+  result = await request('/api/assistant', { language: 'java', code: 'class Main {}', prompt: 'Explain this', history: [{ role: 'system', content: 'ignored' }, { role: 'user', content: 'Earlier question' }, { role: 'assistant', content: 'Previous answer' }] });
   assert.equal(result.response.status, 200);
   assert.match(result.data.reply, /explanation/);
-  assert.equal(aiRequest.input[0].role, 'user');
-  assert.equal(aiRequest.input.length, 2);
-  assert.match(aiRequest.input[1].content, /Current code/);
+  assert.equal(result.data.model, 'test-model');
+  assert.equal(result.data.provider, 'Google Gemini');
+  assert.equal(aiRequest.contents[0].role, 'user');
+  assert.equal(aiRequest.contents[1].role, 'model');
+  assert.equal(aiRequest.contents[1].parts[0].text, 'Previous answer');
+  assert.equal(aiRequest.contents.length, 3);
+  assert.match(aiRequest.contents[2].parts[0].text, /Current code/);
+  assert.match(aiRequest.systemInstruction.parts[0].text, /programming tutor/);
+  assert.equal(aiRequest.generationConfig.maxOutputTokens, 1200);
+  assert.equal(aiRequest.url, undefined);
+  assert.equal(JSON.stringify(aiRequest).includes('test-gemini-key'), false);
+  assert.equal(aiHeaders['x-goog-api-key'], 'test-gemini-key');
+  assert.equal(aiHeaders.Authorization, undefined);
+  assert.match(aiRequestUrl, /generativelanguage\.googleapis\.com\/v1beta\/models\/test-model:generateContent/);
+  assert.doesNotMatch(aiRequestUrl, /key=/i);
 });
 
 test('surfaces assistant provider failures as a bounded service error', async () => {
@@ -128,7 +150,7 @@ test('surfaces assistant provider failures as a bounded service error', async ()
   const result = await request('/api/assistant', { language: 'python', code: 'print(1)', prompt: 'Explain' });
   aiStatus = 200;
   assert.equal(result.response.status, 502);
-  assert.match(result.data.error, /mock provider error/);
+  assert.match(result.data.error, /quota/i);
 });
 
 test('validates and accepts feedback with only the allowed category and rating', async () => {
@@ -148,4 +170,3 @@ test('returns helpful errors for malformed JSON and unknown API routes', async (
   const missing = await request('/api/not-a-route', undefined, 'GET');
   assert.equal(missing.response.status, 404);
 });
-

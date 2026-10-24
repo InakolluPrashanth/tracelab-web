@@ -6,7 +6,6 @@ TraceLab is an interactive code playground with source-driven walkthroughs acros
 
 For programs that call standard input functions, TraceLab detects common input reads and asks for values one at a time. It then combines the answers into stdin and submits the program to Wandbox. The public Wandbox API runs programs in batch mode, so answers must be collected before execution begins.
 
-The editor includes a searchable language picker, lightweight language-aware completion, a Console and I/O side panel, and a code tutor. To enable the tutor, configure `OPENAI_API_KEY` on the server; see `DEPLOY.md`. The Feedback tab sends feedback to the service logs for developer review.
+The editor includes a searchable language picker, lightweight language-aware completion, a Console and I/O side panel, and a Gemini-powered code tutor. To enable the tutor, configure `GEMINI_API_KEY` on the server; see `DEPLOY.md`. The Feedback tab sends feedback to the service logs for developer review.
 
 See `DEPLOY.md` for deployment settings and `LAUNCH_CHECKLIST.md` for a release check.
-
