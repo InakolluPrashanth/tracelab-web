@@ -333,6 +333,16 @@ app.post('/api/execute', async (req, res) => {
     const status = data.status == null ? null : String(data.status);
     const signal = data.signal ? String(data.signal) : '';
     const compileMessage = compilerMessage || [compilerOutput, compilerError].filter(Boolean).join('\n');
+    if (/catatonit:\d+\).*failed to exec pid1: No such file or directory/i.test(compileMessage)) {
+      return res.json({
+        ok: false,
+        output: `${SUPPORTED[language].name} is temporarily unavailable on Wandbox. Its runner could not start, so your code and input were not executed. Please try again later or choose another language.`,
+        runtime: SUPPORTED[language].name,
+        compiler: compiler.name,
+        retryable: true,
+        errorCode: 'provider_runner_unavailable'
+      });
+    }
     const compileFailed = status == null && Boolean(compilerError || compilerMessage) && !programOutput;
     const runtimeFailed = status == null && Boolean(programError) && !programOutput;
     const failed = Boolean(signal) || (status !== null && status !== '0') || compileFailed || runtimeFailed;
