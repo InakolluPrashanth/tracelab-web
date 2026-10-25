@@ -33,6 +33,9 @@ global.fetch = async (url, options = {}) => {
   }
   if (address.endsWith('/compile.json')) {
     compileRequest = JSON.parse(options.body);
+    if (compileRequest.code.includes('swift-runner-unavailable')) {
+      return jsonResponse({ status: '1', compiler_error: 'ERROR (catatonit:2): failed to exec pid1: No such file or directory' });
+    }
     if (compileRequest.code.includes('syntaxerror')) {
       return jsonResponse({ status: '1', compiler_error: 'syntax error near token' });
     }
@@ -122,6 +125,16 @@ test('forwards multiline input unchanged for every hosted runtime', async () => 
     assert.equal(compileRequest.stdin, stdin, `${language} must preserve line breaks and spaces`);
     assert.equal(result.data.output, 'input=42\nhello world');
   }
+});
+
+test('reports Wandbox container startup failures as a provider outage', async () => {
+  const result = await request('/api/execute', { language: 'swift', code: 'swift-runner-unavailable', stdin: 'TraceLab' });
+  assert.equal(result.response.status, 200);
+  assert.equal(result.data.ok, false);
+  assert.equal(result.data.errorCode, 'provider_runner_unavailable');
+  assert.equal(result.data.retryable, true);
+  assert.match(result.data.output, /Swift is temporarily unavailable on Wandbox/);
+  assert.match(result.data.output, /code and input were not executed/);
 });
 
 test('returns compiler diagnostics instead of disguising compile errors as success', async () => {
