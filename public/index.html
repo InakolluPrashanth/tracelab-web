@@ -22,6 +22,28 @@
 @media(max-width:1050px){.lower{grid-template-columns:1fr 1fr}.logic{grid-column:span 2}.cap-grid{grid-template-columns:1fr 1fr}}@media(max-width:860px){.nav{position:absolute;top:72px;left:0;right:0;background:#fff;flex-direction:column;align-items:flex-start;gap:0;border-bottom:1px solid var(--line);max-height:0;overflow:hidden;transition:max-height .25s ease}.nav.open{max-height:260px}.nav a{padding:14px clamp(22px,6vw,88px);width:100%}.menu-btn{display:block}.cta{display:none}.workspace{grid-template-columns:1fr}.editor{border-right:0;border-bottom:1px solid var(--line);min-height:450px}.lower{grid-template-columns:1fr}.logic{grid-column:auto}.step-grid,.cap-grid{grid-template-columns:1fr}.faq-grid{grid-template-columns:1fr}}@media(max-width:700px){.server-pill{display:none}.lang{min-width:115px}.runbar{flex-wrap:wrap}.saved{margin-left:0;width:100%}}@media(max-width:480px){main{padding-top:28px}.node{width:48px;height:48px;border-radius:15px;top:115px}.node small{top:57px;font-size:9px;white-space:normal;width:60px;text-align:center}.node span{font-size:16px}.line{top:139px}.pulse{top:134px}.stage{height:275px}.bar{padding:10px 12px;min-height:58px}.bar-actions{gap:5px}.detect{font-size:9px;padding:5px}}
 @media(prefers-color-scheme:dark){:root{--ink:#edf2ff;--muted:#aeb8cc;--line:#2a3550;--blue:#86a0ff;--mint:#56dbb8;--bg:#0e1423;--pale:#202b4d}.top,.workspace,.card,.node,.step,.cap-card{background:#141c30;border-color:var(--line)}body{background:var(--bg);color:var(--ink)}.nav{color:#a9b4ca}.nav.open{background:#141c30}.brand{color:#f4f6ff}.bar,.console,.preview{background:#141c30;border-color:var(--line)}.file{color:#b7c2d8}.lang,.speed{background:#141c30;color:#edf2ff;border-color:#40506f}.lang option,.lang optgroup,.speed option{color:#edf2ff;background:#141c30}.codearea{background:#11182a}.nums{color:#66728c}textarea{color:#d9e2f6}.reset,.circle{background:#28334c;color:#c7d1e6}.console{background:#11182a}.console pre{color:#bdc9df}.stage{background-color:#10182a;background-image:radial-gradient(#34415a 1px,transparent 1px);border-color:var(--line)}.line{background:#3a4764}.node{border-color:#40506f}.node.active{background:#26345e;border-color:var(--blue)}.node.done{background:#173b37;border-color:#4d9f91}.note{color:#b3bed3}.note b{color:var(--ink)}.toptime span,.labels{color:#96a3bd}.track{background:#29344b}.card p{color:#bac5d9}.var,.chip{background:#222d45;color:#c1cbe1}.logic-summary{color:#bac5d9}.logic-summary strong{color:#aebdff}.focus,.detect,.badge{background:#222e53;border-color:#40558f;color:#aebdff}.languages .tiny,.hint{color:#9daac3}.step .num{background:#202b4d;color:#aebdff}.step p,.cap-card p,.section-head p,.foot-note,.faq-item p{color:#aeb8cc}.site-footer{border-color:var(--line)}.foot-links{color:#a9b4ca}.cta{background:#eef2ff;color:#18223b}.menu-btn{color:#edf2ff}}.lower{grid-template-columns:repeat(2,minmax(0,1fr))}.logic-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:18px}.logic-grid .logic,.logic-source{min-width:0}.main-logic-code{margin:0;min-height:150px;max-height:360px;overflow:auto;border-radius:9px;padding:13px 15px;background:#f6f8fc;color:#2b3852;font:12px/1.75 'DM Mono',monospace;white-space:pre;tab-size:2}.main-logic-empty{color:var(--muted);font:13px/1.6 Manrope,sans-serif;white-space:normal}.logic-grid .logic{grid-column:auto}@media(max-width:860px){.lower,.logic-grid{grid-template-columns:1fr}}@media(prefers-color-scheme:dark){.main-logic-code{background:#11182a;color:#d9e2f6}}.language-browser{margin:28px 0 16px;padding:24px;background:#101114;color:#f4f5f8;border:1px solid #282a30;border-radius:14px}.picker-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}.picker-heading h2{font-size:22px;letter-spacing:-.7px;margin:0 0 5px}.picker-heading p{margin:0;color:#a7aab4;font-size:12px}.picker-search{width:min(420px,48%);padding:12px 14px;border:1px solid #30323a;border-radius:9px;background:#0b0c0e;color:#f4f5f8;outline:none;font-size:12px}.picker-search:focus{border-color:#637cff;box-shadow:0 0 0 3px #637cff25}.picker-categories{display:flex;gap:5px;padding:4px;width:max-content;max-width:100%;overflow:auto;background:#202126;border-radius:9px;margin:0 auto 18px}.picker-category{background:transparent;color:#b9bbc4;padding:8px 12px;border-radius:7px;font-size:11px;font-weight:800;white-space:nowrap}.picker-category.active{background:#30323a;color:#fff;box-shadow:inset 0 0 0 1px #484b55}.language-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}.language-card{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;border:1px solid #30323a;border-radius:11px;background:#191a1e;color:#f4f5f8;text-align:left;transition:background .15s,border-color .15s,transform .15s}.language-card:hover,.language-card.selected{background:#20232b;border-color:#6278ed;transform:translateY(-1px)}.language-card span:first-child{font-size:12px;font-weight:700}.language-icon{display:grid;place-items:center;min-width:31px;height:31px;padding:0 5px;border-radius:9px;background:#292d39;color:#aebcff;font:700 11px 'DM Mono'}.language-meta{display:block;margin-top:4px;color:#8f929c;font-size:9px;font-weight:500}.picker-empty{grid-column:1/-1;padding:22px;text-align:center;color:#a7aab4;font-size:12px}.workspace.ide-shell{grid-template-columns:minmax(0,1.12fr) minmax(340px,.88fr);margin-top:0;min-height:650px;overflow:hidden;background:#0b0c0e;color:#eff1f6;border:1px solid #292b31;border-radius:13px;box-shadow:0 18px 50px #0b0d1418}.workspace.ide-shell .editor{min-width:0;min-height:650px;border-right:1px solid #292b31;background:#0b0c0e}.ide-shell .bar{background:#101114;border-color:#292b31}.ide-shell .file{color:#e2e4ea}.ide-shell .file i{background:#6781ff}.ide-shell .lang{background:#191a1f;color:#f1f2f7;border-color:#333640}.ide-shell .lang option,.ide-shell .lang optgroup{background:#17191e;color:#f1f2f7}.ide-shell .detect{background:#1a1c22;border-color:#343740;color:#bbc5ff}.ide-shell .codearea{min-height:420px;background:#090a0c}.ide-shell .nums{color:#747988;font-size:12px;line-height:27px}.ide-shell #code{min-height:420px;background:transparent;color:#e3e6ed;font-size:13px;line-height:27px;caret-color:#89a0ff}.ide-shell .runbar{background:#101114;border-color:#292b31}.ide-shell .run{background:#5a71f2;box-shadow:none}.ide-shell .reset{background:#202228;color:#c6c9d3}.ide-shell .saved{color:#9195a2}.ide-shell .server-pill{color:#9195a2}.ide-side{min-width:0;display:flex;flex-direction:column;background:#0c0d10}.ide-tabs{height:45px;display:flex;align-items:stretch;overflow-x:auto;border-bottom:1px solid #292b31;background:#101114}.ide-tab{flex:0 0 auto;padding:0 13px;background:transparent;color:#9a9eaa;border-bottom:2px solid transparent;font-size:11px;font-weight:700;white-space:nowrap}.ide-tab.active{color:#f4f5f8;border-bottom-color:#7288ff}.side-panel{display:none;min-height:604px;max-height:740px;flex:1;overflow:auto}.side-panel.active{display:flex;flex-direction:column}.side-panel .console{min-height:100%;padding:16px;background:#0c0d10;border-top:0}.side-panel .chead{color:#9b9eaa}.side-panel .console pre{max-height:none;overflow:visible;color:#d4d8e2}.side-panel .input-panel{width:100%;min-height:100%;padding:18px;background:#0c0d10;color:#eef0f5;border-top:0}.side-panel .input-guidance{color:#9da1ae}.side-panel .input-title,.side-panel .input-hint{color:#a6a9b4}.side-panel .program-input{background:#14161a;color:#eff1f7;border-color:#363944}.side-panel .input-prompt{background:#1b2030;color:#e5e9f6}.side-panel .input-prompt.done{background:#152a25;color:#d8f2e8}.side-panel .input-message{color:#f0c15b}.feedback-view{padding:20px}.feedback-view h3{margin:0 0 6px;font-size:14px}.feedback-view p{margin:0 0 15px;color:#a2a6b2;font-size:11px;line-height:1.6}.feedback-form{display:grid;gap:10px}.feedback-form label{display:grid;gap:6px;color:#c4c7d0;font-size:10px;font-weight:700}.feedback-form select,.feedback-form textarea{width:100%;padding:10px 11px;border:1px solid #343741;border-radius:8px;outline:none;background:#14161a;color:#f1f2f7;font-size:11px}.feedback-form textarea{min-height:135px;resize:vertical;line-height:1.5}.feedback-form select:focus,.feedback-form textarea:focus{border-color:#657cff}.feedback-submit{justify-self:start;padding:9px 13px;border-radius:8px;background:#596ff0;color:#fff;font-size:11px;font-weight:800}.feedback-status{min-height:18px;color:#72d9b7;font-size:10px}.feedback-status.error{color:#f28b83}.trace-workspace{margin-top:18px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}.trace-workspace .visual{min-width:0}.trace-workspace .stage{border-bottom-color:var(--line)}.code-completions{position:absolute;z-index:12;display:none;min-width:210px;max-width:290px;max-height:190px;overflow:auto;padding:4px;border:1px solid #414550;border-radius:8px;background:#191b20;box-shadow:0 10px 28px #0008}.code-completions.open{display:block}.completion-option{display:flex;width:100%;justify-content:space-between;gap:15px;padding:6px 8px;border-radius:5px;background:transparent;color:#e7e9ef;text-align:left;font:11px 'DM Mono'}.completion-option.active,.completion-option:hover{background:#173c5a;color:#8ecbff}.completion-kind{color:#9298a7;font-size:9px}.ide-shell .codearea{overflow:visible}.ide-shell .codearea #code{position:relative;z-index:1}.language-browser[hidden],.side-panel[hidden]{display:none!important}@media(max-width:1100px){.language-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:860px){.workspace.ide-shell{grid-template-columns:1fr}.workspace.ide-shell .editor{border-right:0;border-bottom:1px solid #292b31;min-height:510px}.ide-shell .codearea,.ide-shell #code{min-height:350px}.side-panel{min-height:500px}.picker-heading{align-items:stretch;flex-direction:column}.picker-search{width:100%}.trace-workspace{margin-top:14px}}@media(max-width:600px){.language-browser{padding:16px}.language-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.language-card{min-height:60px;padding:10px}.picker-heading h2{font-size:19px}.picker-categories{margin-left:0}.ide-tab{padding:0 10px;font-size:10px}.workspace.ide-shell .bar{align-items:flex-start;flex-direction:column;padding:10px 12px}.workspace.ide-shell .bar-actions{width:100%;justify-content:flex-start}.feedback-view{padding:14px}}.ide-shell .save-code{padding:7px 10px;border:1px solid #343740;border-radius:7px;background:#191a1f;color:#e3e5ec;font-size:10px;font-weight:800}.ide-shell .save-code:hover{border-color:#7288ff;color:#fff}
 </style>
+<style>
+@media(prefers-color-scheme:dark){
+  .trace-workspace{background:#141c30;color:#edf2ff;border-color:#2a3550}
+  .trace-workspace .bar,.trace-workspace .timeline{background:#141c30;border-color:#2a3550}
+  .trace-workspace .title,.trace-workspace .toptime strong{color:#edf2ff}
+  .trace-workspace .badge{background:#222e53;color:#aebdff}
+  .trace-workspace .stage{background-color:#10182a;background-image:radial-gradient(#34415a 1px,transparent 1px);border-color:#2a3550}
+  .trace-workspace .line{background:#3a4764}
+  .trace-workspace .node{background:#141c30;border-color:#40506f;color:#edf2ff}
+  .trace-workspace .node small,.trace-workspace .toptime span,.trace-workspace .labels{color:#96a3bd}
+  .trace-workspace .node.active{background:#26345e;border-color:#86a0ff}
+  .trace-workspace .node.done{background:#173b37;border-color:#4d9f91}
+  .trace-workspace .note{color:#b3bed3}
+  .trace-workspace .note b{color:#edf2ff}
+  .trace-workspace .track{background:#29344b}
+  .trace-workspace .track.done{background:#56dbb8}
+  .trace-workspace .track.now{background:#86a0ff}
+  .trace-workspace .circle{background:#28334c;color:#c7d1e6}
+  .trace-workspace .speed{background:#141c30;color:#edf2ff;border-color:#40506f}
+  .trace-workspace .play,.trace-workspace .playing{background:#5277f5;color:#fff}
+}
+</style>
 </head>
 <body>
 <header class="top">
@@ -76,7 +98,7 @@ let steps=[];let step=0;let timer=null;let currentKind='generic';
 const EXT={python:'py',javascript:'js',typescript:'ts',c:'c',cpp:'cpp',java:'java',go:'go',kotlin:'kt',swift:'swift',ruby:'rb',php:'php',perl:'pl',bash:'sh',sql:'sql'};
 const LABELS={html:'HTML',css:'CSS',python:'Python',javascript:'JavaScript',typescript:'TypeScript',c:'C',cpp:'C++',java:'Java',go:'Go',kotlin:'Kotlin',swift:'Swift',ruby:'Ruby',php:'PHP',perl:'Perl',bash:'Bash',sql:'SQL'};
 // Languages compiled on the hosted Wandbox backend. Input is supplied before execution.
-const WANDBOX_RUNTIMES={typescript:true,c:true,cpp:true,java:true,go:true,kotlin:true,swift:true,ruby:true,php:true,perl:true,bash:true,sql:true};
+const WANDBOX_RUNTIMES={typescript:true,c:true,cpp:true,java:true,go:true,swift:true,ruby:true,php:true,perl:true,bash:true,sql:true};
 const codes={
 html:['index.html',['<!doctype html>','<html>','<head>','<title>TraceLab</title>','</head>','<body>','<h1>Hello, TraceLab!</h1>','<p>Edit this HTML and run it.</p>','</body>','</html>']],
 css:['style.css',['body {','  font-family: sans-serif;','  background: #f4f6fb;','}','h1 { color: #5277f5; }']],
@@ -204,31 +226,58 @@ let pendingStdinValues=[];let stdinStored=false;
 let inputPromptSteps=[];let inputStepIndex=0;let inputCollectedAnswers=[];let inputCollectionActive=false;let inputCollectionKey="";
 let pyodidePromise=null;function getPyodide(){if(pyodidePromise)return pyodidePromise;pyodidePromise=new Promise((resolve,reject)=>{if(window.loadPyodide){window.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'}).then(resolve).catch(reject);return}const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js';s.onload=()=>window.loadPyodide({indexURL:'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'}).then(resolve).catch(reject);s.onerror=()=>reject(new Error('Could not load the Python runtime.'));document.head.appendChild(s)});return pyodidePromise}
 function stripCodeStringsAndComments(code,lang){
-  let s=String(code||'');
-  if(lang==='python') s=s.replace(/#.*$/gm,'');
-  else if(lang==='bash'||lang==='ruby'||lang==='perl') s=s.replace(/#.*/g,'');
-  else s=s.replace(/\/\*[\s\S]*?\*\//g,'').replace(/\/\/.*$/gm,'');
-  return s;
+  const source=String(code||''),chars=source.split('');
+  const blank=(from,to)=>{for(let j=from;j<to;j++)if(chars[j]!=='\n'&&chars[j]!=='\r')chars[j]=' '};
+  const hashComments=['python','bash','ruby','perl','php'].includes(lang);
+  const slashComments=lang!=='sql'&&lang!=='html';
+  const dashComments=lang==='sql';
+  const htmlComments=lang==='html';
+  const blockComments=['c','cpp','java','javascript','typescript','go','kotlin','swift','php','sql','css'].includes(lang);
+  let i=0;
+  while(i<source.length){
+    if(htmlComments&&source.startsWith('<!--',i)){const end=source.indexOf('-->',i+4);const to=end<0?source.length:end+3;blank(i,to);i=to;continue}
+    if(blockComments&&source.startsWith('/*',i)){const end=source.indexOf('*/',i+2);const to=end<0?source.length:end+2;blank(i,to);i=to;continue}
+    if(hashComments&&source[i]==='#'){let end=i;while(end<source.length&&source[end]!=='\n'&&source[end]!=='\r')end++;blank(i,end);i=end;continue}
+    if(dashComments&&source.startsWith('--',i)||slashComments&&source.startsWith('//',i)){
+      let end=i;while(end<source.length&&source[end]!=='\n'&&source[end]!=='\r')end++;blank(i,end);i=end;continue;
+    }
+    const quote=source[i];
+    if(quote==='\''||quote==='"'||quote==='`'){
+      const triple=(quote==='\''||quote==='"')&&source.startsWith(quote.repeat(3),i);
+      const width=triple?3:1;let end=i+width;
+      while(end<source.length){
+        if(source[end]==='\\'){end+=2;continue}
+        if(lang==='sql'&&source[end]===quote&&source[end+1]===quote){end+=2;continue}
+        if(source.startsWith(quote.repeat(width),end)){end+=width;break}
+        end++;
+      }
+      blank(i,Math.min(end,source.length));i=end;continue;
+    }
+    i++;
+  }
+  return chars.join('');
 }
 function inputCount(lang,code){
   const s=stripCodeStringsAndComments(code,lang);
   const patterns={
-    python:/\binput\s*\(/g,
-    javascript:/(?:\bprompt\s*\(|\breadline\s*\()/g,
-    typescript:/(?:\bprompt\s*\(|\breadline\s*\(|\bquestion\s*\(|\breadFileSync\s*\(\s*0|\bprocess\.stdin\b)/g,
+    python:/(?:\binput\s*\(|\bsys\s*\.\s*stdin(?:\s*\.\s*buffer)?\s*\.\s*(?:readline|readlines|read)\s*\()/g,
+    javascript:/(?:\bprompt\s*\(|\breadline\s*\(|\bquestion\s*\(|\breadFileSync\s*\(\s*0|\bprocess\s*\.\s*stdin\s*\.\s*(?:on|once|read)\s*\()/g,
+    typescript:/(?:\bprompt\s*\(|\breadline\s*\(|\bquestion\s*\(|\breadFileSync\s*\(\s*0|\bprocess\s*\.\s*stdin\s*\.\s*(?:on|once|read)\s*\()/g,
     c:/(?:\bscanf\s*\(|\bfscanf\s*\(|\bfgets\s*\(|\bgetchar\s*\()/g,
-    cpp:/(?:\bcin\s*>>|\bstd::cin\s*>>|\bgetline\s*\(\s*(?:std::)?cin\s*,)/g,
-    java:/(?:\.next(?:Int|Double|Float|Long|Short|Byte|Boolean|Line)?\s*\(|\.readLine\s*\()/g,
-    go:/(?:\bfmt\.(?:F?Scan(?:f|ln)?|Scan)\s*\(|\bFscan(?:f|ln)?\s*\(|\b(?:scanner|sc)\.Scan\s*\(|\bReadString\s*\()/g,
-    kotlin:/(?:\breadLine\s*\(|\breadln\s*\(|\.next(?:Int|Double|Float|Long|Short|Byte|Boolean|Line)?\s*\()/g,
+    cpp:/(?:\bcin\s*>>|\bstd::cin\s*>>|\bgetline\s*\(\s*(?:std::)?cin\s*,|\bcin\s*\.\s*(?:get|getline)\s*\(|\bscanf\s*\(|\bfscanf\s*\(|\bfgets\s*\(|\bgetchar\s*\()/g,
+    java:/(?:\.next(?:Int|Double|Float|Long|Short|Byte|Boolean|Line)?\s*\(|\.read(?:Line)?\s*\()/g,
+    go:/(?:\bfmt\.(?:F?Scan(?:f|ln)?|Scan)\s*\(|\bFscan(?:f|ln)?\s*\(|\b(?:scanner|sc)\.Scan\s*\(|\bRead(?:String|Bytes|Line)\s*\()/g,
+    kotlin:/(?:\breadLine\s*\(|\breadln(?:OrNull)?\s*\(|\.next(?:Int|Double|Float|Long|Short|Byte|Boolean|Line)?\s*\()/g,
     swift:/\breadLine\s*\(/g,
-    ruby:/\bgets\b/g,
-    php:/(?:\bfgets\s*\(\s*STDIN|\btrim\s*\(\s*fgets\s*\(\s*STDIN)/g,
-    perl:/(?:<STDIN>|\breadline\s*\()/g,
+    ruby:/(?:\bgets\b|\bSTDIN\s*\.\s*(?:gets|read|readline)\b)/g,
+    php:/(?:\bfgets\s*\(\s*STDIN|\bfscanf\s*\(\s*STDIN|\btrim\s*\(\s*fgets\s*\(\s*STDIN|\breadline\s*\(|\bstream_get_contents\s*\(\s*STDIN)/g,
+    perl:/(?:<STDIN>|<>|\breadline\s*\(|\breadline\s+STDIN\b)/g,
     bash:/(?:^|[;\n\s])read\b/gm,
     sql:/(?!x)x/g
   };
-  const p=patterns[lang]; return p?(s.match(p)||[]).length:0;
+  const p=patterns[lang];let count=p?(s.match(p)||[]).length:0;
+  if(lang==='php'&&/\bfile_get_contents\s*\(\s*(['"])php:\/\/stdin\1\s*\)/i.test(String(code||''))&&/\bfile_get_contents\s*\(/i.test(s))count++;
+  return count;
 }
 function pythonInputCount(code){return inputCount('python',code)}
 function inputCollectionKeyFor(lang,code){return `${lang}\n${code}`}
