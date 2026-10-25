@@ -7,6 +7,7 @@ const originalFetch = global.fetch;
 let server;
 let baseUrl;
 let compileRequest;
+let requestId = 0;
 
 const jsonResponse = (body, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -17,9 +18,17 @@ global.fetch = async (url, options = {}) => {
   const address = String(url);
   if (address.endsWith('/list.json')) {
     return jsonResponse([
+      { name: 'tsc-head', language: 'TypeScript' },
       { name: 'gcc-head-c', language: 'C' },
       { name: 'gcc-head', language: 'C++' },
-      { name: 'openjdk-head', language: 'Java' }
+      { name: 'openjdk-head', language: 'Java' },
+      { name: 'go-head', language: 'Go' },
+      { name: 'swift-head', language: 'Swift' },
+      { name: 'ruby-head', language: 'Ruby' },
+      { name: 'php-head', language: 'PHP' },
+      { name: 'perl-head', language: 'Perl' },
+      { name: 'wandbox-bash', language: 'Bash script' },
+      { name: 'wandbox-sqlite3', language: 'SQL' }
     ]);
   }
   if (address.endsWith('/compile.json')) {
@@ -44,9 +53,13 @@ after(async () => {
 });
 
 async function request(path, body, method = 'POST') {
+  requestId += 1;
   const response = await fetch(baseUrl + path, {
     method,
-    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+    headers: {
+      'X-Forwarded-For': `198.51.100.${requestId}`,
+      ...(body === undefined ? {} : { 'Content-Type': 'application/json' })
+    },
     body: body === undefined ? undefined : JSON.stringify(body)
   });
   return { response, data: await response.json() };
@@ -86,6 +99,31 @@ test('runs code with stdin through the Wandbox adapter', async () => {
   assert.equal(compileRequest.compiler, 'gcc-head');
 });
 
+test('advertises the available hosted runtimes and excludes unavailable Kotlin', async () => {
+  const result = await request('/api/runtimes', undefined, 'GET');
+  assert.equal(result.response.status, 200);
+  assert.deepEqual(result.data.map(runtime => runtime.id).sort(), [
+    'bash', 'c', 'cpp', 'go', 'java', 'perl', 'php', 'ruby', 'sql', 'swift', 'typescript'
+  ]);
+});
+
+test('forwards multiline input unchanged for every hosted runtime', async () => {
+  const languages = ['typescript', 'c', 'cpp', 'java', 'go', 'swift', 'ruby', 'php', 'perl', 'bash', 'sql'];
+  for (const language of languages) {
+    const stdin = '42\nhello world\n';
+    const result = await request('/api/execute', { language, code: 'test program', stdin });
+    assert.equal(result.response.status, 200, `${language} should execute`);
+    assert.equal(result.data.ok, true, `${language} should succeed`);
+    assert.equal(compileRequest.compiler, {
+      typescript: 'tsc-head', c: 'gcc-head-c', cpp: 'gcc-head', java: 'openjdk-head',
+      go: 'go-head', swift: 'swift-head', ruby: 'ruby-head', php: 'php-head',
+      perl: 'perl-head', bash: 'wandbox-bash', sql: 'wandbox-sqlite3'
+    }[language]);
+    assert.equal(compileRequest.stdin, stdin, `${language} must preserve line breaks and spaces`);
+    assert.equal(result.data.output, 'input=42\nhello world');
+  }
+});
+
 test('returns compiler diagnostics instead of disguising compile errors as success', async () => {
   const result = await request('/api/execute', { language: 'c', code: 'syntaxerror' });
   assert.equal(result.response.status, 200);
@@ -114,7 +152,8 @@ test('validates and accepts feedback with only the allowed category and rating',
 });
 
 test('returns helpful errors for malformed JSON and unknown API routes', async () => {
-  const malformed = await fetch(baseUrl + '/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{' });
+  requestId += 1;
+  const malformed = await fetch(baseUrl + '/api/feedback', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': `198.51.100.${requestId}` }, body: '{' });
   assert.equal(malformed.status, 400);
   assert.match((await malformed.json()).error, /JSON/i);
   const missing = await request('/api/not-a-route', undefined, 'GET');
