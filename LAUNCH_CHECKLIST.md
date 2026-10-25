@@ -14,7 +14,7 @@
 - [ ] HTML/CSS preview still works
 - [ ] Search and category filters show the expected language cards
 - [ ] Editor completion popup can insert a suggestion
-- [ ] AI Agent uses Google Gemini, explains code, and reports clear setup errors when no key is configured
+- [ ] No AI tutor controls or `/api/assistant` endpoints are exposed
 - [ ] Feedback form accepts and reports a successful submission
 - [ ] No API key is present in browser source
 
