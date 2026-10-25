@@ -3,18 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>TraceLab | Learn code by watching it run</title>
-<meta name="description" content="TraceLab is an interactive code playground with source-driven walkthroughs for 16 languages and live execution in 15 runtimes.">
+<title>TraceLab Compiler: Free Online Code Compiler</title>
+<meta name="description" content="Free online compiler and code visualizer. Run programs with input in Python, JavaScript, TypeScript, C, C++, Java, Go, Swift, Ruby and more.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://tracelab-web.pages.dev/">
 <meta property="og:type" content="website">
-<meta property="og:title" content="TraceLab — Interactive Code Playground">
-<meta property="og:description" content="Run, visualize, and understand code with TraceLab across 15 live runtimes, plus a Kotlin walkthrough.">
+<meta property="og:title" content="TraceLab Compiler: Free Online Code Compiler">
+<meta property="og:description" content="Run code, enter program input, and trace important steps across Python, Java, C, C++, JavaScript, TypeScript, and more.">
 <meta property="og:url" content="https://tracelab-web.pages.dev/">
 <meta property="og:site_name" content="TraceLab">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TraceLab — Interactive Code Playground">
-<meta name="twitter:description" content="Run, visualize, and understand code with TraceLab across 15 live runtimes, plus a Kotlin walkthrough.">
+<meta name="twitter:title" content="TraceLab Compiler: Free Online Code Compiler">
+<meta name="twitter:description" content="Free online compiler and code visualizer. Run code, enter input, and trace important program steps.">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"TraceLab Compiler","alternateName":"TraceLab","url":"https://tracelab-web.pages.dev/","description":"Free online code compiler and visualizer for running code, entering input, and tracing program steps.","applicationCategory":"DeveloperApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -52,7 +55,7 @@
   <div class="top-actions"><a class="cta" href="#playground">Start coding</a><button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button></div>
 </header>
 <main>
-<section class="hero"><div class="eyebrow">Interactive code playground</div><h1>Don’t just run code. <span>Watch it think.</span></h1><p class="sub">Trace code in 16 languages and run it in 15 live runtimes, with real output and a source-driven visual flow. Kotlin is available for walkthroughs.</p></section>
+<section class="hero"><div class="eyebrow">Free online compiler &amp; code visualizer</div><h1>Don’t just run code. <span>Watch it think.</span></h1><p class="sub">Run programs with input, then trace important steps across Python, JavaScript, TypeScript, C, C++, Java, Go, Swift, Ruby, PHP, Perl, Bash, SQL, HTML and CSS.</p></section>
 <section class="language-browser" aria-label="Choose a programming language">
   <div class="picker-heading"><div><div class="eyebrow">Choose your workspace</div><h2>What do you want to build?</h2><p>Pick a language to open its example, write code, and run it in the editor.</p></div><input class="picker-search" id="languageSearch" type="search" placeholder="⌕  Search language or runtime…" aria-label="Search languages"></div>
   <div class="picker-categories" role="tablist" aria-label="Language categories"><button class="picker-category active" type="button" data-category="Popular">Popular</button><button class="picker-category" type="button" data-category="Programming">Programming</button><button class="picker-category" type="button" data-category="Web">Web</button><button class="picker-category" type="button" data-category="Databases">Databases</button></div>
@@ -261,8 +264,8 @@ function inputCount(lang,code){
   const s=stripCodeStringsAndComments(code,lang);
   const patterns={
     python:/(?:\binput\s*\(|\bsys\s*\.\s*stdin(?:\s*\.\s*buffer)?\s*\.\s*(?:readline|readlines|read)\s*\()/g,
-    javascript:/(?:\bprompt\s*\(|\breadline\s*\(|\bquestion\s*\(|\breadFileSync\s*\(\s*0|\bprocess\s*\.\s*stdin\s*\.\s*(?:on|once|read)\s*\()/g,
-    typescript:/(?:\bprompt\s*\(|\breadline\s*\(|\bquestion\s*\(|\breadFileSync\s*\(\s*0|\bprocess\s*\.\s*stdin\s*\.\s*(?:on|once|read)\s*\()/g,
+    javascript:/(?:\bprompt\s*\(|\breadline\s*\(|\bquestion\s*\(|\breadFileSync\s*\(\s*0|\bprocess\s*\.\s*stdin\s*\.\s*read\s*\()/g,
+    typescript:/(?:\bprompt\s*\(|\breadline\s*\(|\bquestion\s*\(|\breadFileSync\s*\(\s*0|\bprocess\s*\.\s*stdin\s*\.\s*read\s*\()/g,
     c:/(?:\bscanf\s*\(|\bfscanf\s*\(|\bfgets\s*\(|\bgetchar\s*\()/g,
     cpp:/(?:\bcin\s*>>|\bstd::cin\s*>>|\bgetline\s*\(\s*(?:std::)?cin\s*,|\bcin\s*\.\s*(?:get|getline)\s*\(|\bscanf\s*\(|\bfscanf\s*\(|\bfgets\s*\(|\bgetchar\s*\()/g,
     java:/(?:\.next(?:Int|Double|Float|Long|Short|Byte|Boolean|Line)?\s*\(|\.read(?:Line)?\s*\()/g,
@@ -276,6 +279,16 @@ function inputCount(lang,code){
     sql:/(?!x)x/g
   };
   const p=patterns[lang];let count=p?(s.match(p)||[]).length:0;
+  if(lang==='javascript'||lang==='typescript'){
+    const directStreamRead=/\bprocess\s*\.\s*stdin\s*\.\s*read\s*\(/.test(s);
+    const event=/\bprocess\s*\.\s*stdin\s*\.\s*(?:on|once)\s*\(\s*(["'])(?:data|readable)\1/g;
+    let match,countedEvent=false;
+    while(!directStreamRead&&!countedEvent&&(match=event.exec(String(code||'')))){
+      const quoteIndex=match[0].indexOf(match[1]);
+      const visiblePrefix=match[0].slice(0,quoteIndex);
+      if(s.slice(match.index,match.index+visiblePrefix.length)===visiblePrefix){count++;countedEvent=true;}
+    }
+  }
   if(lang==='php'&&/\bfile_get_contents\s*\(\s*(['"])php:\/\/stdin\1\s*\)/i.test(String(code||''))&&/\bfile_get_contents\s*\(/i.test(s))count++;
   return count;
 }

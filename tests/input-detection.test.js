@@ -69,8 +69,12 @@ test('recognizes common stdin APIs that are not input() or prompt()', () => {
   assert.equal(context.detectInputCount('python', 'sys.stdin.readline()'), 1);
   assert.equal(context.detectInputCount('python', 'sys.stdin.buffer.readline()'), 1);
   assert.equal(context.detectInputCount('javascript', 'process.stdin.on("data", handler)'), 1);
+  assert.equal(context.detectInputCount('javascript', 'process.stdin.on("data", handleData); process.stdin.on("end", finish);'), 1);
+  assert.equal(context.detectInputCount('javascript', 'process.stdin.on("end", finish);'), 0);
   assert.equal(context.detectInputCount('javascript', 'rl.question("Name: ", answer => {})'), 1);
   assert.equal(context.detectInputCount('typescript', 'process.stdin.on("data", handler)'), 1);
+  assert.equal(context.detectInputCount('typescript', 'process.stdin.on("data", handleData); process.stdin.on("end", finish);'), 1);
+  assert.equal(context.detectInputCount('typescript', 'process.stdin.on("end", finish);'), 0);
   assert.equal(context.detectInputCount('cpp', 'std::cin.get()'), 1);
   assert.equal(context.detectInputCount('java', 'System.in.read()'), 1);
   assert.equal(context.detectInputCount('kotlin', 'readlnOrNull()'), 1);

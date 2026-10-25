@@ -80,6 +80,21 @@ test('serves the IDE without AI controls or AI health metadata', async () => {
   assert.equal(Object.hasOwn(health.data, 'assistantConfigured'), false);
 });
 
+test('serves search metadata, structured app details, and crawler files', async () => {
+  const page = await fetch(baseUrl + '/');
+  assert.equal(page.status, 200);
+  const markup = await page.text();
+  assert.match(markup, /<title>TraceLab Compiler: Free Online Code Compiler<\/title>/);
+  assert.match(markup, /name="description" content="Free online compiler and code visualizer/);
+  assert.match(markup, /application\/ld\+json/);
+  const robots = await fetch(baseUrl + '/robots.txt');
+  assert.equal(robots.status, 200);
+  assert.match(await robots.text(), /Sitemap: https:\/\/tracelab-web\.pages\.dev\/sitemap\.xml/);
+  const sitemap = await fetch(baseUrl + '/sitemap.xml');
+  assert.equal(sitemap.status, 200);
+  assert.match(await sitemap.text(), /https:\/\/tracelab-web\.pages\.dev\//);
+});
+
 test('rejects invalid execution requests clearly', async () => {
   let result = await request('/api/execute', { language: '', code: 'x' });
   assert.equal(result.response.status, 400);
