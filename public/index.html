@@ -47,6 +47,12 @@
   .trace-workspace .play,.trace-workspace .playing{background:#5277f5;color:#fff}
 }
 </style>
+<style>
+.ide-tab.needs-input,.ide-tab.active.needs-input{background:#3a2d12;color:#ffe08a;border-bottom-color:#ffd15a;animation:io-input-pulse 1.1s ease-in-out infinite}
+.ide-tab.needs-input::after{content:' · INPUT NEEDED';margin-left:6px;color:#ffda70;font-size:9px}
+@keyframes io-input-pulse{0%,100%{box-shadow:inset 0 0 0 1px #f5c04855,0 0 0 #f5c04800}50%{box-shadow:inset 0 0 0 1px #ffd15a,0 0 12px #f5c04888}}
+@media(prefers-reduced-motion:reduce){.ide-tab.needs-input,.ide-tab.active.needs-input{animation:none;outline:2px solid #ffd15a;outline-offset:-2px}}
+</style>
 </head>
 <body>
 <header class="top">
@@ -170,6 +176,7 @@ function stop(){if(timer){clearInterval(timer);timer=null}$('#play').textContent
 function loadSample(){const c=codes[$('#language').value];if(!c)return;$('#file').textContent=c[0];$('#code').value=c[1].join('\n');lineCount()}
 function updateWeb(){const l=$('#language').value;const web=['html','css','javascript'].includes(l);$('#openBrowser').style.display=web?'inline-flex':'none';if(!['html','css'].includes(l))hidePreview();const text={html:'HTML renders in your browser',css:'CSS renders in your browser',javascript:'JavaScript runs locally in your browser',python:'Python runs locally in your browser'}[l]||'Live server execution via TraceLab backend';$('#modeStatus').textContent=text}
 function showSidePanel(panelId){document.querySelectorAll('.ide-tab').forEach(tab=>{const active=tab.dataset.panel===panelId;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active))});document.querySelectorAll('.side-panel').forEach(panel=>panel.classList.toggle('active',panel.id===panelId))}
+function setInputTabAttention(active){const tab=document.querySelector('.ide-tab[data-panel="ioPanel"]');if(!tab)return;tab.classList.toggle('needs-input',active);if(active)tab.setAttribute('aria-label','I/O tab. Input needed. Type a value and press Enter.');else tab.removeAttribute('aria-label')}
 async function submitFeedback(event){event.preventDefault();const statusEl=$('#feedbackStatus'),button=$('.feedback-submit'),message=$('#feedbackMessage').value.trim();statusEl.classList.remove('error');statusEl.textContent='Sending…';button.disabled=true;try{const response=await fetch(TRACE_BACKEND+'/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({category:$('#feedbackCategory').value,rating:$('#feedbackRating').value?Number($('#feedbackRating').value):null,message})});const data=await response.json().catch(()=>({}));if(!response.ok||!data.ok)throw new Error(data.error||'Feedback could not be sent. Try again shortly.');statusEl.textContent=data.message;$('#feedbackForm').reset()}catch(error){statusEl.textContent=error.message;statusEl.classList.add('error')}finally{button.disabled=false}}
 function completionCandidates(prefix){const lang=$('#language').value,source=$('#code').value,local=[...source.matchAll(/\b[A-Za-z_$][\w$]*\b/g)].map(match=>match[0]),words=[...new Set([...local,...(COMPLETION_WORDS[lang]||[])])];return words.filter(word=>word.toLowerCase().startsWith(prefix.toLowerCase())&&word!==prefix).sort((a,b)=>{const localA=local.includes(a)?0:1,localB=local.includes(b)?0:1;return localA-localB||a.localeCompare(b)}).slice(0,8)}
 function hideCompletions(){const box=$('#codeCompletions');box.classList.remove('open');box.replaceChildren();completionItems=[]}
@@ -533,8 +540,8 @@ function renderInputPromptGuidance(lang,code,count){
     $('#inputHint').textContent=`Input ${inputStepIndex+1} of ${inputPromptSteps.length}`;
     const arrayGroup=findArrayInputGroup(lang,code,inputCollectedAnswers);
     guidance.textContent=arrayGroup
-      ?'Enter the array size first, then enter each indexed element separately. Press Enter or click “Store answer & next” after every value. TraceLab sends the collected array values to the program after the final element.'
-      :'Enter the answer for the prompt shown above, then press Enter or click “Store answer & next”. Answers are saved in order. For programs that read several lines at once, use Shift+Enter to add more lines inside the same answer.';
+      ?'Enter the array size first, then type each indexed value and press the Enter key to continue. You can also click the Store answer and next button. TraceLab runs the program after the final element.'
+      :'Type the answer for the prompt shown above and press the Enter key to continue. You can also click the Store answer and next button. Answers are saved in order. Use Shift+Enter to add more lines inside one answer.';
     return;
   }
   if(stdinStored && pendingStdinValues.length){
@@ -571,6 +578,7 @@ function renderInputPromptGuidance(lang,code,count){
 }
 function resetInputCollection(){
   inputPromptSteps=[];inputStepIndex=0;inputCollectedAnswers=[];inputCollectionActive=false;inputCollectionKey='';
+  setInputTabAttention(false);
   pendingStdinValues=[];stdinStored=false;
   const box=$('#programInput');
   if(box){box.value='';box.disabled=true;box.placeholder='Click Analyze & visualize to display the first prompt';}
@@ -584,6 +592,7 @@ function startInputCollection(lang,code){
   if(!inputPromptSteps.length)return false;
   inputStepIndex=0;inputCollectedAnswers=[];pendingStdinValues=[];stdinStored=false;
   inputCollectionActive=true;inputCollectionKey=inputCollectionKeyFor(lang,code);
+  setInputTabAttention(true);showSidePanel('ioPanel');
   const panel=$('#inputPanel'),box=$('#programInput'),button=$('#sendInput');
   panel.classList.add('show');panel.classList.remove('required');
   $('#inputActions').style.display='flex';
@@ -626,6 +635,7 @@ function storeProgramInput(showConfirmation=true){
     return [...pendingStdinValues];
   }
   inputCollectionActive=false;stdinStored=true;
+  setInputTabAttention(false);
   box.disabled=true;
   $('#sendInput').disabled=false;
   $('#sendInput').textContent='↻ Restart input entry';
