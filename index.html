@@ -540,8 +540,8 @@ function renderInputPromptGuidance(lang,code,count){
     $('#inputHint').textContent=`Input ${inputStepIndex+1} of ${inputPromptSteps.length}`;
     const arrayGroup=findArrayInputGroup(lang,code,inputCollectedAnswers);
     guidance.textContent=arrayGroup
-      ?'Enter the array size first, then type each indexed value and press the Enter key to continue. You can also click the Store answer and next button. TraceLab runs the program after the final element.'
-      :'Type the answer for the prompt shown above and press the Enter key to continue. You can also click the Store answer and next button. Answers are saved in order. Use Shift+Enter to add more lines inside one answer.';
+      ?'Enter the array size first. Then type each indexed value and press Enter on your keyboard to move to the next index. TraceLab runs the program after the final value.'
+      :'Type the answer for the prompt shown above and press Enter on your keyboard to continue. Each Enter submits one answer.';
     return;
   }
   if(stdinStored && pendingStdinValues.length){
@@ -592,7 +592,7 @@ function startInputCollection(lang,code){
   if(!inputPromptSteps.length)return false;
   inputStepIndex=0;inputCollectedAnswers=[];pendingStdinValues=[];stdinStored=false;
   inputCollectionActive=true;inputCollectionKey=inputCollectionKeyFor(lang,code);
-  setInputTabAttention(true);showSidePanel('ioPanel');
+  setInputTabAttention(true);showSidePanel('ioPanel');$('#inputActions').style.display='none';
   const panel=$('#inputPanel'),box=$('#programInput'),button=$('#sendInput');
   panel.classList.add('show');panel.classList.remove('required');
   $('#inputActions').style.display='flex';
@@ -637,6 +637,7 @@ function storeProgramInput(showConfirmation=true){
   inputCollectionActive=false;stdinStored=true;
   setInputTabAttention(false);
   box.disabled=true;
+  $('#inputActions').style.display='flex';
   $('#sendInput').disabled=false;
   $('#sendInput').textContent='↻ Restart input entry';
   renderInputPromptGuidance(lang,code,inputPromptSteps.length);
