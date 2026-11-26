@@ -595,7 +595,6 @@ function startInputCollection(lang,code){
   setInputTabAttention(true);showSidePanel('ioPanel');$('#inputActions').style.display='none';
   const panel=$('#inputPanel'),box=$('#programInput'),button=$('#sendInput');
   panel.classList.add('show');panel.classList.remove('required');
-  $('#inputActions').style.display='flex';
   box.value='';box.disabled=false;box.placeholder='Type the answer for the prompt above';
   button.disabled=false;button.textContent=inputPromptSteps.length===1?'Store answer ✓':'Store answer & next →';
   renderInputPromptGuidance(lang,code,inputPromptSteps.length);
@@ -668,6 +667,7 @@ function prepareProgramInput(lang,code){
     return {ok:false,collecting:true,values:[],count};
   }
   if(inputCollectionActive){
+    showSidePanel('ioPanel');
     status(`● Please answer input ${inputStepIndex+1} of ${inputPromptSteps.length} before running`,true);
     return {ok:false,collecting:true,values:[],count};
   }
