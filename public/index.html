@@ -667,6 +667,7 @@ function prepareProgramInput(lang,code){
     return {ok:false,collecting:true,values:[],count};
   }
   if(inputCollectionActive){
+    showSidePanel('ioPanel');
     status(`● Please answer input ${inputStepIndex+1} of ${inputPromptSteps.length} before running`,true);
     return {ok:false,collecting:true,values:[],count};
   }
