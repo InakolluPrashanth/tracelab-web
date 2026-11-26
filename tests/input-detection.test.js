@@ -17,6 +17,13 @@ globalThis.detectEstimatedInputCount=estimatedInputCount;
 globalThis.detectArrayInputPrompts=buildInputPromptSteps;
 globalThis.formatCollectedInputValues=formatCollectedInputValues;`, context);
 
+const outputStart = html.indexOf('function cleanOutput');
+const outputEnd = html.indexOf('function runJS', outputStart);
+assert.notEqual(outputStart, -1, 'compiler output formatter should exist');
+assert.notEqual(outputEnd, -1, 'compiler output formatter should have a stable boundary');
+const outputContext = { extractPromptTexts: () => ['Enter 5 integers:'] };
+vm.runInNewContext(`${html.slice(outputStart, outputEnd)}\nglobalThis.cleanCompilerOutput=cleanOutput;`, outputContext);
+
 test('detects stdin patterns for every language with interactive input', () => {
   const examples = {
     python: 'name = input("Name: ")',
@@ -142,6 +149,36 @@ test('prompts fixed-size arrays without requesting a size the program does not r
   assert.deepEqual(
     Array.from(context.detectArrayInputPrompts('cpp', code, [])),
     ['Enter arr[0]', 'Enter arr[1]', 'Enter arr[2]']
+  );
+});
+
+test('asks for each element in the five-integer C sample before its display loop', () => {
+  const code = [
+    '#include <stdio.h>',
+    'int main() {',
+    '    int values[5];',
+    '    printf("Enter 5 integers: ");',
+    '    for (int i = 0; i < 5; ++i) {',
+    '        scanf("%d", &values[i]);',
+    '    }',
+    '    printf("Displaying integers:\\n");',
+    '    for (int i = 0; i < 5; ++i) {',
+    '        printf("%d\\n", values[i]);',
+    '    }',
+    '    return 0;',
+    '}'
+  ].join('\n');
+  assert.deepEqual(
+    Array.from(context.detectArrayInputPrompts('c', code, [])),
+    ['Enter values[0]', 'Enter values[1]', 'Enter values[2]', 'Enter values[3]', 'Enter values[4]']
+  );
+});
+
+test('keeps prompts printed by the actual compiled program in console output', () => {
+  const raw = 'Enter 5 integers: \r\nDisplaying integers:\r\n10\r\n20\r\n30\r\n40\r\n50\r\n';
+  assert.equal(
+    outputContext.cleanCompilerOutput(raw, 'printf("Enter 5 integers: ");'),
+    'Enter 5 integers: \nDisplaying integers:\n10\n20\n30\n40\n50\n'
   );
 });
 
