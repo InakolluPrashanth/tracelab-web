@@ -6,14 +6,16 @@ const vm = require('node:vm');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
 const helperStart = html.indexOf('function stripCodeStringsAndComments');
-const helperEnd = html.indexOf('function buildInputPromptSteps', helperStart);
+const helperEnd = html.indexOf('function renderInputPromptGuidance', helperStart);
 assert.notEqual(helperStart, -1, 'input detector should exist in the page');
 assert.notEqual(helperEnd, -1, 'input detector helpers should have a stable boundary');
 
-const context = {};
+const context = { extractPromptTexts: () => [] };
 vm.runInNewContext(`${html.slice(helperStart, helperEnd)}
 globalThis.detectInputCount=inputCount;
-globalThis.detectEstimatedInputCount=estimatedInputCount;`, context);
+globalThis.detectEstimatedInputCount=estimatedInputCount;
+globalThis.detectArrayInputPrompts=buildInputPromptSteps;
+globalThis.formatCollectedInputValues=formatCollectedInputValues;`, context);
 
 test('detects stdin patterns for every language with interactive input', () => {
   const examples = {
@@ -84,3 +86,62 @@ test('recognizes common stdin APIs that are not input() or prompt()', () => {
   assert.equal(context.detectInputCount('php', 'file_get_contents("php://stdin")'), 1);
   assert.equal(context.detectInputCount('perl', 'my $line = readline STDIN;'), 1);
 });
+
+test('prompts one indexed array element at a time for all supported input-loop syntaxes', () => {
+  const examples = {
+    python: 'n = int(input())\narr = []\nfor i in range(n):\n    arr.append(int(input()))',
+    javascript: 'const n = Number(prompt()); const arr = []; for (let i = 0; i < n; i++) { arr[i] = Number(prompt()); }',
+    typescript: 'const n: number = Number(prompt()); const arr: number[] = []; for (let i = 0; i < n; i++) { arr[i] = Number(prompt()); }',
+    c: 'int n, arr[100]; scanf("%d", &n); for (int i = 0; i < n; i++) { scanf("%d", &arr[i]); }',
+    cpp: 'int n, arr[100]; cin >> n; for (int i = 0; i < n; i++) { cin >> arr[i]; }',
+    java: 'int n = scanner.nextInt(); int[] arr = new int[n]; for (int i = 0; i < n; i++) { arr[i] = scanner.nextInt(); }',
+    go: 'var n int; fmt.Scan(&n); arr := make([]int, n); for i := 0; i < n; i++ { fmt.Scan(&arr[i]) }',
+    kotlin: 'val n = readLine()!!.toInt(); val arr = IntArray(n); for (i in 0 until n) { arr[i] = readLine()!!.toInt() }',
+    swift: 'let n = Int(readLine()!)!; var arr = [Int](repeating: 0, count: n); for i in 0..<n { arr[i] = Int(readLine()!)! }',
+    ruby: 'n = gets.to_i\narr = []\nn.times do |i|\n  arr[i] = gets.to_i\nend',
+    php: '$n = intval(trim(fgets(STDIN))); $arr = array(); for ($i = 0; $i < $n; $i++) { $arr[$i] = intval(trim(fgets(STDIN))); }',
+    perl: 'my $n = <STDIN>; my @arr; for (my $i = 0; $i < $n; $i++) { $arr[$i] = <STDIN>; }',
+    bash: 'read -r n\narr=()\nfor ((i=0; i<n; i++)); do\n  read -r arr[i]\ndone'
+  };
+
+  for (const [language, code] of Object.entries(examples)) {
+    const initial = context.detectArrayInputPrompts(language, code, []);
+    assert.equal(initial.length, 2, `${language} should initially ask for size and one array read`);
+    assert.match(initial[0], /array size/i, `${language} should label the size prompt`);
+
+    const prompts = context.detectArrayInputPrompts(language, code, ['3']);
+    assert.equal(prompts.length, 4, `${language} should ask for three elements individually`);
+    assert.deepEqual(Array.from(prompts.slice(1)), ['Enter arr[0]', 'Enter arr[1]', 'Enter arr[2]']);
+
+    assert.deepEqual(
+      Array.from(context.formatCollectedInputValues(language, code, ['3', '7', '11', '13'])),
+      ['3', '7', '11', '13'],
+      `${language} token-based array input should be sent in order`
+    );
+  }
+});
+
+test('collects split-based array values one at a time and repacks them onto the line the program reads', () => {
+  const code = 'n = int(input())\narr = list(map(int, input().split()))\nprint(sum(arr))';
+  const prompts = context.detectArrayInputPrompts('python', code, ['3']);
+
+  assert.deepEqual(Array.from(prompts), [
+    'Enter array size (n)',
+    'Enter array element 1 (index 0)',
+    'Enter array element 2 (index 1)',
+    'Enter array element 3 (index 2)'
+  ]);
+  assert.deepEqual(
+    Array.from(context.formatCollectedInputValues('python', code, ['3', '7', '11', '13'])),
+    ['3', '7 11 13']
+  );
+});
+
+test('prompts fixed-size arrays without requesting a size the program does not read', () => {
+  const code = 'int arr[3]; for (int i = 0; i < 3; i++) { cin >> arr[i]; }';
+  assert.deepEqual(
+    Array.from(context.detectArrayInputPrompts('cpp', code, [])),
+    ['Enter arr[0]', 'Enter arr[1]', 'Enter arr[2]']
+  );
+});
+
