@@ -469,11 +469,28 @@ function findSplitArrayInput(lang,source){
     mode:'line',startAt:0,inclusive:false,kind:'split',loopStart:arrayRead.index
   };
 }
+function findTokenizedArrayInput(lang,source){
+  if(lang!=='typescript')return null;
+  const reader=/\b(?:const|let|var)\s+([A-Za-z_]\w*)\s*(?:\:\s*[^=;\n]+)?\s*=\s*[^;\n]*\breadFileSync\s*\(\s*0\b[^;\n]*?\.split\s*\(/i.exec(source);
+  if(!reader)return null;
+  const tokenName=reader[1];
+  const tokenRef='\\b'+tokenName+'\\b';
+  const sizePattern=new RegExp('\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?:\\:\\s*[^=;\\n]+)?\\s*=\\s*(?:(?:Number|parseInt)\\s*\\(\\s*)?'+tokenRef+'\\s*\\[\\s*0\\s*\\]\\s*\\)?','i');
+  const sizeMatch=sizePattern.exec(source);
+  if(!sizeMatch||sizeMatch.index<reader.index+reader[0].length)return null;
+  const arrayPattern=new RegExp('\\b(?:const|let|var)\\s+([A-Za-z_$][\\w$]*)\\s*(?:\\:\\s*[^=;\\n]+)?\\s*=\\s*'+tokenRef+'\\s*\\.\\s*slice\\s*\\(\\s*1\\b','i');
+  const arrayMatch=arrayPattern.exec(source);
+  if(!arrayMatch||arrayMatch.index<sizeMatch.index)return null;
+  return{
+    sizeName:sizeMatch[1],sizeInputIndex:0,arrayInputIndex:1,arrayInputCount:0,
+    arrayName:arrayMatch[1],mode:'tokenized',kind:'tokenized'
+  };
+}
 function findArrayInputGroup(lang,code,answers=[]){
   const source=lang==='java'?javaInputSourceForDetection(code,answers):stripCodeStringsAndComments(code,lang);
   const loop=findArrayInputLoop(lang,source);
   if(loop)return{...loop,mode:'tokens'};
-  return findSplitArrayInput(lang,source);
+  return findSplitArrayInput(lang,source)||findTokenizedArrayInput(lang,source);
 }
 function buildInputPromptSteps(lang,code,answers=[]){
   const source=lang==='java'?javaInputSourceForDetection(code,answers):code;
@@ -484,6 +501,13 @@ function buildInputPromptSteps(lang,code,answers=[]){
   const result=Array.from({length:total},(_,i)=>prompts[i]||'Enter input '+(i+1));
   const group=findArrayInputGroup(lang,source,answers);
   if(!group)return result;
+  if(group.kind==='tokenized'){
+    const sizeText=String(answers[0]??'').trim();
+    const size=Number(sizeText);
+    const sizePrompt='Enter array size ('+group.sizeName+')';
+    if(!Number.isSafeInteger(size)||size<0||size>500)return[sizePrompt];
+    return[sizePrompt,...Array.from({length:size},(_,index)=>'Enter '+group.arrayName+'['+index+']')];
+  }
   if(group.sizeInputIndex!==null&&!prompts[group.sizeInputIndex])result[group.sizeInputIndex]='Enter array size ('+group.sizeName+')';
   const sizeText=String(answers[group.sizeInputIndex]??'').trim();
   const size=Number.isSafeInteger(group.fixedSize)?group.fixedSize:(sizeText===''?NaN:Number(sizeText));
@@ -505,7 +529,15 @@ function buildInputPromptSteps(lang,code,answers=[]){
 }
 function formatCollectedInputValues(lang,code,answers=[]){
   const group=findArrayInputGroup(lang,code,answers);
-  if(!group||group.mode!=='line')return[...answers];
+  if(!group)return[...answers];
+  if(group.kind==='tokenized'){
+    const size=Number(String(answers[0]??'').trim());
+    if(!Number.isSafeInteger(size)||size<0||size>500)return[...answers];
+    const values=answers.slice(1,size+1);
+    if(values.length!==size)return[...answers];
+    return[answers.slice(0,size+1).map(value=>String(value).trim()).join(' ')];
+  }
+  if(group.mode!=='line')return[...answers];
   const sizeText=String(answers[group.sizeInputIndex]??'').trim();
   const size=Number.isSafeInteger(group.fixedSize)?group.fixedSize:(sizeText===''?NaN:Number(sizeText));
   if(!Number.isSafeInteger(size)||size<0||size>500)return[...answers];
