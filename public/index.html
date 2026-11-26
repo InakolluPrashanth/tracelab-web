@@ -328,13 +328,188 @@ function estimatedInputCount(lang,code,answers=[]){
   const source=lang==='java'?javaInputSourceForDetection(code,answers):code;
   return inputCount(lang,source);
 }
+function readPositionForVariable(lang,source,variable,before=source.length){
+  const name=String(variable||'').replace(/^\$/,'').replace(/[^A-Za-z0-9_]/g,'');
+  if(!name)return null;
+  const id='\\$?'+name;
+  const inputCall='(?:\\binput\\s*\\(|\\bprompt\\s*\\(|\\.next(?:Int|Double|Float|Long|Short|Byte|Boolean|Line)?\\s*\\(|\\breadLine\\s*\\(|\\breadln(?:OrNull)?\\s*\\(|\\bgets\\b|\\bfgets\\s*\\(|\\breadline\\b|<\\s*STDIN\\s*>)';
+  const patterns=[
+    new RegExp('(?:\\b(?:const|let|var|int|long|short|float|double|size_t|unsigned|auto|val|my|our|local)\\s+)?'+id+'(?:\\s*:\\s*[^=;\\n]+)?\\s*=\\s*[^;\\n]*'+inputCall,'i'),
+    new RegExp('\\b(?:scanf|fscanf)\\s*\\([^;\\n]*&\\s*'+id+'\\b','i'),
+    new RegExp('\\b(?:std::)?cin\\s*>>\\s*&?'+id+'\\b','i'),
+    new RegExp('\\b(?:fmt\\.)?(?:F?Scan(?:f|ln)?|Scan)\\s*\\([^;\\n]*&\\s*'+id+'\\b','i'),
+    new RegExp('\\bread(?:\\s+-\\w+)?\\s+'+id+'\\b','i')
+  ];
+  let best=null;
+  for(const pattern of patterns){
+    const match=pattern.exec(source);
+    if(match&&match.index<before&&(!best||match.index<best.index))best=match;
+  }
+  return best?{index:best.index,match:best[0]}:null;
+}
+function loopBodyRange(source,match,kind){
+  const after=match.index+match[0].length;
+  if(kind==='ruby'||kind==='bash'){
+    const terminator=kind==='ruby'?/\bend\b/g:/\bdone\b/g;
+    terminator.lastIndex=after;
+    const found=terminator.exec(source);
+    return{start:after,end:found?found.index:source.length,body:source.slice(after,found?found.index:source.length)};
+  }
+  if(kind==='python'){
+    const lineStart=source.lastIndexOf('\n',match.index)+1;
+    const indent=(source.slice(lineStart,match.index).match(/^\s*/)||[''])[0].length;
+    const firstNewline=source.indexOf('\n',after);
+    let start=firstNewline<0?after:firstNewline+1;
+    let end=source.length,cursor=start;
+    while(cursor<source.length){
+      const lineEnd=source.indexOf('\n',cursor);
+      const next=lineEnd<0?source.length:lineEnd;
+      const line=source.slice(cursor,next);
+      if(line.trim()){
+        const lineIndent=(line.match(/^\s*/)||[''])[0].length;
+        if(lineIndent<=indent){end=cursor;break;}
+      }
+      cursor=next+1;
+    }
+    return{start,end,body:source.slice(start,end)};
+  }
+  let cursor=after;
+  while(/\s/.test(source[cursor]||''))cursor++;
+  if(source[cursor]==='{'){
+    let depth=1,end=cursor+1;
+    for(;end<source.length&&depth;end++){if(source[end]==='{')depth++;else if(source[end]==='}')depth--;}
+    return{start:cursor+1,end:depth?source.length:end-1,body:source.slice(cursor+1,depth?source.length:end-1)};
+  }
+  const end=source.indexOf(';',cursor);
+  return{start:cursor,end:end<0?source.length:end,body:source.slice(cursor,end<0?source.length:end)};
+}
+function findArrayInputLoop(lang,source){
+  const headers=[
+    {kind:'classic',re:/\bfor\s*\(\s*(?:(?:my|var|let|const|int|long|short|size_t|unsigned|auto)\s+)?(\$?[A-Za-z_]\w*)\s*(?::=|=)\s*(\d+)\s*;\s*([^;]+);[^)]*\)\s*/g},
+    {kind:'go',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s*:=\s*(\d+)\s*;\s*([^;]+);[^{}]*\s*/g},
+    {kind:'bash',re:/\bfor\s*\(\(\s*(\$?[A-Za-z_]\w*)\s*=\s*(\d+)\s*;\s*([^;]+);[^)]*\)\)\s*;?\s*do\b/g},
+    {kind:'python',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+range\s*\(\s*(\$?[A-Za-z_]\w*)\s*\)\s*:/g},
+    {kind:'kotlin',re:/\bfor\s*\(\s*(\$?[A-Za-z_]\w*)\s+in\s+0\s+(until|\.\.)\s*(\$?[A-Za-z_]\w*)\s*\)\s*/g},
+    {kind:'swift',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+0\s*(\.\.<|\.\.\.)\s*(\$?[A-Za-z_]\w*)\s*/g},
+    {kind:'rubyTimes',re:/\b(\$?[A-Za-z_]\w*)\s*\.\s*times\s+do\s*\|\s*(\$?[A-Za-z_]\w*)\s*\|/g},
+    {kind:'rubyRange',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+0\s*(\.\.\.|\.\.)\s*(\$?[A-Za-z_]\w*)\s+do\b/g}
+  ];
+  const candidates=[];
+  const normalizeName=value=>String(value||'').replace(/^\$/,'');
+  for(const spec of headers){
+    let match;
+    while((match=spec.re.exec(source))){
+      let indexName='',sizeName='',startAt=0,inclusive=false,condition='';
+      if(spec.kind==='classic'||spec.kind==='bash'||spec.kind==='go'){
+        indexName=normalizeName(match[1]);startAt=Number(match[2]);condition=match[3]||'';
+        const bound=new RegExp('\\$?'+indexName+'\\s*(<=|<)\\s*\\$?([A-Za-z_]\\w*|\\d+)\\b').exec(condition);
+        if(!bound)continue;
+        sizeName=normalizeName(bound[2]);inclusive=bound[1]==='<=';
+      }else if(spec.kind==='python'){
+        indexName=normalizeName(match[1]);sizeName=normalizeName(match[2]);
+      }else if(spec.kind==='kotlin'||spec.kind==='swift'||spec.kind==='rubyRange'){
+        indexName=normalizeName(match[1]);inclusive=match[2]==='..'||match[2]==='...';sizeName=normalizeName(match[3]);
+        if(spec.kind==='kotlin'&&match[2]==='until')inclusive=false;
+        if(spec.kind==='swift'&&match[2]==='..<')inclusive=false;
+      }else if(spec.kind==='rubyTimes'){
+        sizeName=normalizeName(match[1]);indexName=normalizeName(match[2]);
+      }
+      const bodyKind=spec.kind==='rubyTimes'||spec.kind==='rubyRange'?'ruby':spec.kind;
+      const bodyRange=loopBodyRange(source,match,bodyKind);
+      const indexed=new RegExp('([A-Za-z_$][\\w$]*)\\s*\\[\\s*[^\\]]*\\b'+indexName+'\\b[^\\]]*\\]');
+      const appended=/([A-Za-z_$][\w$]*)\s*\.\s*(?:append|push|add)\s*\(/.exec(bodyRange.body);
+      const arrayMatch=indexed.exec(bodyRange.body);
+      const reads=inputCount(lang,bodyRange.body);
+      if(reads<=0||(!arrayMatch&&!appended))continue;
+      const fixedSize=/^\d+$/.test(sizeName)?Number(sizeName):null;
+      const sizeRead=fixedSize===null?readPositionForVariable(lang,source,sizeName,match.index):null;
+      if(fixedSize===null&&!sizeRead)continue;
+      candidates.push({
+        sizeName,indexName,arrayName:normalizeName((arrayMatch||appended||[])[1]),
+        sizeInputIndex:sizeRead?inputCount(lang,source.slice(0,sizeRead.index)):null,fixedSize,
+        arrayInputIndex:inputCount(lang,source.slice(0,match.index)),
+        arrayInputCount:reads,startAt,inclusive,kind:spec.kind,
+        loopStart:match.index,bodyRange
+      });
+    }
+  }
+  candidates.sort((a,b)=>(a.bodyRange.end-a.bodyRange.start)-(b.bodyRange.end-b.bodyRange.start));
+  return candidates[0]||null;
+}
+function findSplitArrayInput(lang,source){
+  const patterns=[
+    /\binput\s*\(\s*[^)]*\)\s*(?:\.\s*(?:strip|rstrip)\s*\(\s*\)\s*)?\.split\s*\(/gi,
+    /\b(?:prompt|readline)\s*\(\s*[^)]*\)\s*(?:\.\s*trim\s*\(\s*\)\s*)?\.split\s*\(/gi,
+    /\.nextLine\s*\(\s*\)\s*\.split\s*\(/gi,
+    /\bgets\b[^;\n]*\.split\s*\(/gi
+  ];
+  let arrayRead=null;
+  for(const pattern of patterns){const match=pattern.exec(source);if(match&&(!arrayRead||match.index<arrayRead.index))arrayRead=match;}
+  if(!arrayRead)return null;
+  const prefix=source.slice(0,arrayRead.index);
+  const sizePattern=/(?:\b(?:const|let|var|int|long|short|float|double|size_t|unsigned|auto|val|my|our|local)\s+)?(\$?[A-Za-z_]\w*)\s*=\s*[^;\n]*(?:\binput\s*\(|\bprompt\s*\(|\.next(?:Int|Double|Float|Long|Short|Byte|Boolean|Line)?\s*\(|\breadLine\s*\(|\breadln(?:OrNull)?\s*\(|\bgets\b|\bfgets\s*\()/gi;
+  let latest=null,match;
+  while((match=sizePattern.exec(prefix))){
+    if(/\.split\s*\(/i.test(match[0]))continue;
+    latest={name:String(match[1]).replace(/^\\$/,''),index:match.index,match:match[0]};
+  }
+  if(!latest)return null;
+  const sizeRead=readPositionForVariable(lang,source,latest.name,latest.index+latest.match.length);
+  if(!sizeRead)return null;
+  return{
+    sizeName:latest.name,sizeInputIndex:inputCount(lang,source.slice(0,sizeRead.index)),
+    arrayInputIndex:inputCount(lang,prefix),arrayInputCount:1,arrayName:'',
+    mode:'line',startAt:0,inclusive:false,kind:'split',loopStart:arrayRead.index
+  };
+}
+function findArrayInputGroup(lang,code,answers=[]){
+  const source=lang==='java'?javaInputSourceForDetection(code,answers):stripCodeStringsAndComments(code,lang);
+  const loop=findArrayInputLoop(lang,source);
+  if(loop)return{...loop,mode:'tokens'};
+  return findSplitArrayInput(lang,source);
+}
 function buildInputPromptSteps(lang,code,answers=[]){
   const source=lang==='java'?javaInputSourceForDetection(code,answers):code;
   const count=estimatedInputCount(lang,code,answers);
   if(count<=0)return [];
   const prompts=extractPromptTexts(source);
   const total=Math.max(count,prompts.length);
-  return Array.from({length:total},(_,i)=>prompts[i]||`Enter input ${i+1}`);
+  const result=Array.from({length:total},(_,i)=>prompts[i]||'Enter input '+(i+1));
+  const group=findArrayInputGroup(lang,source,answers);
+  if(!group)return result;
+  if(group.sizeInputIndex!==null&&!prompts[group.sizeInputIndex])result[group.sizeInputIndex]='Enter array size ('+group.sizeName+')';
+  const sizeText=String(answers[group.sizeInputIndex]??'').trim();
+  const size=Number.isSafeInteger(group.fixedSize)?group.fixedSize:(sizeText===''?NaN:Number(sizeText));
+  if(!Number.isSafeInteger(size)||size<0||size>500)return result;
+  const iterations=Math.max(0,size-group.startAt+(group.inclusive?1:0));
+  const dynamicPrompts=[];
+  for(let item=0;item<iterations;item++){
+    for(let read=0;read<group.arrayInputCount;read++){
+      const position=group.startAt+item;
+      const target=group.arrayName?group.arrayName+'['+position+']':'array element '+(item+1)+' (index '+position+')';
+      dynamicPrompts.push(group.arrayInputCount===1?'Enter '+target:'Enter '+target+' · value '+(read+1));
+    }
+  }
+  return[
+    ...result.slice(0,group.arrayInputIndex),
+    ...dynamicPrompts,
+    ...result.slice(group.arrayInputIndex+group.arrayInputCount)
+  ];
+}
+function formatCollectedInputValues(lang,code,answers=[]){
+  const group=findArrayInputGroup(lang,code,answers);
+  if(!group||group.mode!=='line')return[...answers];
+  const sizeText=String(answers[group.sizeInputIndex]??'').trim();
+  const size=Number.isSafeInteger(group.fixedSize)?group.fixedSize:(sizeText===''?NaN:Number(sizeText));
+  if(!Number.isSafeInteger(size)||size<0||size>500)return[...answers];
+  const start=group.arrayInputIndex;
+  const values=answers.slice(start,start+size);
+  if(values.length!==size)return[...answers];
+  return[
+    ...answers.slice(0,start),
+    values.join(' '),
+    ...answers.slice(start+size)
+  ];
 }
 function renderInputPromptGuidance(lang,code,count){
   const list=$('#inputPrompts');
@@ -356,7 +531,10 @@ function renderInputPromptGuidance(lang,code,count){
     });
     $('#inputTitle').textContent='Program asks';
     $('#inputHint').textContent=`Input ${inputStepIndex+1} of ${inputPromptSteps.length}`;
-    guidance.textContent='Enter the answer for the prompt shown above, then press Enter or click “Store answer & next”. Answers are saved in order. For programs that read several lines at once, use Shift+Enter to add more lines inside the same answer.';
+    const arrayGroup=findArrayInputGroup(lang,code,inputCollectedAnswers);
+    guidance.textContent=arrayGroup
+      ?'Enter the array size first, then enter each indexed element separately. Press Enter or click “Store answer & next” after every value. TraceLab sends the collected array values to the program after the final element.'
+      :'Enter the answer for the prompt shown above, then press Enter or click “Store answer & next”. Answers are saved in order. For programs that read several lines at once, use Shift+Enter to add more lines inside the same answer.';
     return;
   }
   if(stdinStored && pendingStdinValues.length){
@@ -373,6 +551,7 @@ function renderInputPromptGuidance(lang,code,count){
     return;
   }
   const prompts=buildInputPromptSteps(lang,code);
+  const arrayGroup=findArrayInputGroup(lang,code);
   $('#inputTitle').textContent='Program input';
   $('#programInput').disabled=true;
   $('#programInput').placeholder='Click Analyze & visualize to display the first prompt';
@@ -380,7 +559,9 @@ function renderInputPromptGuidance(lang,code,count){
   $('#sendInput').disabled=!prompts.length;
   $('#sendInput').textContent='Start prompt sequence';
   if(prompts.length){
-    guidance.textContent=`TraceLab detected ${prompts.length} input step${prompts.length===1?'':'s'}. Click Analyze & visualize to begin. It will show one prompt at a time, store each answer, and run the program automatically after the final answer.`;
+    guidance.textContent=arrayGroup
+      ?'TraceLab detected an array input. Enter the size first; then it will prompt for each indexed element one at a time and run the program after the final value.'
+      :`TraceLab detected ${prompts.length} input step${prompts.length===1?'':'s'}. Click Analyze & visualize to begin. It will show one prompt at a time, store each answer, and run the program automatically after the final answer.`;
   }else if(count>0){
     guidance.textContent='Your program reads input, but TraceLab could not identify exact prompt text. Run the program to collect detected input values one at a time.';
   }else{
@@ -483,7 +664,7 @@ function prepareProgramInput(lang,code){
     startInputCollection(lang,code);
     return {ok:false,collecting:true,values:[],count};
   }
-  return {ok:true,values:[...pendingStdinValues],count:pendingStdinValues.length};
+  return {ok:true,values:formatCollectedInputValues(lang,code,pendingStdinValues),count:pendingStdinValues.length};
 }
 function preparePythonInput(code){return prepareProgramInput('python',code)}
 function sanitizePythonPrompts(code){
@@ -808,3 +989,4 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)warmBacken
 </script>
 </body>
 </html>
+
