@@ -144,6 +144,30 @@ test('collects split-based array values one at a time and repacks them onto the 
   );
 });
 
+test('prompts TypeScript token-stream arrays by index and repacks the answers for stdin', () => {
+  const code = [
+    'declare const require: (name: string) => any;',
+    'const fs = require("fs");',
+    'const data: number[] = fs.readFileSync(0, "utf8").trim().split(/\\s+/).map(Number);',
+    'const n = data[0] || 0;',
+    'const values: number[] = data.slice(1, n + 1);',
+    'console.log("Values:", values.join(" "));'
+  ].join('\n');
+
+  assert.deepEqual(
+    Array.from(context.detectArrayInputPrompts('typescript', code, [])),
+    ['Enter array size (n)']
+  );
+  assert.deepEqual(
+    Array.from(context.detectArrayInputPrompts('typescript', code, ['3'])),
+    ['Enter array size (n)', 'Enter values[0]', 'Enter values[1]', 'Enter values[2]']
+  );
+  assert.deepEqual(
+    Array.from(context.formatCollectedInputValues('typescript', code, ['3', '7', '11', '13'])),
+    ['3 7 11 13']
+  );
+});
+
 test('prompts fixed-size arrays without requesting a size the program does not read', () => {
   const code = 'int arr[3]; for (int i = 0; i < 3; i++) { cin >> arr[i]; }';
   assert.deepEqual(
