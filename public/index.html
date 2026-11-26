@@ -598,7 +598,7 @@ function startInputCollection(lang,code){
   box.value='';box.disabled=false;box.placeholder='Type the answer for the prompt above';
   button.disabled=false;button.textContent=inputPromptSteps.length===1?'Store answer ✓':'Store answer & next →';
   renderInputPromptGuidance(lang,code,inputPromptSteps.length);
-  box.focus();
+  setTimeout(()=>{if(inputCollectionActive&&!box.disabled)box.focus()},0);
   status(`● Waiting for input 1 of ${inputPromptSteps.length}`);
   return true;
 }
@@ -668,7 +668,8 @@ function prepareProgramInput(lang,code){
   }
   if(inputCollectionActive){
     showSidePanel('ioPanel');
-    $('#programInput').focus();
+    const inputBox=$('#programInput');
+    setTimeout(()=>{if(inputCollectionActive&&!inputBox.disabled)inputBox.focus()},0);
     status(`● Please answer input ${inputStepIndex+1} of ${inputPromptSteps.length} before running`,true);
     return {ok:false,collecting:true,values:[],count};
   }
