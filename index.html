@@ -540,7 +540,9 @@ function renderInputPromptGuidance(lang,code,count){
     $('#inputHint').textContent=`Input ${inputStepIndex+1} of ${inputPromptSteps.length}`;
     const arrayGroup=findArrayInputGroup(lang,code,inputCollectedAnswers);
     guidance.textContent=arrayGroup
-      ?'Enter the array size first. Then type each indexed value and press Enter on your keyboard to move to the next index. TraceLab runs the program after the final value.'
+      ?(Number.isSafeInteger(arrayGroup.fixedSize)
+        ?'This array has a fixed size. Type each indexed value and press Enter on your keyboard to move to the next index.'
+        :'Enter the array size first. Then type each indexed value and press Enter on your keyboard to move to the next index. TraceLab runs the program after the final value.')
       :'Type the answer for the prompt shown above and press Enter on your keyboard to continue. Each Enter submits one answer.';
     return;
   }
@@ -567,7 +569,9 @@ function renderInputPromptGuidance(lang,code,count){
   $('#sendInput').textContent='Start prompt sequence';
   if(prompts.length){
     guidance.textContent=arrayGroup
-      ?'TraceLab detected an array input. Enter the size first; then it will prompt for each indexed element one at a time and run the program after the final value.'
+      ?(Number.isSafeInteger(arrayGroup.fixedSize)
+        ?'TraceLab detected a fixed-size array. It will ask for each indexed element one at a time and run the program after the final value.'
+        :'TraceLab detected an array input. Enter the size first; then it will prompt for each indexed element one at a time and run the program after the final value.')
       :`TraceLab detected ${prompts.length} input step${prompts.length===1?'':'s'}. Click Analyze & visualize to begin. It will show one prompt at a time, store each answer, and run the program automatically after the final answer.`;
   }else if(count>0){
     guidance.textContent='Your program reads input, but TraceLab could not identify exact prompt text. Run the program to collect detected input values one at a time.';
@@ -714,14 +718,7 @@ function extractPromptTexts(code){
   return candidates.map(item=>item.text);
 }
 function cleanOutput(raw,code){
-  let out=String(raw??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
-  const prompts=extractPromptTexts(code);
-  for(const p of prompts){
-    const escaped=p.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
-    out=out.replace(new RegExp(`^\\s*${escaped}\\s*`,'gm'),'');
-  }
-  out=out.replace(/^\s*Enter\s+(?:the\s+)?(?:name|number|value|input|element|choice|target)\s*[:?]?\s*/gmi,'');
-  return out.trim();
+  return String(raw??'').replace(/\r\n/g,'\n').replace(/\r/g,'\n');
 }
 function runJS(code,inputValues=[]){return new Promise(resolve=>{
   const logs=[];let done=false;const f=document.createElement('iframe');f.style.display='none';f.sandbox='allow-scripts';
