@@ -278,7 +278,12 @@ function health() {
   return { ok: true, service: 'TraceLab code execution backend', provider: 'Wandbox public API', executorConfigured: true, note: 'Public API; availability and throttling are controlled by Wandbox.' };
 }
 
-app.get('/api/health', (_req, res) => res.json({ ...health(), timestamp: new Date().toISOString() }));
+app.get('/api/health', (_req, res) => {
+  // Warm the compiler catalog in parallel with the client's input collection.
+  // The actual compile request shares this in-flight lookup if it finishes first.
+  void getWandboxCompilers().catch(() => {});
+  return res.json({ ...health(), timestamp: new Date().toISOString() });
+});
 app.get('/api/runtimes', async (_req, res) => {
   try {
     const compilers = await getWandboxCompilers();
