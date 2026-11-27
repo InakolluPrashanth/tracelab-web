@@ -626,6 +626,9 @@ function resetInputCollection(){
 function startInputCollection(lang,code){
   inputPromptSteps=buildInputPromptSteps(lang,code);
   if(!inputPromptSteps.length)return false;
+  // Start runtime setup while the user answers prompts, so Run does less waiting.
+  if(lang==='python')getPyodide().catch(()=>{});
+  else if(Object.prototype.hasOwnProperty.call(WANDBOX_RUNTIMES,lang))warmBackendInBackground(true);
   inputStepIndex=0;inputCollectedAnswers=[];pendingStdinValues=[];stdinStored=false;
   inputCollectionActive=true;inputCollectionKey=inputCollectionKeyFor(lang,code);
   setInputTabAttention(true);showSidePanel('ioPanel');$('#inputActions').style.display='none';
@@ -795,9 +798,9 @@ function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 // Keep the free Render service warm while the TraceLab page is open.
 // This runs in the background and never blocks Analyze & visualize.
 let lastWarmAttempt=0;
-async function warmBackendInBackground(){
+async function warmBackendInBackground(force=false){
   const now=Date.now();
-  if(now-lastWarmAttempt<8*60*1000) return;
+  if(!force&&now-lastWarmAttempt<8*60*1000) return;
   lastWarmAttempt=now;
   const state=await fetchBackendHealth(7000);
   const el=$('#serverStatus');
