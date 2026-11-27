@@ -395,7 +395,7 @@ function findArrayInputLoop(lang,source){
     {kind:'classic',re:/\bfor\s*\(\s*(?:(?:my|var|let|const|int|long|short|size_t|unsigned|auto)\s+)?(\$?[A-Za-z_]\w*)\s*(?::=|=)\s*(\d+)\s*;\s*([^;]+);[^)]*\)\s*/g},
     {kind:'go',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s*:=\s*(\d+)\s*;\s*([^;]+);[^{}]*\s*/g},
     {kind:'bash',re:/\bfor\s*\(\(\s*(\$?[A-Za-z_]\w*)\s*=\s*(\d+)\s*;\s*([^;]+);[^)]*\)\)\s*;?\s*do\b/g},
-    {kind:'python',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+range\s*\(\s*(\$?[A-Za-z_]\w*)\s*\)\s*:/g},
+    {kind:'python',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+range\s*\(\s*(\$?[A-Za-z_]\w*|\d+)\s*\)\s*:/g},
     {kind:'kotlin',re:/\bfor\s*\(\s*(\$?[A-Za-z_]\w*)\s+in\s+0\s+(until|\.\.)\s*(\$?[A-Za-z_]\w*)\s*\)\s*/g},
     {kind:'swift',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+0\s*(\.\.<|\.\.\.)\s*(\$?[A-Za-z_]\w*)\s*/g},
     {kind:'rubyTimes',re:/\b(\$?[A-Za-z_]\w*)\s*\.\s*times\s+do\s*\|\s*(\$?[A-Za-z_]\w*)\s*\|/g},
