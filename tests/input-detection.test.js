@@ -87,8 +87,8 @@ test('recognizes common stdin APIs that are not input() or prompt()', () => {
   assert.equal(context.detectInputCount('cpp', 'std::cin.get()'), 1);
   assert.equal(context.detectInputCount('java', 'System.in.read()'), 1);
   assert.equal(context.detectInputCount('kotlin', 'readlnOrNull()'), 1);
-  assert.equal(context.detectInputCount('go', 'reader.ReadString(\'\\n\')'), 1);
-  assert.equal(context.detectInputCount('go', 'reader.ReadBytes(\'\\n\')'), 1);
+  assert.equal(context.detectInputCount('go', 'reader.ReadString(\'\n\')'), 1);
+  assert.equal(context.detectInputCount('go', 'reader.ReadBytes(\'\n\')'), 1);
   assert.equal(context.detectInputCount('php', 'fscanf(STDIN, "%d", $number);'), 1);
   assert.equal(context.detectInputCount('php', 'file_get_contents("php://stdin")'), 1);
   assert.equal(context.detectInputCount('perl', 'my $line = readline STDIN;'), 1);
@@ -174,6 +174,17 @@ test('prompts fixed-size arrays without requesting a size the program does not r
     Array.from(context.detectArrayInputPrompts('cpp', code, [])),
     ['Enter arr[0]', 'Enter arr[1]', 'Enter arr[2]']
   );
+
+  
+  const pythonCode = 'values = [0] * 3\nfor i in range(3):\n    values[i] = int(input())\nprint(sum(values))';
+  assert.deepEqual(
+    Array.from(context.detectArrayInputPrompts('python', pythonCode, [])),
+    ['Enter values[0]', 'Enter values[1]', 'Enter values[2]']
+  );
+  assert.deepEqual(
+    Array.from(context.formatCollectedInputValues('python', pythonCode, ['7', '11', '13'])),
+    ['7', '11', '13']
+  );
 });
 
 test('asks for each element in the five-integer C sample before its display loop', () => {
@@ -185,9 +196,9 @@ test('asks for each element in the five-integer C sample before its display loop
     '    for (int i = 0; i < 5; ++i) {',
     '        scanf("%d", &values[i]);',
     '    }',
-    '    printf("Displaying integers:\\n");',
+    '    printf("Displaying integers:\n");',
     '    for (int i = 0; i < 5; ++i) {',
-    '        printf("%d\\n", values[i]);',
+    '        printf("%d\n", values[i]);',
     '    }',
     '    return 0;',
     '}'
