@@ -16,6 +16,7 @@ globalThis.detectInputCount=inputCount;
 globalThis.detectEstimatedInputCount=estimatedInputCount;
 globalThis.detectArrayInputPrompts=buildInputPromptSteps;
 globalThis.formatCollectedInputValues=formatCollectedInputValues;
+globalThis.detectArrayInputValueKind=arrayInputValueKind;
 globalThis.validateInteractiveAnswer=validateInteractiveAnswer;`, context);
 
 const outputStart = html.indexOf('function cleanOutput');
@@ -196,6 +197,73 @@ test('rejects pasted multi-line text for one array prompt but keeps multiline sc
   assert.match(context.validateInteractiveAnswer('c', code, ''), /enter an answer/i);
   assert.equal(context.validateInteractiveAnswer('c', 'char line[80]; fgets(line, 80, stdin);', 'hello' + String.fromCharCode(10) + 'world'), '');
 });
+
+test('shows a useful error when a numeric array receives non-numeric characters', () => {
+  const cCode = 'int values[3]; for (int i = 0; i < 3; i++) { scanf("%d", &values[i]); }';
+  assert.equal(context.detectArrayInputValueKind('c', cCode, {
+    arrayName: 'values', bodyRange: { body: 'scanf("%d", &values[i]);' }
+  }), 'integer');
+  assert.equal(context.validateInteractiveAnswer('c', cCode, '12'), '');
+  assert.equal(context.validateInteractiveAnswer('c', cCode, '-12'), '');
+  assert.match(context.validateInteractiveAnswer('c', cCode, '12x'), /must be an integer/i);
+  assert.match(context.validateInteractiveAnswer('c', cCode, '3.5'), /must be an integer/i);
+
+  const floatCode = 'float values[2]; for (int i = 0; i < 2; i++) { scanf("%f", &values[i]); }';
+  assert.equal(context.validateInteractiveAnswer('c', floatCode, '-3.5'), '');
+  assert.equal(context.validateInteractiveAnswer('c', floatCode, '1e-2'), '');
+  assert.match(context.validateInteractiveAnswer('c', floatCode, 'three'), /must be a number/i);
+});
+
+test('validates numeric array entries across the live language families', () => {
+  const examples = {
+    cpp: 'int values[2]; for (int i = 0; i < 2; i++) { std::cin >> values[i]; }',
+    java: 'int[] values = new int[2]; for (int i = 0; i < 2; i++) { values[i] = scanner.nextInt(); }',
+    javascript: 'const values = []; for (let i = 0; i < 2; i++) { values[i] = parseInt(prompt(), 10); }',
+    typescript: 'const values: number[] = []; for (let i = 0; i < 2; i++) { values[i] = Number(prompt()); }',
+    go: 'values := make([]int, 2); for i := 0; i < 2; i++ { fmt.Scan(&values[i]) }',
+    kotlin: 'val values = IntArray(2); for (i in 0 until 2) { values[i] = readLine()!!.toInt() }',
+    swift: 'var values = [Int](repeating: 0, count: 2); for i in 0..<2 { values[i] = Int(readLine()!)! }',
+    ruby: 'values = []; 2.times do |i|; values[i] = gets.to_i; end',
+    php: '$values = array(); for ($i = 0; $i < 2; $i++) { $values[$i] = intval(fgets(STDIN)); }',
+    perl: 'my @values; for (my $i = 0; $i < 2; $i++) { $values[$i] = int(<STDIN>); }',
+    bash: 'declare -ai values; for ((i=0; i<2; i++)); do read -r values[i]; done'
+  };
+
+  for (const [language, code] of Object.entries(examples)) {
+    assert.equal(context.validateInteractiveAnswer(language, code, '-8'), '', `${language} should accept signed integers`);
+    assert.match(context.validateInteractiveAnswer(language, code, '8x'), /must be (?:an integer|a number)/i, `${language} should reject letters`);
+  }
+});
+
+test('does not reject values for arrays declared as text', () => {
+  const javaCode = 'String[] words = new String[2]; for (int i = 0; i < 2; i++) { words[i] = scanner.nextLine(); }';
+  assert.equal(context.validateInteractiveAnswer('java', javaCode, 'hello'), '');
+});
+
+test('validates boolean and character arrays while leaving char buffers usable as text', () => {
+  const booleanCode = 'boolean[] flags = new boolean[2]; for (int i = 0; i < 2; i++) { flags[i] = scanner.nextBoolean(); }';
+  assert.equal(context.validateInteractiveAnswer('java', booleanCode, 'true'), '');
+  assert.match(context.validateInteractiveAnswer('java', booleanCode, 'yes'), /must be true or false/i);
+
+  const characterCode = "char values[2]; for (int i = 0; i < 2; i++) { scanf(\"%c\", &values[i]); }";
+  assert.equal(context.validateInteractiveAnswer('c', characterCode, 'x'), '');
+  assert.match(context.validateInteractiveAnswer('c', characterCode, 'word'), /single character/i);
+
+  const textBuffer = 'char name[80]; fgets(name, sizeof(name), stdin);';
+  assert.equal(context.validateInteractiveAnswer('c', textBuffer, 'TraceLab'), '');
+});
+
+test('validates variable array sizes and leaves text arrays free to accept words', () => {
+  const numeric = 'n = int(input())\nvalues = []\nfor i in range(n):\n    values.append(int(input()))';
+  assert.match(context.validateInteractiveAnswer('python', numeric, 'three'), /array size must be a whole number/i);
+  assert.match(context.validateInteractiveAnswer('python', numeric, '501'), /cannot be greater than 500/i);
+  assert.equal(context.validateInteractiveAnswer('python', numeric, '3'), '');
+  assert.match(context.validateInteractiveAnswer('python', numeric, 'oops', ['3']), /must be an integer/i);
+
+  const words = 'n = int(input())\nwords = []\nfor i in range(n):\n    words.append(input())';
+  assert.equal(context.validateInteractiveAnswer('python', words, 'hello', ['2']), '');
+});
+
 
 test('asks for each element in the five-integer C sample before its display loop', () => {
   const code = [
