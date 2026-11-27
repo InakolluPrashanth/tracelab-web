@@ -396,10 +396,10 @@ function findArrayInputLoop(lang,source){
     {kind:'go',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s*:=\s*(\d+)\s*;\s*([^;]+);[^{}]*\s*/g},
     {kind:'bash',re:/\bfor\s*\(\(\s*(\$?[A-Za-z_]\w*)\s*=\s*(\d+)\s*;\s*([^;]+);[^)]*\)\)\s*;?\s*do\b/g},
     {kind:'python',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+range\s*\(\s*(\$?[A-Za-z_]\w*|\d+)\s*\)\s*:/g},
-    {kind:'kotlin',re:/\bfor\s*\(\s*(\$?[A-Za-z_]\w*)\s+in\s+0\s+(until|\.\.)\s*(\$?[A-Za-z_]\w*)\s*\)\s*/g},
-    {kind:'swift',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+0\s*(\.\.<|\.\.\.)\s*(\$?[A-Za-z_]\w*)\s*/g},
-    {kind:'rubyTimes',re:/\b(\$?[A-Za-z_]\w*)\s*\.\s*times\s+do\s*\|\s*(\$?[A-Za-z_]\w*)\s*\|/g},
-    {kind:'rubyRange',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+0\s*(\.\.\.|\.\.)\s*(\$?[A-Za-z_]\w*)\s+do\b/g}
+    {kind:'kotlin',re:/\bfor\s*\(\s*(\$?[A-Za-z_]\w*)\s+in\s+0\s+(until|\.\.)\s*(\$?[A-Za-z_]\w*|\d+)\s*\)\s*/g},
+    {kind:'swift',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+0\s*(\.\.<|\.\.\.)\s*(\$?[A-Za-z_]\w*|\d+)\s*/g},
+    {kind:'rubyTimes',re:/\b(\$?[A-Za-z_]\w*|\d+)\s*\.\s*times\s+do\s*\|\s*(\$?[A-Za-z_]\w*)\s*\|/g},
+    {kind:'rubyRange',re:/\bfor\s+(\$?[A-Za-z_]\w*)\s+in\s+0\s*(\.\.\.|\.\.)\s*(\$?[A-Za-z_]\w*|\d+)\s+do\b/g}
   ];
   const candidates=[];
   const normalizeName=value=>String(value||'').replace(/^\$/,'');
@@ -492,6 +492,61 @@ function findArrayInputGroup(lang,code,answers=[]){
   if(loop)return{...loop,mode:'tokens'};
   return findSplitArrayInput(lang,source)||findTokenizedArrayInput(lang,source);
 }
+function arrayInputValueKind(lang,code,group){
+  const source=String(code||'');
+  const name=String(group?.arrayName||'').replace(/^\$/,'');
+  const escaped=name.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const typePattern='(?:unsigned\\s+|signed\\s+)?(?:long\\s+long|long\\s+double|unsigned\\s+int|integer|Integer|UInt|Long|Short|Byte|Boolean|Character|String|long|short|int|float|double|byte|number|bigint|decimal|bool|boolean|char|string|str)';
+  const classify=type=>{
+    const normalized=String(type||'').toLowerCase().replace(/\s+/g,' ');
+    if(/bool/.test(normalized))return'boolean';
+    if(/char|character/.test(normalized))return'character';
+    if(/string|str/.test(normalized))return'text';
+    if(/float|double|number|decimal/.test(normalized))return'number';
+    if(/int|integer|long|short|byte|bigint|uint/.test(normalized))return'integer';
+    return'';
+  };
+  if(escaped){
+    const declarationSource=stripCodeStringsAndComments(source,lang);
+    if(lang==='bash'&&new RegExp('\\bdeclare\\s+-[a-z]*i[a-z]*\\s+\\$?'+escaped+'\\b','i').test(declarationSource))return'integer';
+    const modifiers='(?:(?:public|private|protected|static|final|const|volatile|register|unsigned|signed|val|var)\\s+)*';
+    const dimensions='(?:\\s*\\[[^\\]]*\\]\\s*)*';
+    const directDeclaration=new RegExp('(?:^|[;{}\\n])\\s*'+modifiers+'('+typePattern+')\\s*'+dimensions+'(?:\\*+\\s*)?\\b'+escaped+'\\b'+dimensions,'i').exec(declarationSource);
+    const groupedDeclaration=new RegExp('(?:^|[;{}\\n])\\s*'+modifiers+'('+typePattern+')\\s+[^;{}\\n]*,\\s*(?:\\*+\\s*)?\\b'+escaped+'\\b'+dimensions,'i').exec(declarationSource);
+    const annotatedDeclaration=new RegExp('\\b(?:const|let|var)\\s+'+escaped+'\\s*(?::\\s*(?:Array<\\s*)?('+typePattern+')(?:\\[\\s*\\]|\\s*>))','i').exec(declarationSource);
+    const genericDeclaration=new RegExp('\\b(?:vector|array|list|ArrayList|List|Set)\\s*<\\s*('+typePattern+')\\s*>\\s*'+escaped+'\\b','i').exec(declarationSource);
+    const declaration=directDeclaration||groupedDeclaration||annotatedDeclaration||genericDeclaration;
+    if(declaration){
+      const type=(declaration[1]||'').toLowerCase();
+      const kind=classify(type);
+      if(kind==='character'){
+        const body=group?.bodyRange?source.slice(group.bodyRange.start,group.bodyRange.end):source;
+        return/scanf\s*\([^)]*%[-+ #0-9.]*c|charAt\s*\(/i.test(body)?'character':'text';
+      }
+      return kind;
+    }
+    const goArray=new RegExp('\\b'+escaped+'\\s*:=\\s*make\\s*\\(\\s*\\[\\s*\\]\\s*('+typePattern+')\\b','i').exec(declarationSource);
+    const typedArray=new RegExp('\\b'+escaped+'\\s*=\\s*(?:new\\s+)?('+typePattern+')\\s*(?:Array|\\[)','i').exec(source);
+    const constructorArray=new RegExp('\\b'+escaped+'\\s*=\\s*(Int|Long|Float|Double|Byte|Short|Char|Boolean)Array\\s*\\(','i').exec(source);
+    const swiftArray=new RegExp('\\b'+escaped+'\\s*=\\s*\\[(Int|Double|Float|UInt|Long)\\]\\s*\\(','i').exec(source);
+    const inferredType=(goArray||typedArray||constructorArray||swiftArray)?.[1]||'';
+    if(inferredType)return classify(inferredType);
+  }
+  const body=group?.bodyRange?source.slice(group.bodyRange.start,group.bodyRange.end):String(group?.bodyRange?.body||source);
+  if(/\b(?:scanf|fscanf)\s*\([^)]*%[-+ #0-9.]*[diuoxX]/i.test(body))return'integer';
+  if(/\b(?:scanf|fscanf)\s*\([^)]*%[-+ #0-9.]*[fFeEgGaA]/i.test(body))return'number';
+  if(/\b(?:scanf|fscanf)\s*\([^)]*%[-+ #0-9.]*c/i.test(body))return'character';
+  if(/\b(?:scanf|fscanf)\s*\([^)]*%[-+ #0-9.]*s/i.test(body))return'text';
+  if(/\b(?:int|parseInt|intval|toInt)\s*\(|\bto_i\b|\b(?:nextInt|nextLong|nextShort|nextByte)\s*\(/i.test(body))return'integer';
+  if(/\b(?:float|parseFloat|Number|double|nextDouble|nextFloat)\s*\(/i.test(body))return'number';
+  if(/\bmap\s*\(\s*int\b/i.test(body))return'integer';
+  if(/\.map\s*\(\s*Number\b/i.test(body))return'number';
+  if(/\bmap\s*\(\s*float\b/i.test(body))return'number';
+  if(/\b(?:Int|int)\s*\(\s*(?:input|readLine|readln)\s*\(/i.test(body))return'integer';
+  if(/\b(?:Float|Double|float)\s*\(\s*(?:input|readLine|readln)\s*\(/i.test(body))return'number';
+  return'';
+}
+
 function buildInputPromptSteps(lang,code,answers=[]){
   const source=lang==='java'?javaInputSourceForDetection(code,answers):code;
   const count=estimatedInputCount(lang,code,answers);
@@ -553,7 +608,31 @@ function formatCollectedInputValues(lang,code,answers=[]){
 function validateInteractiveAnswer(lang,code,value,answers=[]){
   const answer=String(value??'').replace(/\r\n?/g,'\n');
   if(!answer.trim())return'Please enter an answer before moving to the next prompt.';
-  if(findArrayInputGroup(lang,code,answers)&&answer.includes('\n'))return'Enter one array value per prompt. Remove line breaks and press Enter after each index.';
+  const group=findArrayInputGroup(lang,code,answers);
+  if(group&&answer.includes('\n'))return'Enter one array value per prompt. Remove line breaks and press Enter after each index.';
+  if(group&&group.sizeInputIndex===answers.length){
+    const sizeText=answer.trim();
+    if(!/^\d+$/.test(sizeText))return'The array size must be a whole number from 0 to 500.';
+    if(Number(sizeText)>500)return'The array size cannot be greater than 500.';
+  }
+  if(group){
+    let end=group.arrayInputIndex;
+    if(group.kind==='tokenized'){
+      const size=Number(String(answers[group.sizeInputIndex]??'').trim());
+      end+=Number.isSafeInteger(size)&&size>=0&&size<=500?size:0;
+    }else{
+      const size=Number.isSafeInteger(group.fixedSize)?group.fixedSize:Number(String(answers[group.sizeInputIndex]??'').trim());
+      const iterations=Number.isSafeInteger(size)&&size>=0&&size<=500?Math.max(0,size-group.startAt+(group.inclusive?1:0)):0;
+      end+=iterations*group.arrayInputCount;
+    }
+    if(answers.length>=group.arrayInputIndex&&answers.length<end){
+      const kind=arrayInputValueKind(lang,code,group),text=answer.trim();
+      if(kind==='integer'&&!/^[+-]?\d+$/.test(text))return'This array element must be an integer. Enter digits only, with an optional leading + or - sign.';
+      if(kind==='number'&&!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/.test(text))return'This array element must be a number. Enter digits only, with an optional sign and decimal point.';
+      if(kind==='boolean'&&!/^(?:true|false)$/i.test(text))return'This array element must be true or false.';
+      if(kind==='character'&&Array.from(text).length!==1)return'This array element must be a single character.';
+    }
+  }
   return'';
 }
 function renderInputPromptGuidance(lang,code,count){
