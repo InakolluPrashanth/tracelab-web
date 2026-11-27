@@ -8,6 +8,7 @@ let server;
 let baseUrl;
 let compileRequest;
 let requestId = 0;
+let compilerListRequests = 0;
 
 const jsonResponse = (body, status = 200) => new Response(JSON.stringify(body), {
   status,
@@ -17,6 +18,7 @@ const jsonResponse = (body, status = 200) => new Response(JSON.stringify(body), 
 global.fetch = async (url, options = {}) => {
   const address = String(url);
   if (address.endsWith('/list.json')) {
+    compilerListRequests += 1;
     return jsonResponse([
       { name: 'tsc-head', language: 'TypeScript' },
       { name: 'gcc-head-c', language: 'C' },
@@ -33,6 +35,9 @@ global.fetch = async (url, options = {}) => {
   }
   if (address.endsWith('/compile.json')) {
     compileRequest = JSON.parse(options.body);
+    if (compileRequest.code.includes('provider-error')) {
+      return jsonResponse({ message: 'Wandbox maintenance window' }, 503);
+    }
     if (compileRequest.code.includes('swift-runner-unavailable')) {
       return jsonResponse({ status: '1', compiler_error: 'ERROR (catatonit:2): failed to exec pid1: No such file or directory' });
     }
@@ -78,6 +83,7 @@ test('serves the IDE without AI controls or AI health metadata', async () => {
   const health = await request('/api/health', undefined, 'GET');
   assert.equal(health.data.provider, 'Wandbox public API');
   assert.equal(Object.hasOwn(health.data, 'assistantConfigured'), false);
+  assert.ok(compilerListRequests > 0, 'health pings should warm the compiler catalog');
 });
 
 test('serves search metadata, structured app details, and crawler files', async () => {
@@ -105,6 +111,16 @@ test('rejects invalid execution requests clearly', async () => {
   assert.match(result.data.error, /empty/i);
 
   result = await request('/api/execute', { language: 'java', code: 'x'.repeat(18001) });
+  assert.equal(result.response.status, 413);
+
+  result = await request('/api/execute', { language: 'unknown', code: 'main()' });
+  assert.equal(result.response.status, 400);
+  assert.match(result.data.error, /unsupported language/i);
+
+  result = await request('/api/execute', { language: 'c', code: 'int main() {}', stdin: 42 });
+  assert.equal(result.response.status, 413);
+
+  result = await request('/api/execute', { language: 'c', code: 'int main() {}', stdin: 'x'.repeat(8001) });
   assert.equal(result.response.status, 413);
 });
 
@@ -140,6 +156,13 @@ test('forwards multiline input unchanged for every hosted runtime', async () => 
     assert.equal(compileRequest.stdin, stdin, `${language} must preserve line breaks and spaces`);
     assert.equal(result.data.output, 'input=42\nhello world');
   }
+});
+
+test('returns a retryable provider error when Wandbox is unavailable', async () => {
+  const result = await request('/api/execute', { language: 'c', code: 'provider-error' });
+  assert.equal(result.response.status, 502);
+  assert.match(result.data.error, /Wandbox maintenance window/);
+  assert.equal(result.data.retryable, true);
 });
 
 test('reports Wandbox container startup failures as a provider outage', async () => {
