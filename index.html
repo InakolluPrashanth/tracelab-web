@@ -550,6 +550,12 @@ function formatCollectedInputValues(lang,code,answers=[]){
     ...answers.slice(start+size)
   ];
 }
+function validateInteractiveAnswer(lang,code,value,answers=[]){
+  const answer=String(value??'').replace(/\r\n?/g,'\n');
+  if(!answer.trim())return'Please enter an answer before moving to the next prompt.';
+  if(findArrayInputGroup(lang,code,answers)&&answer.includes('\n'))return'Enter one array value per prompt. Remove line breaks and press Enter after each index.';
+  return'';
+}
 function renderInputPromptGuidance(lang,code,count){
   const list=$('#inputPrompts');
   const guidance=$('#inputGuidance');
@@ -651,11 +657,12 @@ function storeProgramInput(showConfirmation=true){
   }
   const box=$('#programInput');
   const value=box.value.replace(/\r\n?/g,'\n');
-  if(!value.trim()){
+  const validationMessage=validateInteractiveAnswer(lang,code,value,inputCollectedAnswers);
+  if(validationMessage){
     $('#inputPanel').classList.add('required');
-    $('#inputMessage').textContent='Please enter an answer before moving to the next prompt.';
+    $('#inputMessage').textContent=validationMessage;
     box.focus();
-    status('● Answer required',true);
+    status('● Input needs attention',true);
     return null;
   }
   $('#inputPanel').classList.remove('required');

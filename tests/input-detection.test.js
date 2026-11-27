@@ -15,7 +15,8 @@ vm.runInNewContext(`${html.slice(helperStart, helperEnd)}
 globalThis.detectInputCount=inputCount;
 globalThis.detectEstimatedInputCount=estimatedInputCount;
 globalThis.detectArrayInputPrompts=buildInputPromptSteps;
-globalThis.formatCollectedInputValues=formatCollectedInputValues;`, context);
+globalThis.formatCollectedInputValues=formatCollectedInputValues;
+globalThis.validateInteractiveAnswer=validateInteractiveAnswer;`, context);
 
 const outputStart = html.indexOf('function cleanOutput');
 const outputEnd = html.indexOf('function runJS', outputStart);
@@ -185,6 +186,15 @@ test('prompts fixed-size arrays without requesting a size the program does not r
     Array.from(context.formatCollectedInputValues('python', pythonCode, ['7', '11', '13'])),
     ['7', '11', '13']
   );
+});
+
+test('rejects pasted multi-line text for one array prompt but keeps multiline scalar input', () => {
+  const code = 'int values[3]; for (int i = 0; i < 3; i++) { scanf("%d", &values[i]); }';
+  const pastedValues = ['1', '2', '3'].join(String.fromCharCode(10));
+  assert.match(context.validateInteractiveAnswer('c', code, pastedValues), /one array value per prompt/i);
+  assert.equal(context.validateInteractiveAnswer('c', code, '1'), '');
+  assert.match(context.validateInteractiveAnswer('c', code, ''), /enter an answer/i);
+  assert.equal(context.validateInteractiveAnswer('c', 'char line[80]; fgets(line, 80, stdin);', 'hello' + String.fromCharCode(10) + 'world'), '');
 });
 
 test('asks for each element in the five-integer C sample before its display loop', () => {
